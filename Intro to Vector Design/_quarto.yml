@@ -1,0 +1,33 @@
+project:
+  type: default
+
+# ─────────────────────────────────────────────────────────────────────────────
+# MAKER BOOTCAMP — QUARTO PROJECT CONFIG
+#
+# EDIT TARGETS:
+#   Content (text, headings, image refs) → deck.qmd
+#   Highlight position/size per slide    → style= attribute on ## heading in deck.qmd
+#   Design (colors, layout, appearance)  → theme/maker-bootcamp.scss
+#   Images                               → drop replacement into images/1/
+#                                          using the same filename
+#
+# IMAGE NAMING: {module}.{step}.{image_index}.png
+#   1.0.0 = module 1, divider slide background
+#   1.1.0 = module 1, step 1, main screenshot
+#   1.1.1 = module 1, step 1, callout image
+# ─────────────────────────────────────────────────────────────────────────────
+
+format:
+  revealjs:
+    theme: [default, theme/maker-bootcamp.scss]
+    width: 1280
+    height: 720
+    slide-number: false
+    progress: false
+    controls: false
+    history: false
+    center: false
+    margin: 0
+    auto-stretch: false
+    transition: none
+    background-transition: none

@@ -1,0 +1,37 @@
+---
+title: ""
+---
+
+# 0.0.0 Overview {.divider}
+
+```{=html}
+<div class="left-panel">
+  <div class="number">0</div>
+  <div class="label">OVERVIEW</div>
+</div>
+<div class="right-panel">
+  <img src="images/0/0.0.0.png" alt="Section divider background for overview">
+</div>
+```
+
+## 0.1 Intro to Vector Design {.content}
+
+```{=html}
+<div class="top-bar">0. OVERVIEW</div>
+
+<div class="screenshot-row">
+  <div class="callout-box">
+    <img src="images/0/0.1.1.png" alt="Callout image for step 0.1">
+    <div class="callout-label">
+      0.1.1: Replace this text with your step instruction.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/0/0.1.0.png" alt="Main screenshot for step 0.1">
+      <div class="click-highlight" style="--box-x:10%; --box-y:10%; --box-w:20%; --box-h:12%;" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+```

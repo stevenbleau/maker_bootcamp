@@ -1,0 +1,304 @@
+// ═══════════════════════════════════════════════════════════════════════════
+//   MAKER BOOTCAMP — QUARTO REVEALJS THEME
+// ═══════════════════════════════════════════════════════════════════════════
+//
+//   EDIT THIS FILE to change the look and layout of all slides:
+//     • Colors, fonts, spacing            → scss:defaults variables
+//     • Divider slide layout              → section.divider rules
+//     • Content slide layout              → section.content rules
+//     • Callout box size / border         → .callout-box rules
+//     • Highlight box shape / color       → .click-highlight rules
+//     • Code block styling                → section.content pre rules
+//
+//   Per-slide highlight POSITION/SIZE is set via a style= attribute on
+//   the ## heading in deck.qmd — no rules needed here for that.
+//
+//   Do NOT add content here. Content (text, image refs) lives in deck.qmd.
+// ═══════════════════════════════════════════════════════════════════════════
+
+/*-- scss:defaults --*/
+
+// Suppress Reveal's default padding so our layout can own all spacing
+$presentation-block-margin: 0px;
+$body-bg: #ffffff;
+$body-color: #222222;
+
+/*-- scss:rules --*/
+
+// ── Design tokens ────────────────────────────────────────────────────────────
+// (These are CSS custom properties, not Sass variables, so they cascade
+//  and can be overridden per-slide via style= on the section element.)
+
+.reveal .slides section {
+  --font-ui: 'Segoe UI', Arial, sans-serif;
+  --color-teal: #2b8a8a;
+  --color-white: #ffffff;
+  --color-text: #222222;
+  --color-heading: #1a1a1a;
+  --color-muted: #555;
+  --color-border: #ddd;
+  --color-code-bg: #0f172a;
+  --space-x: 40px;
+  --radius-md: 6px;
+  --top-bar-height: 1.0in;
+  --callout-width: 4in;
+  --main-shot-width: 66.666%;
+  --screenshot-gap: 0.25in;
+
+  // Default highlight values — overridden per slide via style= on ## heading
+  --highlight-x: 4%;
+  --highlight-y: 4%;
+  --highlight-w: 14%;
+  --highlight-h: 10%;
+  --highlight-color: #ffb703;
+}
+
+// ── Base ─────────────────────────────────────────────────────────────────────
+
+// Body background fills the letterbox area when viewport isn't exactly 16:9
+body.reveal-viewport {
+  background: #1a1a1a;
+}
+
+.reveal .slides section {
+  padding: 0;
+  font-family: var(--font-ui);
+  background: var(--color-white);
+  color: var(--color-text);
+  // Remove Reveal's default text-align and transforms
+  text-align: left;
+}
+
+// ── Divider slide ─────────────────────────────────────────────────────────────
+.reveal .slides section.divider {
+  display: flex !important; // beats RevealJS's inline display:block on active slides
+  flex-direction: row;
+  align-items: stretch;
+  flex-wrap: nowrap;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  // Keep divider text centered inside the left panel.
+  text-align: center !important;
+  background: var(--color-teal);
+  color: var(--color-white);
+
+  // Hide the auto-generated h1/h2 from the # heading
+  > h1, > h2 {
+    display: none;
+  }
+
+  .left-panel {
+    flex: 0 0 33.333%;
+    box-sizing: border-box;
+    padding: 40px;
+    gap: 8px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+  }
+
+  .number {
+    font-size: 96px;
+    font-weight: 900;
+    line-height: 1;
+  }
+
+  .label {
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+
+  .right-panel {
+    flex: 0 0 66.667%;
+    box-sizing: border-box;
+    overflow: hidden;
+    line-height: 0;
+
+    img {
+      width: 100%;
+      height: 100%;
+      max-width: none;
+      max-height: none;
+      margin: 0;
+      border: 0;
+      box-shadow: none;
+      display: block;
+      object-fit: cover;
+    }
+  }
+}
+
+// ── Content slide ─────────────────────────────────────────────────────────────
+.reveal .slides section.content {
+  display: flex !important; // beats RevealJS's inline display:block on active slides
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  box-sizing: border-box;
+  flex-direction: column;
+
+  // The auto-generated h2 from ## heading is our slide title.
+  // Use flex ordering to place it after the top-bar visually.
+  > h2 {
+    order: 2;
+    margin: 0;
+    padding: 8px var(--space-x) 12px;
+    color: var(--color-heading);
+    font-size: 30px;
+    font-weight: 800;
+    // Override Reveal defaults
+    text-transform: none;
+    letter-spacing: normal;
+    text-shadow: none;
+  }
+
+  .top-bar {
+    order: 1;
+    flex: 0 0 var(--top-bar-height);
+    height: var(--top-bar-height);
+    min-height: var(--top-bar-height);
+    padding: 0 var(--space-x);
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    background: var(--color-teal);
+    color: var(--color-white);
+    font-size: 48px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  .screenshot-row {
+    order: 3;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+    display: flex;
+    gap: var(--screenshot-gap);
+    align-items: stretch;
+    padding: 0 var(--space-x) 28px;
+    box-sizing: border-box;
+    // NOTE: --highlight-* variables are NOT set here.
+    // They inherit from section (set via style= on ## heading in deck.qmd,
+    // falling back to the defaults on .reveal .slides section above).
+  }
+
+  .main-shot {
+    width: 100%;
+    max-width: none;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  .main-shot-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  .main-panel {
+    flex: 0 0 var(--main-shot-width);
+    width: var(--main-shot-width);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+}
+
+// ── Click highlight overlay ───────────────────────────────────────────────────
+// Supports one or many highlight boxes.
+// Each .click-highlight can override with --box-* vars on the element itself.
+// If --box-* is omitted, we fall back to legacy --highlight-* vars.
+.reveal .slides section.content .click-highlight {
+  position: absolute;
+  left: var(--box-x, var(--highlight-x));
+  top: var(--box-y, var(--highlight-y));
+  width: var(--box-w, var(--highlight-w));
+  height: var(--box-h, var(--highlight-h));
+  border: var(--box-border, 4px) solid var(--box-color, var(--highlight-color));
+  border-radius: 10px;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.18), 0 0 18px var(--box-color, var(--highlight-color));
+  z-index: 2;
+  pointer-events: none;
+}
+
+// ── Callout box ───────────────────────────────────────────────────────────────
+.reveal .slides section.content .callout-box {
+  flex: 0 0 var(--callout-width);
+  width: var(--callout-width);
+  min-width: var(--callout-width);
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  img {
+    width: 100%;
+    max-height: 46%;
+    object-fit: cover;
+    border: 2px solid var(--highlight-color);
+    border-radius: var(--radius-md);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.reveal .slides section.content .callout-label {
+  color: var(--color-muted);
+  font-size: 24px;
+  line-height: 1.4;
+  overflow: hidden;
+
+  strong { color: var(--color-teal); }
+}
+
+// ── Concept insight text ──────────────────────────────────────────────────────
+.reveal .slides section.content .concept-insight {
+  margin: 0;
+  font-size: 21px;
+  line-height: 1.35;
+  color: var(--color-muted);
+  margin-top: auto;
+  overflow: hidden;
+
+  strong { color: var(--color-teal); }
+}
+
+// ── Code blocks ───────────────────────────────────────────────────────────────
+.reveal .slides section.content pre {
+  margin: 0;
+  padding: 16px 18px;
+  width: 100%;
+  box-sizing: border-box;
+  background: var(--color-code-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font-size: 20px;
+  line-height: 1.45;
+
+  code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    color: inherit;
+  }
+}
+
+.reveal .slides section.content :not(pre) > code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  background: rgba(43, 138, 138, 0.12);
+  color: #0f3f3f;
+  border-radius: 4px;
+  padding: 0.08em 0.35em;
+}
