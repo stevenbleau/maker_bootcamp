@@ -1,92 +1,81 @@
 # Maker Bootcamp Curriculum
 
-An open-source, remixable curriculum for teaching maker fundamentals using Autodesk Fusion.
+Open-source, remixable slide-based curriculum for maker education.
+
+This repository currently uses **Quarto + RevealJS** for deck authoring.
 
 **License**: [Creative Commons Attribution 4.0 International (CC BY 4.0)](LICENSE)
 
----
+## Current Repository Layout
 
-## Project Structure
-
-```
+```text
 maker_bootcamp/
-├── curriculum.yaml              ← Master curriculum index
-├── module.yaml                  ← This module's metadata (title, duration, license)
-├── deck.md                      ← Marp presentation: all slides + content
-├── theme/
-│   └── maker-bootcamp.css       ← ALL slide design (colors, layout, highlights)
-└── images/
-    ├── 0/                       ← Module 0: preliminary/pre-req assets
-    └── 1/                       ← Module 1: setup assets
-        ├── 1.0.0.png
-        ├── 1.1.0.png
-        ├── 1.1.1.png
-        └── 1.2.0.png
+├── Intro to CAD/
+│   ├── _quarto.yml
+│   ├── curriculum.md
+│   ├── theme/
+│   └── decks/
+│       └── autodesk-fusion/
+│           └── 01-cad-level-2/
+│               ├── deck.qmd
+│               └── images/
+├── Intro to Vector Design/
+│   ├── _quarto.yml
+│   ├── theme/
+│   └── decks/
+│       └── 01-intro/
+│           ├── deck.qmd
+│           └── images/
+├── CONTRIBUTING.md
+└── README.md
 ```
 
----
+## Authoring Model
 
-## Image Naming Convention
+- Each module (for example, `Intro to CAD`) has module-level shared files like `_quarto.yml` and `theme/`.
+- Each deck lives in its own folder under `decks/` and owns its own `images/`.
+- Generated artifacts (`deck.html`, `deck_files/`, `.quarto/`) are build outputs and are ignored by git.
 
-Images use a three-part numeric scheme: **`{module}.{step}.{image_index}.png`**
+## Where To Edit
 
-| Part | Meaning |
+| Change type | Primary file/folder |
 |---|---|
-| `module` | Module number. `0` = preliminary info. `1`, `2`, `3`... = project steps |
-| `step` | Step within the module. `0` = section divider slide. `1`+ = numbered steps |
-| `image_index` | 0-based image index on that slide. `0` = main screenshot, `1` = callout, etc. |
+| Slide content | `*/decks/*/*/deck.qmd` |
+| Module theme | `*/theme/maker-bootcamp.scss` (or module theme files) |
+| Deck images | `*/decks/*/*/images/` |
+| Curriculum map (CAD module) | `Intro to CAD/curriculum.md` |
 
-**Examples:**
+## Running Decks
 
-| Filename | Meaning |
-|---|---|
-| `images/1/1.0.0.png` | Module 1 section divider — background image |
-| `images/1/1.1.0.png` | Module 1, step 1 — main screenshot |
-| `images/1/1.1.1.png` | Module 1, step 1 — callout image |
-| `images/1/1.2.0.png` | Module 1, step 2 — main screenshot |
+From a deck folder (example shown for CAD):
 
-Images live in **`images/{module}/`** subfolders mirroring the module structure.
+```bash
+cd "Intro to CAD/decks/autodesk-fusion/01-cad-level-2"
+quarto preview deck.qmd
+```
 
----
+Render once:
 
-## The Three Edit Targets
+```bash
+quarto render deck.qmd
+```
 
-| What you're changing | File to edit |
-|---|---|
-| Slide text, headings, callout copy, insight text, image refs | `modules/{N}-{slug}/deck.md` |
-| Colors, layout, highlight boxes, callout sizing, fonts | `theme/maker-bootcamp.css` |
-| A screenshot or image | Drop replacement into `images/{N}/` with the **same filename** |
+## Image Conventions
 
-## File Roles
+Images use a three-part numeric scheme:
 
-| File | Role | Update when |
-|---|---|---|
-| `curriculum.yaml` | Top-level index of all modules | Adding/removing a module |
-| `theme/maker-bootcamp.css` | All slide design and layout | Changing look, colors, or layout |
-| `modules/{N}-{slug}/deck.md` | All slide content — one `---` slide per step | Changing any slide content |
-| `modules/{N}-{slug}/module.yaml` | Module metadata only (title, duration, license) | Module title/duration changes |
+`{section}.{step}.{image_index}.{ext}`
 
----
+- `section`: major section number in the deck
+- `step`: step number inside that section (`0` is usually a divider image)
+- `image_index`: `0` main screenshot, `1` callout/secondary image
+- `ext`: `webp` is now the default for screenshots; use `png` only when necessary
 
-## Authoring Workflow
+Example:
 
-1. **Edit `deck.md`** to change slide content — Marp preview updates live in VS Code.
-2. **Edit `theme/maker-bootcamp.css`** to change design — one file affects all slides.
-3. **Replace an image** by dropping a new file into `images/{N}/` with the same numeric filename.
-4. **Update `curriculum.yaml`** when adding or removing a module.
-
----
-
-## Adding a New Module
-
-1. Create `modules/{N}-{slug}/` (e.g. `modules/2-sketching/`)
-2. Add `module.yaml` and `deck.md` inside it (copy from an existing module as a template)
-3. Create `images/{N}/` for that module's assets
-4. Add the module entry to `curriculum.yaml`
-5. Name all images as `{N}.{step}.{image_index}.png`
-
----
+- `images/3/3.5.0.webp` (main image)
+- `images/3/3.5.1.webp` (callout image)
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md) before submitting changes.
+See [CONTRIBUTING.md](CONTRIBUTING.md) for workflow details and style guidance.
