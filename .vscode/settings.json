@@ -1,0 +1,28 @@
+{
+    "chat.tools.terminal.autoApprove": {
+        "mkdir": true,
+        "quarto": true,
+        "/^python3 -c \"\nimport json, re\ncontent = open\\('/Users/macbook/Library/Mobile Documents/com~apple~CloudDocs/dev/maker_bootcamp/\\.vscode/maker-bootcamp\\.code-snippets'\\)\\.read\\(\\)\n# strip JS-style comments before parsing\ncontent_clean = re\\.sub\\(r'//\\[\\^\\\\n\\]\\*', '', content\\)\njson\\.loads\\(content_clean\\)\nprint\\('valid JSON'\\)\n\"$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
+    },
+    "markdown.marp.themes": [
+        "marp example/theme/maker-bootcamp.css"
+    ],
+    "[markdown]": {
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "off",
+            "strings": "off"
+        }
+    },
+    "editor.showFoldingControls": "mouseover",
+    "[quarto]": {
+        "editor.quickSuggestions": {
+            "other": "on",
+            "comments": "off",
+            "strings": "off"
+        }
+    }
+}

@@ -1,0 +1,226 @@
+{
+  // ─────────────────────────────────────────────────────────────────────────
+  // MAKER BOOTCAMP — SLIDE TEMPLATES
+  //
+  // How to use:
+  //   1. In deck.md, place your cursor on a blank line after a ---
+  //   2. Type the snippet prefix (e.g. slide-content) and press Tab
+  //   3. Tab through each highlighted field to fill it in
+  //
+  // Available snippets:
+  //   slide-divider       Section title slide (number + label + background image)
+  //   slide-content       Standard step slide (callout + main screenshot + highlight)
+  //   slide-content-wide  Step slide with full-width screenshot (no callout)
+  //   slide-text          Text-only step slide (numbered steps list, no screenshot)
+  // ─────────────────────────────────────────────────────────────────────────
+
+  "Section Divider Slide": {
+    "scope": "markdown",
+    "prefix": "slide-divider",
+    "description": "Section title slide — large number on left, background image on right",
+    "body": [
+      "<!-- #region ${1:1.0} — ${2:Section Title} -->",
+      "---",
+      "<!-- _class: divider -->",
+      "",
+      "<div class=\"left-panel\">",
+      "  <div class=\"number\">${3:1}</div>",
+      "  <div class=\"label\">${4:SECTION LABEL}</div>",
+      "</div>",
+      "<div class=\"right-panel\">",
+      "  <img src=\"images/${5:1}/${1:1.0}.0.png\" alt=\"${6:Background image description}\">",
+      "</div>",
+      "<!-- #endregion -->",
+      ""
+    ]
+  },
+
+  "Content Slide — Callout + Screenshot": {
+    "scope": "markdown",
+    "prefix": "slide-content",
+    "description": "Standard step slide with callout box on left and main screenshot on right",
+    "body": [
+      "<!-- #region ${1:1.1} — ${2:Slide Title} -->",
+      "---",
+      "<!-- _class: content -->",
+      "",
+      "<style scoped>",
+      "  .screenshot-row {",
+      "    --highlight-x: ${3:1.5%};",
+      "    --highlight-y: ${4:4.5%};",
+      "    --highlight-w: ${5:12%};",
+      "    --highlight-h: ${6:3%};",
+      "    --highlight-color: ${7:#ffb703};",
+      "  }",
+      "</style>",
+      "",
+      "<div class=\"top-bar\">${8:1. SECTION NAME}</div>",
+      "<div class=\"body\">",
+      "  <h2>${1:1.1} ${2:Slide Title}</h2>",
+      "  <div class=\"screenshot-row\">",
+      "    <div class=\"callout-box\">",
+      "      <img src=\"images/${9:1}/${1:1.1}.1.png\"",
+      "          alt=\"${10:Callout image description}\">",
+      "      <div class=\"callout-label\">",
+      "        ${11:Callout instruction text.}",
+      "      </div>",
+      "      <p class=\"concept-insight\"><strong>*</strong> ${12:Concept insight text.}</p>",
+      "    </div>",
+      "    <div class=\"main-panel\">",
+      "      <div class=\"main-shot-wrap\">",
+      "        <img class=\"main-shot\" src=\"images/${9:1}/${1:1.1}.0.png\" alt=\"${13:Main screenshot description}\">",
+      "        <div class=\"click-highlight\" aria-hidden=\"true\"></div>",
+      "      </div>",
+      "    </div>",
+      "  </div>",
+      "</div>",
+      "<!-- #endregion -->",
+      ""
+    ]
+  },
+
+  "Content Slide — Full-Width Screenshot": {
+    "scope": "markdown",
+    "prefix": "slide-content-wide",
+    "description": "Step slide with a single full-width screenshot and no callout box",
+    "body": [
+      "<!-- #region ${1:1.1} — ${2:Slide Title} -->",
+      "---",
+      "<!-- _class: content -->",
+      "",
+      "<style scoped>",
+      "  .screenshot-row {",
+      "    --highlight-x: ${3:1.5%};",
+      "    --highlight-y: ${4:4.5%};",
+      "    --highlight-w: ${5:12%};",
+      "    --highlight-h: ${6:3%};",
+      "    --highlight-color: ${7:#ffb703};",
+      "  }",
+      "  .main-panel { width: 100%; flex: 1; }",
+      "</style>",
+      "",
+      "<div class=\"top-bar\">${8:1. SECTION NAME}</div>",
+      "<div class=\"body\">",
+      "  <h2>${1:1.1} ${2:Slide Title}</h2>",
+      "  <div class=\"screenshot-row\">",
+      "    <div class=\"main-panel\">",
+      "      <div class=\"main-shot-wrap\">",
+      "        <img class=\"main-shot\" src=\"images/${9:1}/${1:1.1}.0.png\" alt=\"${10:Screenshot description}\">",
+      "        <div class=\"click-highlight\" aria-hidden=\"true\"></div>",
+      "      </div>",
+      "      <p class=\"concept-insight\"><strong>*</strong> ${11:Concept insight text.}</p>",
+      "    </div>",
+      "  </div>",
+      "</div>",
+      "<!-- #endregion -->",
+      ""
+    ]
+  },
+
+  "Content Slide — Text Only": {
+    "scope": "markdown",
+    "prefix": "slide-text",
+    "description": "Step slide with a numbered list of instructions and no screenshot",
+    "body": [
+      "<!-- #region ${1:1.1} — ${2:Slide Title} -->",
+      "---",
+      "<!-- _class: content -->",
+      "",
+      "<div class=\"top-bar\">${3:1. SECTION NAME}</div>",
+      "<div class=\"body\">",
+      "  <h2>${1:1.1} ${2:Slide Title}</h2>",
+      "  <ol>",
+      "    <li>${4:First step.}</li>",
+      "    <li>${5:Second step.}</li>",
+      "    <li>${6:Third step.}</li>",
+      "  </ol>",
+      "  <p class=\"concept-insight\"><strong>*</strong> ${7:Concept insight text.}</p>",
+      "</div>",
+      "<!-- #endregion -->",
+      ""
+    ]
+  },
+
+  // ── Quarto snippets (for deck.qmd) ──────────────────────────────────────
+
+  "Quarto — Section Divider Slide": {
+    "scope": "markdown,quarto",
+    "prefix": "qslide-divider",
+    "description": "Quarto: section title slide — number on left, image on right",
+    "body": [
+      "# ${1:1.0} ${2:Section Title} {.divider}",
+      "",
+      "```{=html}",
+      "<div class=\"left-panel\">",
+      "  <div class=\"number\">${3:1}</div>",
+      "  <div class=\"label\">${4:SECTION LABEL}</div>",
+      "</div>",
+      "<div class=\"right-panel\">",
+      "  <img src=\"images/${5:1}/${1:1.0}.0.png\" alt=\"${6:Background image description}\">",
+      "</div>",
+      "```",
+      ""
+    ]
+  },
+
+  "Quarto — Content Slide": {
+    "scope": "markdown,quarto",
+    "prefix": "qslide-content",
+    "description": "Quarto: step slide with callout box on left and main screenshot on right",
+    "body": [
+      "## ${1:1.1} ${2:Slide Title} {.content}",
+      "",
+      "```{=html}",
+      "<div class=\"top-bar\">${3:1. SECTION NAME}</div>",
+      "<div class=\"screenshot-row\" style=\"",
+      "    --highlight-x:${4:1.5%};",
+      "    --highlight-y:${5:4.5%};",
+      "    --highlight-w:${6:12%};",
+      "    --highlight-h:${7:3%};\">",
+      "  <div class=\"callout-box\">",
+      "    <img src=\"images/${8:1}/${1:1.1}.1.png\"",
+      "        alt=\"${9:Callout image description}\">",
+      "    <div class=\"callout-label\">",
+      "      ${10:Callout instruction text.}",
+      "    </div>",
+      "    <p class=\"concept-insight\"><strong>*</strong> ${11:Concept insight text.}</p>",
+      "  </div>",
+      "  <div class=\"main-panel\">",
+      "    <div class=\"main-shot-wrap\">",
+      "      <img class=\"main-shot\" src=\"images/${8:1}/${1:1.1}.0.png\" alt=\"${12:Main screenshot description}\">",
+      "      <div class=\"click-highlight\" aria-hidden=\"true\"></div>",
+      "    </div>",
+      "  </div>",
+      "</div>",
+      "```",
+      ""
+    ]
+  },
+
+  "Quarto — Content Slide Wide": {
+    "scope": "markdown,quarto",
+    "prefix": "qslide-content-wide",
+    "description": "Quarto: step slide with full-width screenshot and no callout box",
+    "body": [
+      "## ${1:1.1} ${2:Slide Title} {.content}",
+      "",
+      "```{=html}",
+      "<div class=\"top-bar\">${3:1. SECTION NAME}</div>",
+      "<div class=\"screenshot-row\" style=\"",
+      "    --highlight-x:${4:1.5%};",
+      "    --highlight-y:${5:4.5%};",
+      "    --highlight-w:${6:12%};",
+      "    --highlight-h:${7:3%};\">",
+      "  <div class=\"main-panel\" style=\"flex:1; width:100%;\">",
+      "    <div class=\"main-shot-wrap\">",
+      "      <img class=\"main-shot\" src=\"images/${8:1}/${1:1.1}.0.png\" alt=\"${9:Screenshot description}\">",
+      "      <div class=\"click-highlight\" aria-hidden=\"true\"></div>",
+      "    </div>",
+      "    <p class=\"concept-insight\"><strong>*</strong> ${10:Concept insight text.}</p>",
+      "  </div>",
+      "</div>",
+      "```",
+      ""
+    ]
+  }
+}

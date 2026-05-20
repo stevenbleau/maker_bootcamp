@@ -1,0 +1,9 @@
+.DS_Store
+.venv/
+
+# Quarto / rendered output
+README.html
+README_files/
+**/.quarto/
+**/deck.html
+**/deck_files/
