@@ -1,0 +1,157 @@
+---
+jupyter: maker_bootcamp_venv
+format:
+  revealjs:
+    include-in-header:
+      - text: |
+          <style>
+          .py-editor {
+            width: 100%;
+            min-height: 240px;
+            resize: vertical;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 18px;
+            line-height: 1.35;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 10px;
+            box-sizing: border-box;
+            background: #ffffff;
+            color: #222222;
+          }
+
+          .py-run {
+            margin-top: 10px;
+            padding: 9px 14px;
+            border: 0;
+            border-radius: var(--radius-md);
+            background: var(--color-teal);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+          }
+
+          .py-run:disabled {
+            opacity: 0.6;
+            cursor: progress;
+          }
+
+          .py-output {
+            margin: 0;
+            padding: 16px 18px;
+            width: 100%;
+            min-height: 330px;
+            box-sizing: border-box;
+            background: var(--color-code-bg);
+            color: #e2e8f0;
+            border-radius: var(--radius-md);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            overflow: auto;
+            white-space: pre-wrap;
+            overflow-wrap: anywhere;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 18px;
+            line-height: 1.35;
+          }
+          </style>
+          <script type="module">
+          import { loadPyodide } from "https://cdn.jsdelivr.net/pyodide/v0.27.2/full/pyodide.mjs";
+
+          let pyodidePromise = null;
+
+          async function getPyodide() {
+            if (!pyodidePromise) {
+              pyodidePromise = loadPyodide();
+            }
+            return pyodidePromise;
+          }
+
+          async function runPython(codeId, outputId, button) {
+            const codeEl = document.getElementById(codeId);
+            const outEl = document.getElementById(outputId);
+            if (!codeEl || !outEl) return;
+
+            const originalLabel = button ? button.textContent : "";
+            if (button) {
+              button.disabled = true;
+              button.textContent = "Running...";
+            }
+
+            outEl.textContent = "Running...";
+
+            try {
+              const pyodide = await getPyodide();
+              let output = "";
+
+              pyodide.setStdout({
+                batched: (msg) => {
+                  output += (output ? "\\n" : "") + msg;
+                },
+              });
+
+              pyodide.setStderr({
+                batched: (msg) => {
+                  output += (output ? "\\n" : "") + msg;
+                },
+              });
+
+              const result = await pyodide.runPythonAsync(codeEl.value);
+              if (result !== undefined && result !== null) {
+                output += (output ? "\\n" : "") + String(result);
+              }
+
+              outEl.textContent = output || "(no output)";
+            } catch (err) {
+              outEl.textContent = "Error:\\n" + String(err);
+            } finally {
+              if (button) {
+                button.disabled = false;
+                button.textContent = originalLabel;
+              }
+            }
+          }
+
+          document.addEventListener("click", (event) => {
+            const btn = event.target.closest(".py-run");
+            if (!btn) return;
+            runPython(btn.dataset.codeId, btn.dataset.outputId, btn);
+          });
+          </script>
+---
+
+## 1.1 Hello World {.content}
+
+```{=html}
+<div class="top-bar">1. PYTHON BASICS</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <textarea id="code-hello" class="py-editor">print("Hello, world!")</textarea>
+    <button class="py-run" data-code-id="code-hello" data-output-id="out-hello">Run Code</button>
+    <p class="concept-insight"><strong>*</strong> Edit the code and click Run Code.</p>
+  </div>
+  <div class="main-panel">
+    <pre id="out-hello" class="py-output">Output will appear here.</pre>
+  </div>
+</div>
+```
+
+## 1.2 Variables and Math {.content}
+
+```{=html}
+<div class="top-bar">1. PYTHON BASICS</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <textarea id="code-vars" class="py-editor">name = "Maker"
+project_count = 3
+print(f"Hi {name}! Projects done: {project_count}")
+print("Next target:", project_count + 1)</textarea>
+    <button class="py-run" data-code-id="code-vars" data-output-id="out-vars">Run Code</button>
+    <p class="concept-insight"><strong>*</strong> Change values, then rerun.</p>
+  </div>
+  <div class="main-panel">
+    <pre id="out-vars" class="py-output">Output will appear here.</pre>
+  </div>
+</div>
+```

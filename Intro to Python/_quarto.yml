@@ -1,0 +1,22 @@
+project:
+  type: default
+
+format:
+  revealjs:
+    theme: [default, theme/maker-bootcamp.scss]
+    width: 1280
+    height: 720
+    slide-number: false
+    progress: false
+    controls: false
+    history: false
+    center: false
+    margin: 0
+    auto-stretch: false
+    transition: none
+    background-transition: none
+
+execute:
+  echo: true
+  warning: false
+  error: false
