@@ -4,7 +4,7 @@ This module supports multiple decks (for different parts of the project).
 
 ## Structure
 
-- `decks/01-cad-level-2/` = current primary deck
+- `decks/autodesk-fusion/01-cad-level-2/` = current primary deck
 - Add future decks as `decks/02-.../`, `decks/03-.../`, etc.
 
 Each deck folder should contain:
