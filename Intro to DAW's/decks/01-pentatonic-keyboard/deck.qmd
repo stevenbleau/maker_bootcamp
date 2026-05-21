@@ -1,0 +1,407 @@
+---
+format:
+  revealjs:
+    title-slide: false
+    include-in-header:
+      - text: |
+          <style>
+          .keyboard-shell {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            padding: 18px;
+            box-sizing: border-box;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: linear-gradient(180deg, #f9fcff 0%, #eef4f8 100%);
+          }
+
+          .keyboard-note {
+            font-size: 15px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: #5d6d7e;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            flex-wrap: wrap;
+          }
+
+          .piano {
+            position: relative;
+            flex: 1;
+            min-height: 360px;
+            user-select: none;
+          }
+
+          .white-keys {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 10px;
+          }
+
+          .piano-key {
+            appearance: none;
+            border: 0;
+            padding: 0;
+            font: inherit;
+            cursor: pointer;
+            outline: none;
+            transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+          }
+
+          .piano-key:focus-visible {
+            box-shadow: 0 0 0 4px rgba(43, 138, 138, 0.22);
+          }
+
+          .white-key {
+            position: relative;
+            background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+            border: 1px solid #d7dee7;
+            border-radius: 0 0 12px 12px;
+            box-shadow: 0 6px 0 #c7d0da, 0 14px 24px rgba(15, 23, 42, 0.12);
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            padding-bottom: 16px;
+            color: #1f2937;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+          }
+
+          .white-key.pentatonic {
+            background: linear-gradient(180deg, #e9fbf8 0%, #d8f4ee 100%);
+            border-color: #7bcdbf;
+            box-shadow: 0 6px 0 #55b9aa, 0 0 0 2px rgba(43, 138, 138, 0.12), 0 14px 24px rgba(15, 23, 42, 0.12);
+          }
+
+          .black-key {
+            position: absolute;
+            top: 0;
+            width: calc((100% - 60px) / 7 * 0.62);
+            height: 62%;
+            border-radius: 0 0 10px 10px;
+            background: linear-gradient(180deg, #3a4250 0%, #10151d 100%);
+            box-shadow: 0 6px 12px rgba(15, 23, 42, 0.35);
+            color: #f8fafc;
+            z-index: 2;
+            display: flex;
+            align-items: end;
+            justify-content: center;
+            padding-bottom: 14px;
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: 0.06em;
+          }
+
+          .black-key[data-slot="1"] { left: calc((100% - 60px) / 7 * 0.70); }
+          .black-key[data-slot="2"] { left: calc((100% - 60px) / 7 * 1.70); }
+          .black-key[data-slot="4"] { left: calc((100% - 60px) / 7 * 4.04); }
+          .black-key[data-slot="5"] { left: calc((100% - 60px) / 7 * 5.04); }
+          .black-key[data-slot="6"] { left: calc((100% - 60px) / 7 * 6.04); }
+
+          .piano-key.is-active {
+            transform: translateY(2px);
+            filter: brightness(1.08);
+          }
+
+          .piano-key.is-active.white-key {
+            box-shadow: 0 3px 0 #c7d0da, 0 0 0 2px rgba(43, 138, 138, 0.24), 0 14px 24px rgba(15, 23, 42, 0.12);
+          }
+
+          .piano-key.is-active.black-key {
+            box-shadow: 0 3px 10px rgba(15, 23, 42, 0.4), 0 0 0 2px rgba(255, 183, 3, 0.25);
+          }
+
+          .scale-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 8px;
+          }
+
+          .scale-chip {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 42px;
+            padding: 6px 10px;
+            border-radius: 999px;
+            background: #f6f7f9;
+            border: 1px solid #d9dee5;
+            color: #4b5563;
+            font-size: 18px;
+            font-weight: 700;
+          }
+
+          .scale-chip.pentatonic {
+            background: linear-gradient(180deg, #e9fbf8 0%, #d8f4ee 100%);
+            border-color: #7bcdbf;
+            color: #12786d;
+          }
+
+          .backing-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 10px;
+          }
+
+          .backing-toggle {
+            appearance: none;
+            border: 0;
+            border-radius: 999px;
+            padding: 9px 16px;
+            background: var(--color-teal);
+            color: #ffffff;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+          }
+
+          .backing-toggle.is-playing {
+            background: #1d4f50;
+          }
+
+          .backing-status {
+            font-size: 15px;
+            color: #4b5563;
+            letter-spacing: 0.02em;
+          }
+
+          .backing-volume {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-left: 6px;
+          }
+
+          .backing-volume-label {
+            font-size: 14px;
+            color: #4b5563;
+            white-space: nowrap;
+          }
+
+          .backing-volume-slider {
+            width: 120px;
+            accent-color: var(--color-teal);
+            cursor: pointer;
+          }
+          </style>
+          <script type="module">
+          let audioContext = null;
+          let backingIsPlaying = false;
+          let backingAudio = null;
+          const BACKING_TRACK_PATH = "deck_files/Groovy Neo Soul Backing Track in C Major I 85 BPM.mp3";
+
+          const noteFrequency = {
+            "C4": 261.63,
+            "C#4": 277.18,
+            "D4": 293.66,
+            "D#4": 311.13,
+            "E4": 329.63,
+            "F4": 349.23,
+            "F#4": 369.99,
+            "G4": 392.00,
+            "G#4": 415.30,
+            "A4": 440.00,
+            "A#4": 466.16,
+            "B4": 493.88,
+          };
+
+          function ensureAudioContext() {
+            if (!audioContext) {
+              audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioContext.state === "suspended") {
+              audioContext.resume();
+            }
+            return audioContext;
+          }
+
+          function pulseKey(key) {
+            key.classList.add("is-active");
+            window.setTimeout(() => key.classList.remove("is-active"), 180);
+          }
+
+          function playNote(note) {
+            const context = ensureAudioContext();
+            const frequency = noteFrequency[note];
+            if (!frequency) return;
+
+            const now = context.currentTime;
+            const gain = context.createGain();
+            const filter = context.createBiquadFilter();
+            const carrier = context.createOscillator();
+            const body = context.createOscillator();
+
+            filter.type = "lowpass";
+            filter.frequency.setValueAtTime(2400, now);
+
+            carrier.type = "triangle";
+            body.type = "sine";
+            carrier.frequency.setValueAtTime(frequency, now);
+            body.frequency.setValueAtTime(frequency / 2, now);
+
+            gain.gain.setValueAtTime(0.0001, now);
+            gain.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+
+            carrier.connect(filter);
+            body.connect(filter);
+            filter.connect(gain);
+            gain.connect(context.destination);
+
+            carrier.start(now);
+            body.start(now);
+            carrier.stop(now + 1.2);
+            body.stop(now + 1.2);
+          }
+
+          function updateBackingUi() {
+            const button = document.getElementById("backing-toggle");
+            const status = document.getElementById("backing-status");
+            if (!button || !status) return;
+
+            button.textContent = backingIsPlaying ? "Pause Backing Track" : "Play Backing Track";
+            button.classList.toggle("is-playing", backingIsPlaying);
+
+            if (!backingIsPlaying) {
+              status.textContent = "Stopped";
+            } else {
+              status.textContent = "Playing C major backing track";
+            }
+          }
+
+          function startBackingTrack() {
+            if (backingIsPlaying) return;
+            ensureAudioContext();
+            if (!backingAudio) return;
+            backingIsPlaying = true;
+            backingAudio.play().catch(() => {
+              backingIsPlaying = false;
+              updateBackingUi();
+            });
+            updateBackingUi();
+          }
+
+          function stopBackingTrack() {
+            backingIsPlaying = false;
+            if (backingAudio) {
+              backingAudio.pause();
+              backingAudio.currentTime = 0;
+            }
+            updateBackingUi();
+          }
+
+          function bindBackingTrack() {
+            const button = document.getElementById("backing-toggle");
+            if (!button) return;
+
+            backingAudio = new Audio(encodeURI(BACKING_TRACK_PATH));
+            backingAudio.loop = true;
+            backingAudio.preload = "auto";
+            backingAudio.volume = 0.65;
+
+            backingAudio.addEventListener("ended", () => {
+              backingIsPlaying = false;
+              updateBackingUi();
+            });
+
+            const volumeSlider = document.getElementById("backing-volume");
+            if (volumeSlider) {
+              volumeSlider.value = String(Math.round(backingAudio.volume * 100));
+              volumeSlider.addEventListener("input", () => {
+                const percent = Number(volumeSlider.value);
+                backingAudio.volume = Math.max(0, Math.min(1, percent / 100));
+              });
+            }
+
+            button.addEventListener("click", () => {
+              if (backingIsPlaying) {
+                stopBackingTrack();
+              } else {
+                startBackingTrack();
+              }
+            });
+
+            updateBackingUi();
+          }
+
+          function bindKeyboard() {
+            document.querySelectorAll(".piano-key").forEach((key) => {
+              key.addEventListener("pointerdown", (event) => {
+                event.preventDefault();
+                pulseKey(key);
+                playNote(key.dataset.note);
+              });
+            });
+          }
+
+          document.addEventListener("DOMContentLoaded", () => {
+            bindKeyboard();
+            bindBackingTrack();
+          });
+          </script>
+---
+
+## 1.1 Pentatonic in C Major {.content}
+
+```{=html}
+<div class="top-bar">1. MUSIC PRODUCTION</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      <strong>C major pentatonic</strong> uses five notes: <strong>C, D, E, G, A</strong>.
+      It is a simple scale for riffs, melodies, and improvisation because every note fits cleanly over C major harmony.
+    </div>
+    <div class="scale-chips" aria-label="C major pentatonic notes">
+      <span class="scale-chip pentatonic">C</span>
+      <span class="scale-chip pentatonic">D</span>
+      <span class="scale-chip pentatonic">E</span>
+      <span class="scale-chip">F</span>
+      <span class="scale-chip pentatonic">G</span>
+      <span class="scale-chip pentatonic">A</span>
+      <span class="scale-chip">B</span>
+    </div>
+    <div class="backing-controls">
+      <button id="backing-toggle" class="backing-toggle" type="button" aria-label="Play or pause C major backing track">Play Backing Track</button>
+      <label class="backing-volume" for="backing-volume">
+        <span class="backing-volume-label">Volume</span>
+        <input id="backing-volume" class="backing-volume-slider" type="range" min="0" max="100" value="65" step="1" aria-label="Backing track volume">
+      </label>
+      <span id="backing-status" class="backing-status" aria-live="polite">Stopped</span>
+    </div>
+    <p class="concept-insight"><strong>*</strong> Click the highlighted keys to hear the scale. Try moving between notes in the order C, D, E, G, A.</p>
+  </div>
+  <div class="main-panel">
+    <div class="keyboard-shell">
+      <div class="keyboard-note">
+        <span>One octave keyboard</span>
+        <span>click a key to play the note</span>
+      </div>
+      <div class="piano" id="daw-keyboard" aria-label="One octave keyboard in C major">
+        <div class="white-keys">
+          <button class="piano-key white-key pentatonic" data-note="C4" aria-label="C4">C</button>
+          <button class="piano-key white-key pentatonic" data-note="D4" aria-label="D4">D</button>
+          <button class="piano-key white-key pentatonic" data-note="E4" aria-label="E4">E</button>
+          <button class="piano-key white-key" data-note="F4" aria-label="F4">F</button>
+          <button class="piano-key white-key pentatonic" data-note="G4" aria-label="G4">G</button>
+          <button class="piano-key white-key pentatonic" data-note="A4" aria-label="A4">A</button>
+          <button class="piano-key white-key" data-note="B4" aria-label="B4">B</button>
+        </div>
+        <button class="piano-key black-key" data-slot="1" data-note="C#4" aria-label="C sharp 4">C#</button>
+        <button class="piano-key black-key" data-slot="2" data-note="D#4" aria-label="D sharp 4">D#</button>
+        <button class="piano-key black-key" data-slot="4" data-note="F#4" aria-label="F sharp 4">F#</button>
+        <button class="piano-key black-key" data-slot="5" data-note="G#4" aria-label="G sharp 4">G#</button>
+        <button class="piano-key black-key" data-slot="6" data-note="A#4" aria-label="A sharp 4">A#</button>
+      </div>
+    </div>
+  </div>
+</div>
+```
