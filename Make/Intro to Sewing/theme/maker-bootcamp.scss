@@ -76,6 +76,29 @@ body.reveal-viewport {
   overflow: hidden;
 }
 
+// ── PDF export (RevealJS print-pdf mode) ─────────────────────────────────────
+// In print-pdf mode RevealJS repositions slides and can drop flex display.
+// Re-declare it explicitly so both layout types render identically to screen.
+html.print-pdf .reveal .slides section.divider {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: stretch !important;
+  overflow: hidden !important;
+  height: 700px !important;
+  min-height: 700px !important;
+}
+
+html.print-pdf .reveal .slides section.divider .left-panel,
+html.print-pdf .reveal .slides section.divider .right-panel {
+  height: 700px !important;
+}
+
+html.print-pdf .reveal .slides section.content {
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: hidden !important;
+}
+
 // ── Divider slide ─────────────────────────────────────────────────────────────
 .reveal .slides section.divider {
   display: flex !important; // beats RevealJS's inline display:block on active slides

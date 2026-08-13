@@ -31,3 +31,4 @@ format:
     auto-stretch: false
     transition: none
     background-transition: none
+    pdf-max-pages-per-slide: 1
