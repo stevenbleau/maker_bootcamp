@@ -10,141 +10,34 @@ title: ""
   <div class="label">OVERVIEW</div>
 </div>
 <div class="right-panel">
-  <img src="images/Sewing%20Quickstart%20-%2038%20of%2039.png" alt="Sewing overview">
+  <img src="images/collect-sewing-machine-and-pedal.png" alt="Overview section divider">
 </div>
 ```
 
-# 1.0.0 Setup {.divider}
+## 0.1 COLLECT ALL MATERIALS {.content}
+
+```{=html}
+<div class="top-bar">0. OVERVIEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      0.1: Collect all the materials.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/collect-materials.png" alt="Collect sewing machine and pedal">
+    </div>
+  </div>
+</div>
+```
+
+# 1.0.0 Thread the Machine {.divider}
 
 ```{=html}
 <div class="left-panel">
   <div class="number">1</div>
-  <div class="label">SETUP</div>
-</div>
-<div class="right-panel">
-  <img src="images/collect-sewing-machine-and-pedal.png" alt="Setup section divider">
-</div>
-```
-
-## 1.1 COLLECT SEWING MACHINE AND PEDAL {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.1: Collect the sewing machine and foot pedal.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/collect-sewing-machine-and-pedal.png" alt="Collect sewing machine and pedal">
-    </div>
-  </div>
-</div>
-```
-
-## 1.2 LOCATE THE PLUG {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.2: Locate the power plug on the back of the machine.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/locate-plug.png" alt="Locate the plug">
-    </div>
-  </div>
-</div>
-```
-
-## 1.3 PLUG PEDAL INTO MACHINE {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.3: Connect the foot pedal cable into the machine.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/plug-pedal-into-machine.png" alt="Plug pedal into machine">
-    </div>
-  </div>
-</div>
-```
-
-## 1.4 TURN ON THE MACHINE {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.4: Flip the power switch to turn the machine on.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/turn-on-the-machine.png" alt="Turn on the machine">
-    </div>
-  </div>
-</div>
-```
-
-## 1.5 SETUP THE SEWING MACHINE {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.5: Position the machine on a stable surface and prepare it for use.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/setup-the-sewing-machine.png" alt="Setup the sewing machine">
-    </div>
-  </div>
-</div>
-```
-
-## 1.6 SET MACHINE LENGTH AND STITCH SETTING {.content}
-
-```{=html}
-<div class="top-bar">1. SETUP</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      1.6: Dial in the stitch length and stitch type before sewing.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/set-machine-length-and-stitch-setting.png" alt="Set machine length and stitch setting">
-    </div>
-  </div>
-</div>
-```
-
-# 2.0.0 Thread the Machine {.divider}
-
-```{=html}
-<div class="left-panel">
-  <div class="number">2</div>
   <div class="label">THREAD THE MACHINE</div>
 </div>
 <div class="right-panel">
@@ -152,33 +45,14 @@ title: ""
 </div>
 ```
 
-## 2.1 INSERT THREAD SPOOL {.content}
+## 1.1 REMOVE BOBBIN COVER {.content}
 
 ```{=html}
-<div class="top-bar">2. THREAD THE MACHINE</div>
+<div class="top-bar">1. THREAD THE MACHINE</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      2.1: Place the thread spool onto the spool pin.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/insert-thread-spool.png" alt="Insert thread spool">
-    </div>
-  </div>
-</div>
-```
-
-## 2.2 REMOVE BOBBIN COVER {.content}
-
-```{=html}
-<div class="top-bar">2. THREAD THE MACHINE</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      2.2: Slide off the bobbin cover to access the bobbin area.
+      1.1: Slide off the bobbin cover to access the bobbin area.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -190,14 +64,14 @@ title: ""
 </div>
 ```
 
-## 2.3 THREAD THE BOBBIN {.content}
+## 1.2 THREAD THE BOBBIN {.content}
 
 ```{=html}
-<div class="top-bar">2. THREAD THE MACHINE</div>
+<div class="top-bar">1. THREAD THE MACHINE</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      2.3: Insert and thread the bobbin following the machine's guide arrows.
+      1.2: Insert and thread the bobbin following the machine's guide arrows.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -209,14 +83,33 @@ title: ""
 </div>
 ```
 
-## 2.4 THREAD TOP THREAD (PART 1) {.content}
+## 1.3 INSERT THREAD SPOOL {.content}
 
 ```{=html}
-<div class="top-bar">2. THREAD THE MACHINE</div>
+<div class="top-bar">1. THREAD THE MACHINE</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      2.4: Guide the thread from the spool through the upper tension guides.
+      1.3: Place the thread spool onto the spool pin.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/insert-thread-spool.png" alt="Insert thread spool">
+    </div>
+  </div>
+</div>
+```
+
+## 1.4 THREAD TOP THREAD (PART 1) {.content}
+
+```{=html}
+<div class="top-bar">1. THREAD THE MACHINE</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      1.4: Guide the thread from the spool through the upper tension guides.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -228,14 +121,14 @@ title: ""
 </div>
 ```
 
-## 2.5 THREAD TOP THREAD (PART 2) {.content}
+## 1.5 THREAD TOP THREAD (PART 2) {.content}
 
 ```{=html}
-<div class="top-bar">2. THREAD THE MACHINE</div>
+<div class="top-bar">1. THREAD THE MACHINE</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      2.5: Continue threading through the take-up lever and down through the needle.
+      1.5: Continue threading through the take-up lever and down through the needle.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -247,11 +140,68 @@ title: ""
 </div>
 ```
 
-# 3.0.0 Prep Your Fabric {.divider}
+## 1.6 LOCATE THE PLUG {.content}
+
+```{=html}
+<div class="top-bar">1. THREAD THE MACHINE</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      1.6: Locate the power plug on the back of the machine.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/locate-plug.png" alt="Locate the plug">
+    </div>
+  </div>
+</div>
+```
+
+## 1.7 PLUG PEDAL INTO MACHINE {.content}
+
+```{=html}
+<div class="top-bar">1. THREAD THE MACHINE</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      1.7: Connect the foot pedal cable into the machine.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/plug-pedal-into-machine.png" alt="Plug pedal into machine">
+    </div>
+  </div>
+</div>
+```
+
+## 1.8 TURN ON THE MACHINE {.content}
+
+```{=html}
+<div class="top-bar">1. THREAD THE MACHINE</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      1.8: Flip the power switch to turn the machine on.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/turn-on-the-machine.png" alt="Turn on the machine">
+    </div>
+  </div>
+</div>
+```
+
+# 2.0.0 Prep Your Fabric {.divider}
 
 ```{=html}
 <div class="left-panel">
-  <div class="number">3</div>
+  <div class="number">2</div>
   <div class="label">PREP YOUR FABRIC</div>
 </div>
 <div class="right-panel">
@@ -259,33 +209,14 @@ title: ""
 </div>
 ```
 
-## 3.1 COLLECT MATERIALS {.content}
+## 2.1 PREP THE FABRIC {.content}
 
 ```{=html}
-<div class="top-bar">3. PREP YOUR FABRIC</div>
+<div class="top-bar">2. PREP YOUR FABRIC</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      3.1: Gather your fabric, scissors, ruler, and sewing clips.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/collect-materials.png" alt="Collect materials">
-    </div>
-  </div>
-</div>
-```
-
-## 3.2 PREP THE FABRIC {.content}
-
-```{=html}
-<div class="top-bar">3. PREP YOUR FABRIC</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      3.2: Lay the fabric flat and smooth out any wrinkles before cutting.
+      2.1: Lay the fabric flat and smooth out any wrinkles before cutting.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -297,33 +228,14 @@ title: ""
 </div>
 ```
 
-## 3.3 FOLD FABRIC IN HALF AND CLIP {.content}
+## 2.2 MAKE A SMALL CUT AT MARK {.content}
 
 ```{=html}
-<div class="top-bar">3. PREP YOUR FABRIC</div>
+<div class="top-bar">2. PREP YOUR FABRIC</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      3.3: Fold the fabric in half with right sides together and clip the edges to hold.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/fold-fabric-in-half-and-clip.png" alt="Fold fabric in half and clip">
-    </div>
-  </div>
-</div>
-```
-
-## 3.4 MAKE A SMALL CUT AT MARK {.content}
-
-```{=html}
-<div class="top-bar">3. PREP YOUR FABRIC</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      3.4: Make a small notch cut at the marked position on the fabric edge.
+      2.2: Make a small notch cut at the marked position on the fabric edge.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -335,14 +247,14 @@ title: ""
 </div>
 ```
 
-## 3.5 MAKE REMAINING SMALL CUTS {.content}
+## 2.3 MAKE REMAINING SMALL CUTS {.content}
 
 ```{=html}
-<div class="top-bar">3. PREP YOUR FABRIC</div>
+<div class="top-bar">2. PREP YOUR FABRIC</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      3.5: Repeat the notch cuts at all remaining marked positions.
+      2.3: Repeat the notch cuts at all remaining marked positions.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -354,45 +266,64 @@ title: ""
 </div>
 ```
 
-# 4.0.0 Sew {.divider}
+## 2.4 FOLD FABRIC IN HALF AND CLIP {.content}
 
 ```{=html}
-<div class="left-panel">
-  <div class="number">4</div>
-  <div class="label">SEW</div>
-</div>
-<div class="right-panel">
-  <img src="images/Sewing%20Quickstart%20-%2029%20of%2039.png" alt="Sew section divider">
-</div>
-```
-
-## 4.1 ALIGN FABRIC AT 3/8 IN {.content}
-
-```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">2. PREP YOUR FABRIC</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.1: Line up the fabric edge with the 3/8 in seam guide on the machine.
+      2.4: Fold the fabric in half with right sides together and clip the edges to hold.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/align-fabric-at-3:8-in.png" alt="Align fabric at 3/8 in">
+      <img class="main-shot" src="images/fold-fabric-in-half-and-clip.png" alt="Fold fabric in half and clip">
     </div>
   </div>
 </div>
 ```
 
-## 4.2 ALIGN FABRIC AT 5/8 IN (SEAM ALLOWANCE) {.content}
+## 2.5 REPEAT ON REMAINING SIDE {.content}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">2. PREP YOUR FABRIC</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.2: Shift the fabric to align with the 5/8 in seam allowance guide.
+      2.5: Fold and clip the remaining side to complete the channel around the bag.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/repeat-on-remaining-side.png" alt="Repeat on remaining side">
+    </div>
+  </div>
+</div>
+```
+
+# 3.0.0 Sew {.divider}
+
+```{=html}
+<div class="left-panel">
+  <div class="number">3</div>
+  <div class="label">SEW</div>
+</div>
+<div class="right-panel">
+  <img src="images/continue-straight-stitch.png" alt="Sew section divider">
+</div>
+```
+
+## 3.1 ALIGN FABRIC AT 5/8 IN (SEAM ALLOWANCE) {.content}
+
+```{=html}
+<div class="top-bar">3. SEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      3.1: Shift the fabric to align with the 5/8 in seam allowance guide.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -404,33 +335,33 @@ title: ""
 </div>
 ```
 
-## 4.3 CONTINUE STRAIGHT STITCH {.content}
+## 3.2 SET MACHINE LENGTH AND STITCH SETTING {.content}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">3. SEW</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.3: Press the foot pedal and guide the fabric to sew a straight stitch along the edge.
+      3.2: Dial in the stitch length and stitch type before sewing.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/continue-straight-stitch.png" alt="Continue straight stitch">
+      <img class="main-shot" src="images/set-machine-length-and-stitch-setting.png" alt="Set machine length and stitch setting">
     </div>
   </div>
 </div>
 ```
 
-## 4.4 MAKE REVERSE STITCH {.content}
+## 3.3 MAKE REVERSE STITCH {.content}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">3. SEW</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.4: Press the reverse button and backstitch a few stitches to lock the seam.
+      3.3: Press the reverse button and backstitch a few stitches to lock the seam.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -442,14 +373,71 @@ title: ""
 </div>
 ```
 
-## 4.5 REPEAT STRAIGHT STITCH ON OPPOSITE SIDE {.content}
+## 3.4 CONTINUE STRAIGHT STITCH {.content}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">3. SEW</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.5: Rotate the fabric and repeat the straight stitch along the opposite edge.
+      3.4: Press the foot pedal and guide the fabric to sew a straight stitch along the edge.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/continue-straight-stitch.png" alt="Continue straight stitch">
+    </div>
+  </div>
+</div>
+```
+
+## 3.5 CUT EXCESS THREAD {.content}
+
+```{=html}
+<div class="top-bar">3. SEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      3.5: Trim any loose threads from the seams and drawstring ends.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/cut-excess-thread.png" alt="Cut excess thread">
+    </div>
+  </div>
+</div>
+```
+
+## 3.6 YOU HAVE A COMPLETED STRAIGHT STITCH! {.content}
+
+```{=html}
+<div class="top-bar">3. SEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      3.6: Great work — both seams are sewn and locked at both ends.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/you-have-a-completed-straight-stitch!.png" alt="You have a completed straight stitch">
+    </div>
+  </div>
+</div>
+```
+
+## 3.7 REPEAT STRAIGHT STITCH ON OPPOSITE SIDE {.content}
+
+```{=html}
+<div class="top-bar">3. SEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      3.7: Rotate the fabric and repeat the straight stitch along the opposite edge.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -461,14 +449,64 @@ title: ""
 </div>
 ```
 
-## 4.6 STRAIGHT STITCH BOTH SIDES {.content}
+# 4.0.0 Sew the Bag {.divider}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="left-panel">
+  <div class="number">4</div>
+  <div class="label">SEW THE BAG</div>
+</div>
+<div class="right-panel">
+  <img src="images/straight-stitch-both-sides.png" alt="Sew the bag section divider">
+</div>
+```
+
+## 4.1 FOLD FABRIC AT CUT {.content}
+
+```{=html}
+<div class="top-bar">4. SEW THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.6: Both sides of the bag are now stitched — check that seams are even.
+      4.1: Fold the top edge of the fabric down at the notch cut to create the drawstring channel.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/fold-in-half-and-clip.png" alt="Fold fabric at cut">
+    </div>
+  </div>
+</div>
+```
+
+## 4.2 ALIGN FABRIC AT 3/8 IN {.content}
+
+```{=html}
+<div class="top-bar">4. SEW THE BAG</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      4.2: Line up the fabric edge with the 3/8 in seam guide on the machine.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/align-fabric-at-3:8-in.png" alt="Align fabric at 3/8 in">
+    </div>
+  </div>
+</div>
+```
+
+## 4.3 STRAIGHT STITCH BOTH SIDES {.content}
+
+```{=html}
+<div class="top-bar">4. SEW THE BAG</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      4.3: Both sides of the bag are now stitched — check that seams are even.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -480,20 +518,20 @@ title: ""
 </div>
 ```
 
-## 4.7 YOU HAVE A COMPLETED STRAIGHT STITCH! {.content}
+## 4.4 FLIP INSIDE OUT {.content}
 
 ```{=html}
-<div class="top-bar">4. SEW</div>
+<div class="top-bar">4. SEW THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      4.7: Great work — both seams are sewn and locked at both ends.
+      4.4: Reach through the open top and pull the bag right-side out.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/you-have-a-completed-straight-stitch!.png" alt="You have a completed straight stitch">
+      <img class="main-shot" src="images/flip-inside-out.png" alt="Flip inside out">
     </div>
   </div>
 </div>
@@ -511,128 +549,33 @@ title: ""
 </div>
 ```
 
-## 5.1 FOLD FABRIC AT CUT {.content}
+## 5.1 THREAD THE DRAWSTRING MATERIALS {.content}
 
 ```{=html}
 <div class="top-bar">5. FINISH THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      5.1: Fold the top edge of the fabric down at the notch cut to create the drawstring channel.
+      5.1: Gather the Materials
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/fold-fabric-at-cut.png" alt="Fold fabric at cut">
+      <img class="main-shot" src="images/thread-the-drawstrings-materials.png" alt="Thread the drawstring">
     </div>
   </div>
 </div>
 ```
 
-## 5.2 REPEAT ON OPPOSITE SIDE AND CLIP {.content}
+## 5.2 ATTACH SAFETY PIN TO STRING {.content}
 
 ```{=html}
 <div class="top-bar">5. FINISH THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      5.2: Fold the opposite side the same way and clip both folds in place.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/repeat-on-opposite-side-and-clip.png" alt="Repeat on opposite side and clip">
-    </div>
-  </div>
-</div>
-```
-
-## 5.3 REPEAT ON REMAINING SIDE {.content}
-
-```{=html}
-<div class="top-bar">5. FINISH THE BAG</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      5.3: Fold and clip the remaining side to complete the channel around the bag.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/repeat-on-remaining-side.png" alt="Repeat on remaining side">
-    </div>
-  </div>
-</div>
-```
-
-## 5.4 FLIP INSIDE OUT {.content}
-
-```{=html}
-<div class="top-bar">5. FINISH THE BAG</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      5.4: Reach through the open top and pull the bag right-side out.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/flip-inside-out.png" alt="Flip inside out">
-    </div>
-  </div>
-</div>
-```
-
-## 5.5 THREAD STRING THROUGH ONE CHANNEL {.content}
-
-```{=html}
-<div class="top-bar">5. FINISH THE BAG</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      5.5: Use a safety pin to guide the drawstring through one side of the channel.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/thread-string-through-one-channel.png" alt="Thread string through one channel">
-    </div>
-  </div>
-</div>
-```
-
-## 5.6 THREAD STRING THROUGH OTHER CHANNEL {.content}
-
-```{=html}
-<div class="top-bar">5. FINISH THE BAG</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      5.6: Feed the string back through the other channel so both ends exit from the same side.
-    </div>
-    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
-  </div>
-  <div class="main-panel">
-    <div class="main-shot-wrap">
-      <img class="main-shot" src="images/thread-string-through-other-channel.png" alt="Thread string through other channel">
-    </div>
-  </div>
-</div>
-```
-
-## 5.7 ATTACH SAFETY PIN TO STRING {.content}
-
-```{=html}
-<div class="top-bar">5. FINISH THE BAG</div>
-<div class="screenshot-row">
-  <div class="callout-box">
-    <div class="callout-label">
-      5.7: Clip a safety pin to the end of the drawstring to make threading easier.
+      5.2: Clip a safety pin to the end of the drawstring to make threading easier.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
@@ -644,52 +587,71 @@ title: ""
 </div>
 ```
 
-## 5.8 THREAD THE DRAWSTRING {.content}
+## 5.3 THREAD STRING THROUGH ONE CHANNEL {.content}
 
 ```{=html}
 <div class="top-bar">5. FINISH THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      5.8: Push the safety pin through the channel, gathering the fabric as you go.
+      5.3: Use a safety pin to guide the drawstring through one side of the channel.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/thread-the-drawstring.png" alt="Thread the drawstring">
+      <img class="main-shot" src="images/thread-string-through-one-channel.png" alt="Thread string through one channel">
     </div>
   </div>
 </div>
 ```
 
-## 5.9 CUT EXCESS THREAD {.content}
+## 5.4 THREAD STRING THROUGH OTHER CHANNEL {.content}
 
 ```{=html}
 <div class="top-bar">5. FINISH THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      5.9: Trim any loose threads from the seams and drawstring ends.
+      5.4: Feed the string back through the other channel so both ends exit from the same side.
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/cut-excess-thread.png" alt="Cut excess thread">
+      <img class="main-shot" src="images/thread-string-through-other-channel.png" alt="Thread string through other channel">
     </div>
   </div>
 </div>
 ```
 
-## 5.10 YOU HAVE A DRAWSTRING BAG! {.content}
+## 5.5 THREAD OTHER STRING FROM OPPOSITE SIDE {.content}
 
 ```{=html}
 <div class="top-bar">5. FINISH THE BAG</div>
 <div class="screenshot-row">
   <div class="callout-box">
     <div class="callout-label">
-      5.10: Your drawstring bag is complete — pull the strings to close it up!
+      5.5: Thread the second string from the opposite side through both channels.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/thread-other-string-from-opposite-side.png" alt="Thread other string from opposite side">
+    </div>
+  </div>
+</div>
+```
+
+## 5.6 YOU HAVE A DRAWSTRING BAG! {.content}
+
+```{=html}
+<div class="top-bar">5. FINISH THE BAG</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      5.6: Your drawstring bag is complete — pull the strings to close it up!
     </div>
     <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
   </div>
