@@ -286,15 +286,18 @@ async function saveCallout(box, idx) {
       try {
         const fh=await imgFolderHandle.getFileHandle(fname,{create:true});
         const wr=await fh.createWritable(); await wr.write(blob); await wr.close();
-        // Update live DOM callout box
-        updateCalloutDOM(fname, idx);
-        // Update deck.qmd callout box if linked
+        // One deck.qmd write: highlights + callout img tag together
         if (deckFileHandle) {
           const file=await deckFileHandle.getFile();
-          const patched=patchCallout(await file.text(), label, fname, idx);
-          if (patched) { const wr2=await deckFileHandle.createWritable(); await wr2.write(patched); await wr2.close(); }
+          let content=await file.text();
+          const withHL=patchQmd(content, label, getBoxes());
+          if (withHL) content=withHL;
+          const withCL=patchCallout(content, label, fname, idx);
+          if (withCL) content=withCL;
+          const wr2=await deckFileHandle.createWritable();
+          await wr2.write(content); await wr2.close();
         }
-        flashBtn('hlp-save-'+box.id,'✓ Saved'); return;
+        flashBtn('hlp-save-'+box.id,'✓ Saved & Applied'); return;
       } catch(err) { console.warn('Save failed:',err); }
     }
     // Fallback: browser download
@@ -343,7 +346,7 @@ function renderPanel() {
       boxes.map((b,i)=>
         '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'+
           '<span style="color:#555;font-size:10px;flex:1;font-family:monospace;">'+calloutPath(label,i+1)+'</span>'+
-          '<button id="hlp-save-'+b.id+'" data-boxid="'+b.id+'" data-idx="'+( i+1)+'" style="'+bs('#0d2620','#34d399')+'">⬇ Save</button>'+
+          '<button id="hlp-save-'+b.id+'" data-boxid="'+b.id+'" data-idx="'+( i+1)+'" style="'+bs('#0d2620','#34d399')+'">⬇ Save &amp; Apply</button>'+
         '</div>'
       ).join('')
     : '');
