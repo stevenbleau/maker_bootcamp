@@ -1,6 +1,358 @@
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — HIGHLIGHT PICKER DEV TOOL
+   MAKER BOOTCAMP — HIGHLIGHT PICKER v2
+   ───────────────────────────────────────────────────────────────────────────
+   Add to a module's _quarto.yml under format.revealjs:
+     include-after-body:
+       - ../../tools/highlight-picker.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+// ── Wait for Reveal ──────────────────────────────────────────────────────────
+function whenReady(cb) {
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+  const t0 = Date.now();
+  const id = setInterval(() => {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+    else if (Date.now() - t0 > 8000) clearInterval(id);
+  }, 80);
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+const perSlide  = new Map();  // slideKey → [{ id, x, y, w, h }]
+let nextId      = 1;
+let drawMode    = null;       // null | 'new' | <id>  — null = viewing only
+let dragState   = null;
+let toolActive  = false;
+let folderHandle = null;      // FileSystemDirectoryHandle for images/
+let panelEl, overlayEl;
+
+// ── Slide helpers ─────────────────────────────────────────────────────────────
+const slideKey   = () => { const i = Reveal.getIndices(); return `${i.h}-${i.v||0}`; };
+const getBoxes   = () => { const k = slideKey(); if (!perSlide.has(k)) perSlide.set(k, []); return perSlide.get(k); };
+const slideWrap  = () => Reveal.getCurrentSlide()?.querySelector('.main-shot-wrap');
+
+function slideLabel() {
+  return Reveal.getCurrentSlide()?.querySelector('h2')?.textContent?.trim() || '';
+}
+function numParts(label) {
+  const m = (label||'').match(/^(\d+)\.(\d+)/);
+  return m ? { sec: m[1], step: m[2] } : null;
+}
+const fmt = n => parseFloat(n).toFixed(1);
+function calloutName(label, i) {
+  const n = numParts(label);
+  return n ? `${n.sec}.${n.step}.${i}.png` : `callout-${i}.png`;
+}
+function calloutPath(label, i) {
+  const n = numParts(label);
+  return n ? `images/${n.sec}/${n.sec}.${n.step}.${i}.png` : `images/section/step.${i}.png`;
+}
+
+// ── Generated HTML ─────────────────────────────────────────────────────────────
+function genHTML(boxes) {
+  return boxes.map(b =>
+    `<div class="click-highlight" style="--box-x:${b.x}%; --box-y:${b.y}%; --box-w:${b.w}%; --box-h:${b.h}%;" aria-hidden="true"></div>`
+  ).join('\n');
+}
+
+// ── Overlay previews on slide ─────────────────────────────────────────────────
+function syncOverlays() {
+  document.querySelectorAll('.hlp-prev').forEach(e => e.remove());
+  if (!toolActive) return;
+  const wrap = slideWrap();
+  if (!wrap) return;
+  getBoxes().forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'hlp-prev';
+    Object.assign(d.style, {
+      position:'absolute', left:b.x+'%', top:b.y+'%',
+      width:b.w+'%', height:b.h+'%', zIndex:'5', pointerEvents:'none',
+      border:'2px solid #f59e0b', borderRadius:'4px', boxSizing:'border-box',
+      boxShadow:'0 0 0 1px rgba(0,0,0,.25), 0 0 10px rgba(245,158,11,.4)',
+    });
+    const lbl = Object.assign(document.createElement('span'), { textContent: i + 1 });
+    Object.assign(lbl.style, {
+      position:'absolute', top:'2px', left:'4px', background:'#f59e0b',
+      color:'#000', fontSize:'10px', fontWeight:'bold', padding:'0 3px', borderRadius:'2px',
+    });
+    d.appendChild(lbl);
+    wrap.appendChild(d);
+  });
+}
+
+// ── Cursors ───────────────────────────────────────────────────────────────────
+const setCursors = cur => document.querySelectorAll('.main-shot-wrap').forEach(e => e.style.cursor = cur);
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+function toggleTool() {
+  toolActive = !toolActive;
+  document.getElementById('hlp-btn').style.background = toolActive ? '#f59e0b' : '#1eae9d';
+  panelEl.style.display = toolActive ? 'block' : 'none';
+  if (!toolActive) {
+    drawMode = null; dragState = null;
+    overlayEl.style.display = 'none';
+    setCursors('');
+    document.querySelectorAll('.hlp-prev').forEach(e => e.remove());
+  } else {
+    renderPanel();
+    syncOverlays();
+  }
+}
+
+// ── Draw mode ─────────────────────────────────────────────────────────────────
+function activateDraw(id) {
+  drawMode = id;
+  setCursors('crosshair');
+  renderPanel();
+}
+
+// ── Drag ──────────────────────────────────────────────────────────────────────
+document.addEventListener('mousedown', e => {
+  if (!toolActive || drawMode === null) return;
+  const wrap = e.target.closest('.main-shot-wrap');
+  if (!wrap) return;
+  e.preventDefault(); e.stopPropagation();
+  const r = wrap.getBoundingClientRect();
+  dragState = { wrap, r, sx: e.clientX - r.left, sy: e.clientY - r.top };
+  overlayEl.style.display = 'block';
+}, true);
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const { r, sx, sy } = dragState;
+  const cx = Math.max(0, Math.min(e.clientX - r.left, r.width));
+  const cy = Math.max(0, Math.min(e.clientY - r.top,  r.height));
+  Object.assign(overlayEl.style, {
+    left:(r.left+Math.min(sx,cx))+'px', top:(r.top+Math.min(sy,cy))+'px',
+    width:Math.abs(cx-sx)+'px', height:Math.abs(cy-sy)+'px',
+  });
+}, true);
+
+document.addEventListener('mouseup', e => {
+  if (!dragState) return;
+  const { r, sx, sy } = dragState;
+  dragState = null; overlayEl.style.display = 'none';
+  const cx = Math.max(0, Math.min(e.clientX - r.left, r.width));
+  const cy = Math.max(0, Math.min(e.clientY - r.top,  r.height));
+  const x = Math.min(sx,cx), y = Math.min(sy,cy);
+  const w = Math.abs(cx-sx), h = Math.abs(cy-sy);
+  if (w < 8 || h < 8) return;
+  const bx = fmt((x/r.width)*100), by = fmt((y/r.height)*100);
+  const bw = fmt((w/r.width)*100), bh = fmt((h/r.height)*100);
+  const boxes = getBoxes();
+  if (drawMode === 'new') {
+    boxes.push({ id: nextId++, x:bx, y:by, w:bw, h:bh });
+  } else {
+    const b = boxes.find(b => b.id === drawMode);
+    if (b) Object.assign(b, { x:bx, y:by, w:bw, h:bh });
+  }
+  drawMode = null; setCursors('default');
+  syncOverlays(); renderPanel();
+}, true);
+
+// ── Download / save callout ───────────────────────────────────────────────────
+async function saveCallout(box, idx) {
+  const wrap = slideWrap();
+  const img  = wrap?.querySelector('.main-shot');
+  if (!img) return;
+  const c = document.createElement('canvas');
+  const ctx = c.getContext('2d');
+  const nw = img.naturalWidth, nh = img.naturalHeight;
+  const cx = Math.round((parseFloat(box.x)/100)*nw);
+  const cy = Math.round((parseFloat(box.y)/100)*nh);
+  const cw = Math.round((parseFloat(box.w)/100)*nw);
+  const ch = Math.round((parseFloat(box.h)/100)*nh);
+  c.width = cw; c.height = ch;
+  try { ctx.drawImage(img, cx, cy, cw, ch, 0, 0, cw, ch); }
+  catch { alert('CORS error — run quarto preview on localhost.'); return; }
+
+  const label  = slideLabel();
+  const fname  = calloutName(label, idx);
+  const n      = numParts(label);
+
+  c.toBlob(async blob => {
+    // Try direct save into images/N/ folder
+    if (folderHandle && n) {
+      try {
+        const secDir = await folderHandle.getDirectoryHandle(n.sec, { create:true });
+        const fh     = await secDir.getFileHandle(fname, { create:true });
+        const wr     = await fh.createWritable();
+        await wr.write(blob); await wr.close();
+        flashBtn(`hlp-save-${box.id}`, '✓ Saved to folder');
+        return;
+      } catch(err) { console.warn('Direct save failed:', err); }
+    }
+    // Fallback: browser download
+    const url = URL.createObjectURL(blob);
+    const a   = Object.assign(document.createElement('a'), { href:url, download:fname });
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flashBtn(`hlp-save-${box.id}`, '✓ Downloaded');
+  }, 'image/png');
+}
+
+function flashBtn(id, msg) {
+  const b = document.getElementById(id);
+  if (!b) return;
+  const orig = b.textContent;
+  b.textContent = msg;
+  setTimeout(() => b.textContent = orig, 2200);
+}
+
+async function chooseFolder() {
+  if (!('showDirectoryPicker' in window)) {
+    alert('Use the ⬇ buttons to download — direct save not supported in this browser.');
+    return;
+  }
+  try {
+    folderHandle = await window.showDirectoryPicker({ mode:'readwrite' });
+    renderPanel();
+  } catch {}
+}
+
+// ── Panel render ──────────────────────────────────────────────────────────────
+function renderPanel() {
+  if (!panelEl || !toolActive) return;
+  const boxes  = getBoxes();
+  const label  = slideLabel();
+  const html   = genHTML(boxes);
+  const adding = drawMode === 'new';
+
+  panelEl.innerHTML = `
+    <div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:3px;">📐 Highlight Picker</div>
+    <div style="color:#555;font-size:10px;margin-bottom:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${label}">${label||'—'}</div>
+
+    <!-- Highlights list -->
+    ${boxes.length ? `
+      <div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Highlights</div>
+      ${boxes.map((b,i) => `
+        <div style="display:flex;align-items:center;gap:5px;
+          background:${drawMode===b.id?'#2a2000':'#141414'};
+          border:1px solid ${drawMode===b.id?'#f59e0b':'#2e2e2e'};
+          border-radius:5px;padding:5px 8px;margin-bottom:4px;">
+          <span style="color:#f59e0b;font-size:10px;flex:1;">
+            Box ${i+1} &nbsp; x:${b.x}% y:${b.y}% w:${b.w}% h:${b.h}%
+          </span>
+          <button id="hlp-edit-${b.id}" style="${btnStyle('#2a2000','#f59e0b')}">✏ Edit</button>
+          <button id="hlp-del-${b.id}"  style="${btnStyle('#1a0000','#f87171')}">✕</button>
+        </div>
+      `).join('')}
+    ` : `<div style="color:#555;font-size:11px;line-height:1.6;background:#141414;border-radius:5px;padding:8px;margin-bottom:8px;">
+      Click <strong style="color:#aaa;">+ Add highlight</strong> below, then drag on the main image.
+    </div>`}
+
+    <button id="hlp-add" style="${btnStyle(adding?'#2a2000':'#1a1a1a', adding?'#f59e0b':'#888', '100%', '5px 8px')}">
+      ${adding ? '↖ Drag on image to draw…' : '+ Add highlight'}
+    </button>
+
+    <!-- Generated HTML -->
+    ${boxes.length ? `
+      <hr style="border:none;border-top:1px solid #242424;margin:10px 0;">
+      <div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">
+        Generated HTML &nbsp;<span style="color:#444;font-weight:normal;text-transform:none;">paste inside .main-shot-wrap</span>
+      </div>
+      <textarea id="hlp-out" readonly style="width:100%;box-sizing:border-box;background:#111;
+        border:1px solid #2e2e2e;border-radius:5px;color:#a3e635;font-size:10px;
+        line-height:1.5;padding:8px;resize:vertical;height:${Math.min(5,boxes.length)*22+24}px;
+        font-family:ui-monospace,monospace;cursor:text;">${html}</textarea>
+      <div style="color:#444;font-size:10px;margin-top:3px;margin-bottom:10px;">Click textarea to select all</div>
+
+      <!-- Callout images -->
+      <hr style="border:none;border-top:1px solid #242424;margin:0 0 10px;">
+      <div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Callout images</div>
+      ${boxes.map((b,i) => `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+          <span style="color:#666;font-size:10px;flex:1;font-family:monospace;">${calloutPath(label,i+1)}</span>
+          <button id="hlp-save-${b.id}" data-boxid="${b.id}" data-idx="${i+1}"
+            style="${btnStyle('#0d2620','#34d399')}">⬇ Save</button>
+        </div>
+      `).join('')}
+      <button id="hlp-folder" style="${btnStyle('#1a1a1a','#555','100%','5px 8px')}">
+        ${folderHandle ? '📁 ' + folderHandle.name + ' (change)' : '📁 Choose images/ folder for direct save'}
+      </button>
+    ` : ''}
+  `;
+
+  // ── Bind events ──────────────────────────────────────────────────────────
+  panelEl.querySelector('#hlp-add').addEventListener('click', () => activateDraw('new'));
+  panelEl.querySelector('#hlp-folder')?.addEventListener('click', chooseFolder);
+
+  panelEl.querySelector('#hlp-out')?.addEventListener('click', function() {
+    this.focus(); this.select();
+  });
+
+  boxes.forEach(b => {
+    panelEl.querySelector(`#hlp-edit-${b.id}`)?.addEventListener('click', e => {
+      e.stopPropagation(); activateDraw(b.id);
+    });
+    panelEl.querySelector(`#hlp-del-${b.id}`)?.addEventListener('click', e => {
+      e.stopPropagation();
+      const arr = getBoxes();
+      arr.splice(arr.findIndex(h => h.id === b.id), 1);
+      if (drawMode === b.id) { drawMode = null; setCursors('default'); }
+      syncOverlays(); renderPanel();
+    });
+    const saveBtn = panelEl.querySelector(`#hlp-save-${b.id}`);
+    if (saveBtn) {
+      saveBtn.addEventListener('click', () => saveCallout(b, parseInt(saveBtn.dataset.idx)));
+    }
+  });
+}
+
+function btnStyle(bg, color, width='auto', pad='3px 9px') {
+  return `background:${bg};color:${color};border:1px solid ${color}33;border-radius:4px;
+    padding:${pad};cursor:pointer;font-size:10px;font-family:ui-monospace,monospace;
+    ${width!=='auto'?'width:'+width+';':''}`;
+}
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+function build() {
+  // Toggle button
+  const btn = document.createElement('button');
+  btn.id = 'hlp-btn';
+  btn.textContent = '📐';
+  Object.assign(btn.style, {
+    position:'fixed', bottom:'16px', left:'16px', zIndex:'10000',
+    width:'42px', height:'42px', borderRadius:'50%', border:'none',
+    background:'#1eae9d', fontSize:'18px', cursor:'pointer',
+    boxShadow:'0 2px 10px rgba(0,0,0,.4)', transition:'background .15s',
+  });
+  btn.addEventListener('click', toggleTool);
+  document.body.appendChild(btn);
+
+  // Drag overlay
+  overlayEl = document.createElement('div');
+  Object.assign(overlayEl.style, {
+    position:'fixed', zIndex:'9999', pointerEvents:'none', display:'none',
+    border:'2.5px solid #f59e0b', borderRadius:'5px',
+    boxShadow:'0 0 0 2px rgba(0,0,0,.2), 0 0 16px rgba(245,158,11,.55)',
+  });
+  document.body.appendChild(overlayEl);
+
+  // Panel
+  panelEl = document.createElement('div');
+  Object.assign(panelEl.style, {
+    position:'fixed', bottom:'68px', left:'16px', zIndex:'10000',
+    background:'#1a1a1a', color:'#f0f0f0', borderRadius:'10px',
+    padding:'14px 16px', fontFamily:'ui-monospace,monospace',
+    width:'320px', display:'none', maxHeight:'82vh', overflowY:'auto',
+    boxShadow:'0 6px 28px rgba(0,0,0,.7)', border:'1px solid #2a2a2a',
+  });
+  document.body.appendChild(panelEl);
+
+  // Slide navigation → refresh
+  Reveal.on('slidechanged', () => {
+    drawMode = null; setCursors(toolActive ? 'default' : '');
+    syncOverlays(); renderPanel();
+  });
+}
+
+whenReady(build);
+})();
+</script>
+
    ───────────────────────────────────────────────────────────────────────────
    HOW TO ACTIVATE for a deck:
      Add to the module's _quarto.yml under format.revealjs:
