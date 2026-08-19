@@ -1,0 +1,232 @@
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAKER BOOTCAMP — HIGHLIGHT PICKER DEV TOOL
+   ───────────────────────────────────────────────────────────────────────────
+   HOW TO ACTIVATE for a deck:
+     Add to the module's _quarto.yml under format.revealjs:
+       include-after-body:
+         - ../../tools/highlight-picker.html
+
+   HOW TO USE:
+     1. Run  quarto preview deck.qmd
+     2. Click the 📐 button (bottom-left corner)
+     3. Drag a box on the main slide image
+     4. Copy the snippet → paste onto the <div class="screenshot-row"> in deck.qmd
+     5. Download the callout crop → save to images/N/N.M.1.png
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
+
+  // ── Wait for Reveal to initialise ──────────────────────────────────────────
+  function whenReady(cb) {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+    const t = Date.now();
+    const id = setInterval(() => {
+      if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+      else if (Date.now() - t > 8000) clearInterval(id);
+    }, 80);
+  }
+
+  // ── State ──────────────────────────────────────────────────────────────────
+  let active = false;
+  let drag   = null;   // { wrap, rect, startX, startY }
+  let last   = null;   // { x, y, w, h, wrap }
+  let overlayEl, panelEl;
+
+  // ── Helpers ────────────────────────────────────────────────────────────────
+  const p = n => parseFloat(n).toFixed(1);
+
+  function slideLabel() {
+    const s = Reveal.getCurrentSlide();
+    return s ? (s.querySelector('h2') || {}).textContent?.trim() : null;
+  }
+
+  function numParts(label) {
+    if (!label) return null;
+    const m = label.match(/^(\d+)\.(\d+)/);
+    return m ? { sec: m[1], step: m[2] } : null;
+  }
+
+  function suggestPath(label) {
+    const n = numParts(label);
+    return n ? `images/${n.sec}/${n.sec}.${n.step}.1.png` : 'images/section/step.1.png';
+  }
+
+  function suggestFilename(label) {
+    const n = numParts(label);
+    return n ? `${n.sec}.${n.step}.1.png` : 'callout.png';
+  }
+
+  // ── Build UI ───────────────────────────────────────────────────────────────
+  function build() {
+    // Toggle button
+    const btn = document.createElement('button');
+    btn.id = 'hlp-btn';
+    btn.innerHTML = '&#x1F4D0;';
+    btn.title = 'Highlight Picker — click to activate';
+    Object.assign(btn.style, {
+      position:'fixed', bottom:'16px', left:'16px', zIndex:'10000',
+      width:'42px', height:'42px', borderRadius:'50%',
+      border:'none', background:'#1eae9d', color:'#fff',
+      fontSize:'18px', lineHeight:'42px', textAlign:'center',
+      cursor:'pointer', boxShadow:'0 2px 10px rgba(0,0,0,.4)',
+      transition:'background .15s',
+    });
+    btn.addEventListener('click', toggle);
+    document.body.appendChild(btn);
+
+    // Drag overlay rectangle
+    overlayEl = document.createElement('div');
+    Object.assign(overlayEl.style, {
+      position:'fixed', zIndex:'9999', pointerEvents:'none', display:'none',
+      border:'2.5px solid #f59e0b', borderRadius:'5px',
+      boxShadow:'0 0 0 2px rgba(0,0,0,.2), 0 0 16px rgba(245,158,11,.55)',
+    });
+    document.body.appendChild(overlayEl);
+
+    // Results panel
+    panelEl = document.createElement('div');
+    panelEl.innerHTML = `
+      <div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:6px;">&#x1F4D0; Highlight Picker</div>
+      <div id="hlp-hint" style="color:#888;font-size:11px;line-height:1.6;">
+        Drag on the main image to draw a highlight box.
+      </div>
+      <div id="hlp-res" style="display:none;">
+        <div style="color:#666;font-size:10px;letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;">screenshot-row style</div>
+        <pre id="hlp-snip" style="background:#111;border-radius:5px;padding:10px;margin:0 0 8px;
+          color:#f59e0b;font-size:11px;line-height:1.5;white-space:pre-wrap;word-break:break-all;overflow:hidden;"></pre>
+        <button id="hlp-copy" style="background:#1eae9d;color:#fff;border:none;border-radius:5px;
+          padding:5px 14px;cursor:pointer;font-size:11px;">Copy snippet</button>
+        <hr style="border:none;border-top:1px solid #2a2a2a;margin:12px 0;">
+        <div style="color:#666;font-size:10px;letter-spacing:1px;margin-bottom:4px;text-transform:uppercase;">Callout image</div>
+        <div id="hlp-path" style="color:#777;font-size:11px;font-family:monospace;margin-bottom:8px;"></div>
+        <button id="hlp-dl" style="background:#117168;color:#fff;border:none;border-radius:5px;
+          padding:5px 14px;cursor:pointer;font-size:11px;">&#x2B07; Download callout crop</button>
+      </div>
+    `;
+    Object.assign(panelEl.style, {
+      position:'fixed', bottom:'68px', left:'16px', zIndex:'10000',
+      background:'#1f1f1f', color:'#f0f0f0', borderRadius:'10px',
+      padding:'14px 16px', fontFamily:'ui-monospace,monospace', fontSize:'12px',
+      width:'300px', display:'none',
+      boxShadow:'0 6px 28px rgba(0,0,0,.7)', border:'1px solid #2e2e2e',
+    });
+    document.body.appendChild(panelEl);
+
+    document.getElementById('hlp-copy').addEventListener('click', copySnip);
+    document.getElementById('hlp-dl').addEventListener('click', downloadCrop);
+  }
+
+  // ── Toggle ─────────────────────────────────────────────────────────────────
+  function toggle() {
+    active = !active;
+    const btn = document.getElementById('hlp-btn');
+    btn.style.background = active ? '#f59e0b' : '#1eae9d';
+    btn.title = active ? 'Highlight Picker — ACTIVE (drag on image)' : 'Highlight Picker — click to activate';
+    panelEl.style.display = active ? 'block' : 'none';
+    if (!active) { overlayEl.style.display = 'none'; drag = null; }
+    document.querySelectorAll('.main-shot-wrap').forEach(el => {
+      el.style.cursor = active ? 'crosshair' : '';
+    });
+  }
+
+  // ── Drag ───────────────────────────────────────────────────────────────────
+  document.addEventListener('mousedown', e => {
+    if (!active) return;
+    const wrap = e.target.closest('.main-shot-wrap');
+    if (!wrap) return;
+    e.preventDefault(); e.stopPropagation();
+    const rect = wrap.getBoundingClientRect();
+    drag = { wrap, rect, startX: e.clientX - rect.left, startY: e.clientY - rect.top };
+    overlayEl.style.display = 'block';
+  }, true);
+
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const { rect, startX, startY } = drag;
+    const cx = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const cy = Math.max(0, Math.min(e.clientY - rect.top,  rect.height));
+    Object.assign(overlayEl.style, {
+      left:   (rect.left + Math.min(startX, cx)) + 'px',
+      top:    (rect.top  + Math.min(startY, cy)) + 'px',
+      width:  Math.abs(cx - startX) + 'px',
+      height: Math.abs(cy - startY) + 'px',
+    });
+  }, true);
+
+  document.addEventListener('mouseup', e => {
+    if (!drag) return;
+    const { rect, startX, startY, wrap } = drag;
+    drag = null;
+    const cx = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
+    const cy = Math.max(0, Math.min(e.clientY - rect.top,  rect.height));
+    const x = Math.min(startX, cx), y = Math.min(startY, cy);
+    const w = Math.abs(cx - startX), h = Math.abs(cy - startY);
+    if (w < 8 || h < 8) return;
+
+    const bx = p((x / rect.width)  * 100);
+    const by = p((y / rect.height) * 100);
+    const bw = p((w / rect.width)  * 100);
+    const bh = p((h / rect.height) * 100);
+    last = { x: bx, y: by, w: bw, h: bh, wrap };
+
+    const label = slideLabel();
+    document.getElementById('hlp-snip').textContent =
+      `style="--box-x:${bx}%; --box-y:${by}%; --box-w:${bw}%; --box-h:${bh}%;"`;
+    document.getElementById('hlp-path').textContent = '→ ' + suggestPath(label);
+    document.getElementById('hlp-hint').style.display = 'none';
+    document.getElementById('hlp-res').style.display  = 'block';
+  }, true);
+
+  // ── Copy ───────────────────────────────────────────────────────────────────
+  function copySnip() {
+    const text = document.getElementById('hlp-snip').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const b = document.getElementById('hlp-copy');
+      const orig = b.textContent;
+      b.textContent = '✓ Copied!';
+      setTimeout(() => b.textContent = orig, 1800);
+    });
+  }
+
+  // ── Download callout crop ──────────────────────────────────────────────────
+  function downloadCrop() {
+    if (!last) return;
+    const img = last.wrap.querySelector('.main-shot');
+    if (!img) return;
+
+    const canvas = document.createElement('canvas');
+    const ctx    = canvas.getContext('2d');
+    const nw = img.naturalWidth, nh = img.naturalHeight;
+    const cx = Math.round((parseFloat(last.x) / 100) * nw);
+    const cy = Math.round((parseFloat(last.y) / 100) * nh);
+    const cw = Math.round((parseFloat(last.w) / 100) * nw);
+    const ch = Math.round((parseFloat(last.h) / 100) * nh);
+
+    canvas.width = cw; canvas.height = ch;
+    try {
+      ctx.drawImage(img, cx, cy, cw, ch, 0, 0, cw, ch);
+    } catch {
+      alert('Could not crop image — CORS? Ensure quarto preview is running on localhost.');
+      return;
+    }
+
+    const filename = suggestFilename(slideLabel());
+    canvas.toBlob(blob => {
+      const url = URL.createObjectURL(blob);
+      const a = Object.assign(document.createElement('a'), { href: url, download: filename });
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(() => URL.revokeObjectURL(url), 1000);
+      const b = document.getElementById('hlp-dl');
+      const orig = b.textContent;
+      b.textContent = `✓ Saved ${filename}`;
+      setTimeout(() => b.textContent = orig, 2500);
+    }, 'image/png');
+  }
+
+  // ── Init ───────────────────────────────────────────────────────────────────
+  whenReady(build);
+})();
+</script>
