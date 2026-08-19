@@ -1,6 +1,387 @@
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — HIGHLIGHT PICKER v2
+   MAKER BOOTCAMP — HIGHLIGHT PICKER v3
+   ───────────────────────────────────────────────────────────────────────────
+   Add to a module's _quarto.yml under format.revealjs:
+     include-after-body:
+       - ../../tools/highlight-picker.html
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+function whenReady(cb) {
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+  const t0 = Date.now();
+  const id = setInterval(() => {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+    else if (Date.now() - t0 > 8000) clearInterval(id);
+  }, 80);
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+const perSlide    = new Map();
+let nextId        = 1;
+let drawMode      = null;
+let dragState     = null;
+let toolActive    = false;
+let imgFolderHandle = null;
+let deckFileHandle  = null;
+let panelEl, overlayEl;
+
+// ── Slide helpers ─────────────────────────────────────────────────────────────
+const slideKey = () => { const i = Reveal.getIndices(); return `${i.h}-${i.v||0}`; };
+const getBoxes = () => { const k = slideKey(); if (!perSlide.has(k)) perSlide.set(k, []); return perSlide.get(k); };
+const slideWrap = () => Reveal.getCurrentSlide()?.querySelector('.main-shot-wrap');
+
+function slideLabel() {
+  return Reveal.getCurrentSlide()?.querySelector('h2')?.textContent?.trim() || '';
+}
+function numParts(label) {
+  const m = (label||'').match(/^(\d+)\.(\d+)/);
+  return m ? { sec: m[1], step: m[2] } : null;
+}
+const fmt = n => parseFloat(n).toFixed(1);
+const calloutName = (label, i) => { const n = numParts(label); return n ? `${n.sec}.${n.step}.${i}.png` : `callout-${i}.png`; };
+const calloutPath = (label, i) => { const n = numParts(label); return n ? `images/${n.sec}/${n.sec}.${n.step}.${i}.png` : `callout-${i}.png`; };
+
+// ── QMD update logic ──────────────────────────────────────────────────────────
+function buildHighlightHTML(boxes) {
+  if (!boxes.length) return '';
+  return '\n' + boxes.map(b =>
+    `      <div class="click-highlight" style="--box-x:${b.x}%; --box-y:${b.y}%; --box-w:${b.w}%; --box-h:${b.h}%;" aria-hidden="true"></div>`
+  ).join('\n') + '\n    ';
+}
+
+function patchQmdContent(content, label, boxes) {
+  const n = numParts(label);
+  if (!n) return null;
+
+  // Find the unique main-shot image src for this slide
+  const imgSrc = `images/${n.sec}/${n.sec}.${n.step}.0.`;
+  const imgSrcPos = content.indexOf(imgSrc);
+  if (imgSrcPos === -1) return null;
+
+  // End of img tag (first > after the src)
+  const imgTagEnd = content.indexOf('>', imgSrcPos) + 1;
+
+  // Find the closing </div> of main-shot-wrap by tracking depth
+  let pos = imgTagEnd, depth = 0;
+  while (pos < content.length) {
+    const nextOpen  = content.indexOf('<div', pos);
+    const nextClose = content.indexOf('</div>', pos);
+    if (nextClose === -1) return null;
+    if (nextOpen !== -1 && nextOpen < nextClose) {
+      depth++; pos = nextOpen + 4;
+    } else {
+      if (depth === 0) {
+        // nextClose is the closing </div> of main-shot-wrap
+        return content.slice(0, imgTagEnd) + buildHighlightHTML(boxes) + content.slice(nextClose);
+      }
+      depth--; pos = nextClose + 6;
+    }
+  }
+  return null;
+}
+
+async function applyToDeck() {
+  if (!deckFileHandle) { alert('Link deck.qmd first (📄 button above).'); return; }
+  const boxes = getBoxes();
+  const label = slideLabel();
+  try {
+    const file    = await deckFileHandle.getFile();
+    const content = await file.text();
+    const updated = patchQmdContent(content, label, boxes);
+    if (!updated) {
+      alert(`Slide not found in deck.qmd.\nMake sure the image follows the naming convention (e.g. images/${numParts(label)?.sec||'N'}/${numParts(label)?.sec||'N'}.${numParts(label)?.step||'M'}.0.png).`);
+      return;
+    }
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(updated); await wr.close();
+    // Inject real click-highlight divs into live DOM immediately
+    syncOverlays(true);
+    flashStatus('✓ deck.qmd updated — Quarto is reloading…');
+  } catch (err) { alert('Write failed: ' + err.message); }
+}
+
+// ── Live overlay previews ─────────────────────────────────────────────────────
+function syncOverlays(permanent = false) {
+  document.querySelectorAll('.hlp-prev').forEach(e => e.remove());
+  if (!toolActive && !permanent) return;
+  const wrap = slideWrap();
+  if (!wrap) return;
+  const boxes = getBoxes();
+
+  // Also remove any previously injected real highlight divs for this wrap
+  // (so they don't double up after a re-apply)
+  if (permanent) {
+    wrap.querySelectorAll('.click-highlight').forEach(e => e.remove());
+    boxes.forEach(b => {
+      const d = document.createElement('div');
+      d.className = 'click-highlight';
+      d.setAttribute('aria-hidden', 'true');
+      d.style.cssText = `--box-x:${b.x}%; --box-y:${b.y}%; --box-w:${b.w}%; --box-h:${b.h}%;`;
+      wrap.appendChild(d);
+    });
+    return;
+  }
+
+  boxes.forEach((b, i) => {
+    const d = document.createElement('div');
+    d.className = 'hlp-prev';
+    Object.assign(d.style, {
+      position:'absolute', left:b.x+'%', top:b.y+'%', width:b.w+'%', height:b.h+'%',
+      zIndex:'5', pointerEvents:'none', border:'2px solid #f59e0b', borderRadius:'4px',
+      boxSizing:'border-box', boxShadow:'0 0 0 1px rgba(0,0,0,.25), 0 0 10px rgba(245,158,11,.4)',
+    });
+    const lbl = Object.assign(document.createElement('span'), { textContent: i + 1 });
+    Object.assign(lbl.style, {
+      position:'absolute', top:'2px', left:'4px', background:'#f59e0b',
+      color:'#000', fontSize:'10px', fontWeight:'bold', padding:'0 3px', borderRadius:'2px',
+    });
+    d.appendChild(lbl);
+    wrap.appendChild(d);
+  });
+}
+
+// ── Cursors ───────────────────────────────────────────────────────────────────
+const setCursors = c => document.querySelectorAll('.main-shot-wrap').forEach(e => e.style.cursor = c);
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+function toggleTool() {
+  toolActive = !toolActive;
+  document.getElementById('hlp-btn').style.background = toolActive ? '#f59e0b' : '#1eae9d';
+  panelEl.style.display = toolActive ? 'block' : 'none';
+  if (!toolActive) {
+    drawMode = null; dragState = null;
+    overlayEl.style.display = 'none';
+    setCursors('');
+    document.querySelectorAll('.hlp-prev').forEach(e => e.remove());
+  } else {
+    renderPanel(); syncOverlays();
+  }
+}
+
+// ── Draw mode ─────────────────────────────────────────────────────────────────
+function activateDraw(id) { drawMode = id; setCursors('crosshair'); renderPanel(); }
+
+// ── Drag ──────────────────────────────────────────────────────────────────────
+document.addEventListener('mousedown', e => {
+  if (!toolActive || drawMode === null) return;
+  const wrap = e.target.closest('.main-shot-wrap');
+  if (!wrap) return;
+  e.preventDefault(); e.stopPropagation();
+  const r = wrap.getBoundingClientRect();
+  dragState = { r, sx: e.clientX - r.left, sy: e.clientY - r.top };
+  overlayEl.style.display = 'block';
+}, true);
+
+document.addEventListener('mousemove', e => {
+  if (!dragState) return;
+  const { r, sx, sy } = dragState;
+  const cx = Math.max(0, Math.min(e.clientX - r.left, r.width));
+  const cy = Math.max(0, Math.min(e.clientY - r.top,  r.height));
+  Object.assign(overlayEl.style, {
+    left:(r.left+Math.min(sx,cx))+'px', top:(r.top+Math.min(sy,cy))+'px',
+    width:Math.abs(cx-sx)+'px', height:Math.abs(cy-sy)+'px',
+  });
+}, true);
+
+document.addEventListener('mouseup', e => {
+  if (!dragState) return;
+  const { r, sx, sy } = dragState; dragState = null; overlayEl.style.display = 'none';
+  const cx = Math.max(0, Math.min(e.clientX - r.left, r.width));
+  const cy = Math.max(0, Math.min(e.clientY - r.top,  r.height));
+  const x = Math.min(sx,cx), y = Math.min(sy,cy);
+  const w = Math.abs(cx-sx), h = Math.abs(cy-sy);
+  if (w < 8 || h < 8) return;
+  const bx=fmt((x/r.width)*100), by=fmt((y/r.height)*100), bw=fmt((w/r.width)*100), bh=fmt((h/r.height)*100);
+  const boxes = getBoxes();
+  if (drawMode === 'new') { boxes.push({ id:nextId++, x:bx, y:by, w:bw, h:bh }); }
+  else { const b = boxes.find(b => b.id === drawMode); if (b) Object.assign(b, {x:bx,y:by,w:bw,h:bh}); }
+  drawMode = null; setCursors('default');
+  syncOverlays(); renderPanel();
+}, true);
+
+// ── File pickers ──────────────────────────────────────────────────────────────
+async function pickDeckFile() {
+  if (!('showOpenFilePicker' in window)) { alert('File System Access API not available in this browser.'); return; }
+  try {
+    [deckFileHandle] = await window.showOpenFilePicker({
+      types: [{ description: 'Quarto Markdown', accept: { 'text/plain': ['.qmd'] } }]
+    });
+    renderPanel();
+  } catch {}
+}
+
+async function chooseImagesFolder() {
+  if (!('showDirectoryPicker' in window)) { alert('File System Access API not available in this browser.'); return; }
+  try { imgFolderHandle = await window.showDirectoryPicker({ mode:'readwrite' }); renderPanel(); }
+  catch {}
+}
+
+// ── Callout image download/save ───────────────────────────────────────────────
+async function saveCallout(box, idx) {
+  const img = slideWrap()?.querySelector('.main-shot');
+  if (!img) return;
+  const c = document.createElement('canvas'), ctx = c.getContext('2d');
+  const nw=img.naturalWidth, nh=img.naturalHeight;
+  const cx=Math.round((parseFloat(box.x)/100)*nw), cy=Math.round((parseFloat(box.y)/100)*nh);
+  const cw=Math.round((parseFloat(box.w)/100)*nw), ch=Math.round((parseFloat(box.h)/100)*nh);
+  c.width=cw; c.height=ch;
+  try { ctx.drawImage(img,cx,cy,cw,ch,0,0,cw,ch); }
+  catch { alert('CORS error — run quarto preview on localhost.'); return; }
+  const label = slideLabel(), fname = calloutName(label, idx), n = numParts(label);
+  c.toBlob(async blob => {
+    if (imgFolderHandle && n) {
+      try {
+        const sd = await imgFolderHandle.getDirectoryHandle(n.sec, {create:true});
+        const fh = await sd.getFileHandle(fname, {create:true});
+        const wr = await fh.createWritable(); await wr.write(blob); await wr.close();
+        flashBtn(`hlp-save-${box.id}`, '✓ Saved'); return;
+      } catch {}
+    }
+    const url = URL.createObjectURL(blob);
+    const a = Object.assign(document.createElement('a'), {href:url, download:fname});
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    flashBtn(`hlp-save-${box.id}`, '✓ Downloaded');
+  }, 'image/png');
+}
+
+function flashBtn(id, msg) {
+  const b = document.getElementById(id); if (!b) return;
+  const o = b.textContent; b.textContent = msg; setTimeout(() => b.textContent = o, 2200);
+}
+function flashStatus(msg) {
+  const el = document.getElementById('hlp-status'); if (!el) return;
+  el.textContent = msg; el.style.display='block'; setTimeout(()=> el.style.display='none', 4000);
+}
+
+// ── Render panel ──────────────────────────────────────────────────────────────
+function bs(bg, col, w='auto', p='3px 9px') {
+  return `background:${bg};color:${col};border:1px solid ${col}44;border-radius:4px;padding:${p};cursor:pointer;font-size:10px;font-family:ui-monospace,monospace;${w!=='auto'?'width:'+w+';':''}`;
+}
+
+function renderPanel() {
+  if (!panelEl || !toolActive) return;
+  const boxes = getBoxes(), label = slideLabel(), adding = drawMode === 'new';
+  const hasDecks = !!deckFileHandle;
+
+  panelEl.innerHTML = `
+    <div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:2px;">📐 Highlight Picker</div>
+    <div style="color:#555;font-size:10px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${label}">${label||'—'}</div>
+
+    <!-- File links -->
+    <div style="display:flex;gap:5px;margin-bottom:10px;">
+      <button id="hlp-link-deck" style="${bs('#1a1a1a', hasDecks?'#34d399':'#888', 'auto', '4px 8px')}" title="Pick deck.qmd to enable auto-write">
+        ${hasDecks ? '📄 '+deckFileHandle.name : '📄 Link deck.qmd'}
+      </button>
+      <button id="hlp-link-imgs" style="${bs('#1a1a1a', imgFolderHandle?'#34d399':'#888', 'auto', '4px 8px')}" title="Pick images/ folder for direct save">
+        ${imgFolderHandle ? '📁 '+imgFolderHandle.name : '📁 Link images/'}
+      </button>
+    </div>
+
+    <!-- Highlights list -->
+    ${boxes.length ? `
+      <div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Highlights</div>
+      ${boxes.map((b,i) => `
+        <div style="display:flex;align-items:center;gap:5px;
+          background:${drawMode===b.id?'#2a2000':'#141414'};
+          border:1px solid ${drawMode===b.id?'#f59e0b':'#2e2e2e'};
+          border-radius:5px;padding:5px 8px;margin-bottom:4px;">
+          <span style="color:#f59e0b;font-size:10px;flex:1;">Box ${i+1} &nbsp; x:${b.x}% y:${b.y}% w:${b.w}% h:${b.h}%</span>
+          <button id="hlp-edit-${b.id}" style="${bs('#2a2000','#f59e0b')}">✏</button>
+          <button id="hlp-del-${b.id}"  style="${bs('#1a0000','#f87171')}">✕</button>
+        </div>
+      `).join('')}
+    ` : `<div style="color:#555;font-size:11px;line-height:1.6;background:#141414;border-radius:5px;padding:8px;margin-bottom:8px;">
+      Click <strong style="color:#aaa;">+ Add highlight</strong> then drag on the image.
+    </div>`}
+
+    <button id="hlp-add" style="${bs(adding?'#2a2000':'#1a1a1a', adding?'#f59e0b':'#888', '100%', '5px 8px')}">
+      ${adding ? '↖ Drag on image to draw…' : '+ Add highlight'}
+    </button>
+
+    ${boxes.length ? `
+      <!-- Apply to deck -->
+      <hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">
+      <button id="hlp-apply" style="${bs(hasDecks?'#0a2a1a':'#1a1a1a', hasDecks?'#34d399':'#555', '100%', '6px 8px')}">
+        ${hasDecks ? '💾 Apply highlights to deck.qmd' : '💾 Apply (link deck.qmd first)'}
+      </button>
+      <div id="hlp-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>
+
+      <!-- Callout images -->
+      <hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">
+      <div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Callout images</div>
+      ${boxes.map((b,i) => `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">
+          <span style="color:#555;font-size:10px;flex:1;font-family:monospace;">${calloutPath(label,i+1)}</span>
+          <button id="hlp-save-${b.id}" data-boxid="${b.id}" data-idx="${i+1}" style="${bs('#0d2620','#34d399')}">⬇ Save</button>
+        </div>
+      `).join('')}
+    ` : ''}
+  `;
+
+  // Bindings
+  document.getElementById('hlp-link-deck').addEventListener('click', pickDeckFile);
+  document.getElementById('hlp-link-imgs').addEventListener('click', chooseImagesFolder);
+  document.getElementById('hlp-add').addEventListener('click', () => activateDraw('new'));
+  document.getElementById('hlp-apply')?.addEventListener('click', applyToDeck);
+
+  boxes.forEach(b => {
+    document.getElementById(`hlp-edit-${b.id}`)?.addEventListener('click', e => { e.stopPropagation(); activateDraw(b.id); });
+    document.getElementById(`hlp-del-${b.id}`)?.addEventListener('click', e => {
+      e.stopPropagation();
+      const arr = getBoxes(); arr.splice(arr.findIndex(h => h.id===b.id), 1);
+      if (drawMode===b.id) { drawMode=null; setCursors('default'); }
+      syncOverlays(); renderPanel();
+    });
+    const sb = document.getElementById(`hlp-save-${b.id}`);
+    sb?.addEventListener('click', () => saveCallout(b, parseInt(sb.dataset.idx)));
+  });
+}
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+function build() {
+  const btn = document.createElement('button');
+  btn.id = 'hlp-btn'; btn.textContent = '📐';
+  Object.assign(btn.style, {
+    position:'fixed', bottom:'16px', left:'16px', zIndex:'10000',
+    width:'42px', height:'42px', borderRadius:'50%', border:'none',
+    background:'#1eae9d', fontSize:'18px', cursor:'pointer',
+    boxShadow:'0 2px 10px rgba(0,0,0,.4)', transition:'background .15s',
+  });
+  btn.addEventListener('click', toggleTool);
+  document.body.appendChild(btn);
+
+  overlayEl = document.createElement('div');
+  Object.assign(overlayEl.style, {
+    position:'fixed', zIndex:'9999', pointerEvents:'none', display:'none',
+    border:'2.5px solid #f59e0b', borderRadius:'5px',
+    boxShadow:'0 0 0 2px rgba(0,0,0,.2), 0 0 16px rgba(245,158,11,.55)',
+  });
+  document.body.appendChild(overlayEl);
+
+  panelEl = document.createElement('div');
+  Object.assign(panelEl.style, {
+    position:'fixed', bottom:'68px', left:'16px', zIndex:'10000',
+    background:'#1a1a1a', color:'#f0f0f0', borderRadius:'10px',
+    padding:'14px 16px', fontFamily:'ui-monospace,monospace',
+    width:'310px', display:'none', maxHeight:'82vh', overflowY:'auto',
+    boxShadow:'0 6px 28px rgba(0,0,0,.7)', border:'1px solid #2a2a2a',
+  });
+  document.body.appendChild(panelEl);
+
+  Reveal.on('slidechanged', () => {
+    drawMode = null; setCursors(toolActive ? 'default' : '');
+    syncOverlays(); renderPanel();
+  });
+}
+
+whenReady(build);
+})();
+</script>
+
    ───────────────────────────────────────────────────────────────────────────
    Add to a module's _quarto.yml under format.revealjs:
      include-after-body:
