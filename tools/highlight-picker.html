@@ -21,6 +21,37 @@ function whenReady(cb) {
   }, 80);
 }
 
+// ── IndexedDB — persists file handles across page reloads ────────────────────
+const _db = (() => {
+  let _c = null;
+  const open = () => _c ? Promise.resolve(_c) : new Promise((res,rej) => {
+    const r = indexedDB.open('hlp-db',1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore('h');
+    r.onsuccess = e => { _c=e.target.result; res(_c); };
+    r.onerror   = e => rej(e.target.error);
+  });
+  const tx = (rw,cb) => open().then(db => new Promise((res,rej) => {
+    const t=db.transaction('h',rw), s=t.objectStore('h'), q=cb(s);
+    t.oncomplete=()=>res(q?.result); t.onerror=rej;
+  }));
+  return {
+    save: (k,v) => tx('readwrite', s => s.put(v,k)),
+    load: (k)   => tx('readonly',  s => s.get(k)),
+  };
+})();
+
+async function restoreHandles() {
+  // Called from inside toggleTool — the 📐 click is the required user gesture
+  if (!deckFileHandle) {
+    const h = await _db.load('deck').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') deckFileHandle=h; }
+  }
+  if (!imgFolderHandle) {
+    const h = await _db.load('images').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') imgFolderHandle=h; }
+  }
+}
+
 // ── State ────────────────────────────────────────────────────────────────────
 const perSlide      = new Map();
 let nextId          = 1;
@@ -116,7 +147,7 @@ function syncOverlays(permanent=false) {
 }
 
 // ── Toggle ────────────────────────────────────────────────────────────────────
-function toggleTool() {
+async function toggleTool() {
   toolActive = !toolActive;
   document.getElementById('hlp-btn').style.background = toolActive ? '#f59e0b' : '#1eae9d';
   panelEl.style.display = toolActive ? 'block' : 'none';
@@ -124,7 +155,7 @@ function toggleTool() {
     drawMode=null; captureEl?.remove(); captureEl=null;
     overlayEl.style.display='none';
     document.querySelectorAll('.hlp-prev').forEach(e=>e.remove());
-  } else { renderPanel(); syncOverlays(); }
+  } else { await restoreHandles(); renderPanel(); syncOverlays(); }
 }
 
 // ── Draw mode (capture overlay avoids RevealJS event conflicts) ───────────────
@@ -180,11 +211,11 @@ function onCaptureDown(e) {
 // ── File pickers ──────────────────────────────────────────────────────────────
 async function pickDeckFile() {
   if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
-  try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); renderPanel(); } catch {}
+  try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
 }
 async function chooseImagesFolder() {
   if (!('showDirectoryPicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
-  try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); renderPanel(); } catch {}
+  try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); await _db.save('images',imgFolderHandle); renderPanel(); } catch {}
 }
 
 // ── Callout save ──────────────────────────────────────────────────────────────
