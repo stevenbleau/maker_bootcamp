@@ -1,6 +1,6 @@
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — HIGHLIGHT PICKER v8
+   MAKER BOOTCAMP — HIGHLIGHT PICKER v13
    ───────────────────────────────────────────────────────────────────────────
    Add to a module's _quarto.yml under format.revealjs:
      include-after-body:
@@ -136,15 +136,37 @@ function boxThumbDataURL(img, box, maxW=160) {
   catch { return null; }
 }
 
+// Each successful save writes deck.qmd, which triggers Quarto's live-reload —
+// but that reload can land a moment late, after this page has already moved
+// on to another slide. If a *new* save starts before an *earlier* save's
+// reload actually fires, the reload tears down this page mid-save: whatever
+// already wrote (e.g. the image file) survives, but anything after it (e.g.
+// the deck.qmd write) never runs, with no error to show — the whole JS
+// context is just gone. reloadCooldown blocks starting a new save until a
+// prior one has had time to either reload the page (moot, state resets) or
+// prove no reload is coming.
+let reloadCooldown = false;
+const RELOAD_COOLDOWN_MS = 3000;
+
 // Single save action: always writes every highlight box, and additionally
 // crops + writes a callout image (and its <img> tag) for each box whose
 // "Save image" checkbox is checked.
 async function saveAll() {
+  if (reloadCooldown) { alert('Still waiting for Quarto to finish reloading from the last save — try again in a moment.'); return; }
   if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
   const boxes=getBoxes(); if (!boxes.length) return;
   const label=slideLabel();
   const toSave=boxes.filter(b=>b.saveImg);
   if (toSave.length && !imgFolderHandle) { alert('Link images/ folder first (📁 button) to save checked images.'); return; }
+  const n = numParts(label);
+  if (toSave.length && !n) { alert('Slide title doesn\'t start with N.M — can\'t tell which images/ subfolder to use.'); return; }
+  // Guard against a stale linked handle from before per-deck linking existed
+  // (or a mis-click): if the linked folder's own name is a bare number, it's
+  // almost certainly a section subfolder itself, not the deck's images/ root.
+  if (toSave.length && /^\d+$/.test(imgFolderHandle.name) && imgFolderHandle.name!==n.sec) {
+    alert('Linked folder is "'+imgFolderHandle.name+'/" but this slide is section '+n.sec+' — click 📁 and link the deck\'s top-level images/ folder instead.');
+    return;
+  }
 
   const btn=document.getElementById('hlp-save'), orig=btn?.textContent;
   if (btn) btn.textContent='Saving…';
@@ -152,6 +174,15 @@ async function saveAll() {
     const img = toSave.length ? slideWrap()?.querySelector('.main-shot') : null;
     if (toSave.length && !img) { alert('Main image not found.'); return; }
 
+    // Crop filenames are deterministic from label+idx, so the full deck.qmd
+    // content can be built before any bytes hit disk. Quarto's dev server
+    // watches referenced image assets too (confirmed: writing an image file
+    // alone triggers its reload, same as editing deck.qmd) — so image
+    // writes below carry the same page-teardown risk deck.qmd writes do.
+    // deck.qmd goes first because it holds the hardest-to-redo data (exact
+    // highlight position, any hand-typed label text); if a reload cuts the
+    // save short after this point, the worst case is a missing image that
+    // just needs re-checking and re-saving, not a lost highlight.
     const crops=[];
     for (const b of toSave) {
       const idx=boxes.indexOf(b)+1;
@@ -159,24 +190,34 @@ async function saveAll() {
       if (!blob) { alert('CORS error — run quarto preview on localhost.'); return; }
       crops.push({idx,fname:calloutName(label,idx),blob});
     }
-    for (const c of crops) {
-      const fh=await imgFolderHandle.getFileHandle(c.fname,{create:true});
-      const wr=await fh.createWritable(); await wr.write(c.blob); await wr.close();
-    }
 
     const file=await deckFileHandle.getFile();
     const withHL=patchQmd(await file.text(), label, boxes);
     if (!withHL) { alert('Slide not found in deck.qmd — check image naming convention (N.M.0.webp).'); return; }
     let content=withHL;
-    for (const c of crops) {
-      const withCL=patchCallout(content, label, c.fname, c.idx);
+    if (crops.length) {
+      const withCL=patchCallouts(content, label, crops);
       if (withCL) content=withCL;
     }
     const wr2=await deckFileHandle.createWritable();
     await wr2.write(content); await wr2.close();
 
+    for (const c of crops) {
+      // images/ is linked once per deck; each slide's crops land in the N
+      // subfolder matching its section number, created if missing — unless
+      // the linked folder already IS that section folder (name matches n.sec),
+      // in which case write directly into it instead of nesting N/N/.
+      const sectionDir = imgFolderHandle.name===n.sec
+        ? imgFolderHandle
+        : await imgFolderHandle.getDirectoryHandle(n.sec,{create:true});
+      const fh=await sectionDir.getFileHandle(c.fname,{create:true});
+      const wr=await fh.createWritable(); await wr.write(c.blob); await wr.close();
+    }
+
     syncOverlays(true);
     flashStatus('✓ Saved — Quarto is reloading…');
+    reloadCooldown=true; renderPanel();
+    setTimeout(()=>{ reloadCooldown=false; renderPanel(); }, RELOAD_COOLDOWN_MS);
   } catch(err) { alert('Save failed: '+err.message); }
   finally { if (btn) btn.textContent=orig; }
 }
@@ -281,13 +322,20 @@ async function pickDeckFile() {
   if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
   try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
 }
+// Pick the deck's top-level images/ folder once — saveAll() resolves the
+// N subfolder per slide from its section number, creating it if needed.
 async function chooseImagesFolder() {
   if (!('showDirectoryPicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
   try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); await _db.save('images',imgFolderHandle); renderPanel(); } catch {}
 }
 
-// ── Callout: patch QMD and update live DOM ───────────────────────────────────
-function patchCallout(content, label, fname, idx) {
+// ── Callout: patch QMD with the full set of checked callouts at once ─────────
+// Rebuilds every <img>+<div class="callout-label"> pair together (rather than
+// one at a time) so N checked boxes produce N callouts instead of each save
+// clobbering the previous one. Each label gets an auto-generated "N.M.I:"
+// prefix; any hand-written text typed after an existing label's prefix is
+// preserved by matching position across saves.
+function patchCallouts(content, label, crops) {
   const n = numParts(label); if (!n) return null;
   // Locate this slide by its unique main-shot src
   const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
@@ -305,11 +353,32 @@ function patchCallout(content, label, fname, idx) {
     else { if(depth===0){cbEnd=nc;break;} depth--; pos=nc+6; }
   }
   if (cbEnd===-1) return null;
-  // Rebuild callout-box content: remove any existing callout <img>, prepend new one
   let cbBody = content.slice(cbStart, cbEnd);
-  cbBody = cbBody.replace(/<img(?![\s\S]*?class="main-shot")[^>]*>\n?/g, '');
-  const imgTag = '\n    <img src="images/'+n.sec+'/'+fname+'" alt="Callout image for step '+n.sec+'.'+n.step+'">';
-  cbBody = imgTag + cbBody;
+
+  // Capture existing label bodies (prefix stripped) in document order, so
+  // re-saving preserves hand-written text at the same position.
+  const priorBodies = [];
+  const labelRe = /<div class="callout-label">([\s\S]*?)<\/div>/g;
+  let m;
+  while ((m = labelRe.exec(cbBody))) {
+    priorBodies.push(m[1].trim().replace(/^\d+\.\d+(?:\.\d+)?:\s*/, ''));
+  }
+
+  // Strip all existing callout <img> and callout-label blocks, including
+  // their leading whitespace, so re-saving doesn't accumulate indentation
+  // before whatever follows (e.g. <p class="concept-insight">).
+  cbBody = cbBody.replace(/\s*<img(?![\s\S]*?class="main-shot")[^>]*>/g, '');
+  cbBody = cbBody.replace(/\s*<div class="callout-label">[\s\S]*?<\/div>/g, '');
+
+  const blocks = crops.map((c,i) => {
+    const prefix = n.sec+'.'+n.step+'.'+c.idx+':';
+    const body = priorBodies[i] || '';
+    const text = body ? prefix+' '+body : prefix;
+    return '\n    <img src="images/'+n.sec+'/'+c.fname+'" alt="Callout image for step '+n.sec+'.'+n.step+'.'+c.idx+'">'+
+           '\n    <div class="callout-label">\n      '+text+'\n    </div>';
+  }).join('');
+
+  cbBody = blocks + cbBody;
   return content.slice(0, cbStart) + cbBody + content.slice(cbEnd);
 }
 
@@ -327,7 +396,7 @@ function renderPanel() {
     '<div style="color:#555;font-size:10px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+label+'">'+( label||'—')+'</div>'+
     '<div style="display:flex;gap:5px;margin-bottom:10px;">'+
       '<button id="hlp-link-deck" style="'+bs('#1a1a1a',hasDecks?'#34d399':'#888','auto','4px 8px')+'">'+( hasDecks?'📄 '+deckFileHandle.name:'📄 Link deck.qmd')+'</button>'+
-      '<button id="hlp-link-imgs" style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+( imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
+      '<button id="hlp-link-imgs" title="Pick the deck\'s top-level images/ folder — section subfolders (0, 1, 2…) are resolved automatically." style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+( imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
     '</div>'+
     (boxes.length ?
       '<div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Highlights</div>'+
@@ -351,7 +420,7 @@ function renderPanel() {
     '<button id="hlp-add" style="'+bs(adding?'#2a2000':'#1a1a1a',adding?'#f59e0b':'#888','100%','5px 8px')+'">'+( adding?'↖ Drag on image to draw…':'+ Add highlight')+'</button>'+
     (boxes.length ?
       '<hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">'+
-      '<button id="hlp-save" style="'+bs(hasDecks?'#0d2620':'#1a1a1a',hasDecks?'#34d399':'#555','100%','7px 8px')+'">'+( hasDecks?'💾 Save changes':'💾 Save (link deck.qmd first)')+'</button>'+
+      '<button id="hlp-save" '+(reloadCooldown?'disabled':'')+' style="'+bs(reloadCooldown?'#1a1a1a':(hasDecks?'#0d2620':'#1a1a1a'),reloadCooldown?'#555':(hasDecks?'#34d399':'#555'),'100%','7px 8px')+(reloadCooldown?'cursor:not-allowed;':'')+'">'+( reloadCooldown?'⏳ Waiting for reload…':(hasDecks?'💾 Save changes':'💾 Save (link deck.qmd first)'))+'</button>'+
       '<div id="hlp-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>'
     : '');
 
