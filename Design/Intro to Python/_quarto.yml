@@ -3,7 +3,7 @@ project:
 
 format:
   revealjs:
-    theme: [default, theme/maker-bootcamp.scss]
+    theme: [default, ../../theme/maker-bootcamp.scss, theme/overrides.scss]
     width: 1280
     height: 720
     slide-number: false

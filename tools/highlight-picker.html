@@ -1,0 +1,401 @@
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAKER BOOTCAMP — HIGHLIGHT PICKER v4
+   ───────────────────────────────────────────────────────────────────────────
+   Add to a module's _quarto.yml under format.revealjs:
+     include-after-body:
+       - ../../tools/highlight-picker.html
+
+   REQUIRES CHROME — open quarto preview localhost URL in Chrome for
+   File System Access API (file read/write) support.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+function whenReady(cb) {
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+  const t0 = Date.now();
+  const id = setInterval(() => {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+    else if (Date.now() - t0 > 8000) clearInterval(id);
+  }, 80);
+}
+
+// ── IndexedDB — persists file handles across page reloads ────────────────────
+const _db = (() => {
+  let _c = null;
+  const open = () => _c ? Promise.resolve(_c) : new Promise((res,rej) => {
+    const r = indexedDB.open('hlp-db',1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore('h');
+    r.onsuccess = e => { _c=e.target.result; res(_c); };
+    r.onerror   = e => rej(e.target.error);
+  });
+  const tx = (rw,cb) => open().then(db => new Promise((res,rej) => {
+    const t=db.transaction('h',rw), s=t.objectStore('h'), q=cb(s);
+    t.oncomplete=()=>res(q?.result); t.onerror=rej;
+  }));
+  return {
+    save: (k,v) => tx('readwrite', s => s.put(v,k)),
+    load: (k)   => tx('readonly',  s => s.get(k)),
+  };
+})();
+
+async function restoreHandles() {
+  // Called from inside toggleTool — the 📐 click is the required user gesture
+  if (!deckFileHandle) {
+    const h = await _db.load('deck').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') deckFileHandle=h; }
+  }
+  if (!imgFolderHandle) {
+    const h = await _db.load('images').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') imgFolderHandle=h; }
+  }
+}
+
+// ── State ────────────────────────────────────────────────────────────────────
+const perSlide      = new Map();
+let nextId          = 1;
+let drawMode        = null;   // null | 'new' | <id>
+let captureEl       = null;   // transparent drag-capture overlay on the image
+let toolActive      = false;
+let imgFolderHandle = null;
+let deckFileHandle  = null;
+let panelEl, overlayEl;
+
+// ── Slide helpers ─────────────────────────────────────────────────────────────
+const slideKey  = () => { const i = Reveal.getIndices(); return i.h+'-'+(i.v||0); };
+const getBoxes  = () => { const k=slideKey(); if(!perSlide.has(k)) perSlide.set(k,[]); return perSlide.get(k); };
+const slideWrap = () => Reveal.getCurrentSlide()?.querySelector('.main-shot-wrap');
+const slideLabel= () => Reveal.getCurrentSlide()?.querySelector('h2')?.textContent?.trim() || '';
+
+function numParts(label) {
+  const m = (label||''). match(/^(\d+)\.(\d+)/);
+  return m ? { sec:m[1], step:m[2] } : null;
+}
+const fmt          = n => parseFloat(n).toFixed(1);
+const calloutName  = (label,i) => { const n=numParts(label); return n ? n.sec+'.'+n.step+'.'+i+'.webp' : 'callout-'+i+'.webp'; };
+const calloutPath  = (label,i) => { const n=numParts(label); return n ? n.sec+'.'+n.step+'.'+i+'.webp' : 'callout-'+i+'.webp'; };
+
+// ── QMD patcher ───────────────────────────────────────────────────────────────
+function buildHLHTML(boxes) {
+  if (!boxes.length) return '';
+  return '\n' + boxes.map(b =>
+    '      <div class="click-highlight" style="--box-x:'+b.x+'%; --box-y:'+b.y+'%; --box-w:'+b.w+'%; --box-h:'+b.h+'%;" aria-hidden="true"></div>'
+  ).join('\n') + '\n    ';
+}
+
+function patchQmd(content, label, boxes) {
+  const n = numParts(label);
+  if (!n) return null;
+  const imgSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
+  const imgPos = content.indexOf(imgSrc);
+  if (imgPos === -1) return null;
+  const imgEnd = content.indexOf('>', imgPos) + 1;
+  let pos=imgEnd, depth=0;
+  while (pos < content.length) {
+    const no=content.indexOf('<div',pos), nc=content.indexOf('</div>',pos);
+    if (nc===-1) return null;
+    if (no!==-1 && no<nc) { depth++; pos=no+4; }
+    else {
+      if (depth===0) return content.slice(0,imgEnd)+buildHLHTML(boxes)+content.slice(nc);
+      depth--; pos=nc+6;
+    }
+  }
+  return null;
+}
+
+async function applyToDeck() {
+  if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
+  const boxes=getBoxes(), label=slideLabel();
+  try {
+    const file=await deckFileHandle.getFile();
+    const updated=patchQmd(await file.text(), label, boxes);
+    if (!updated) { alert('Slide not found in deck.qmd — check image naming convention (N.M.0.png).'); return; }
+    const wr=await deckFileHandle.createWritable();
+    await wr.write(updated); await wr.close();
+    syncOverlays(true);
+    flashStatus('✓ deck.qmd updated — Quarto is reloading…');
+  } catch(err) { alert('Write failed: '+err.message); }
+}
+
+// ── Overlays ──────────────────────────────────────────────────────────────────
+function syncOverlays(permanent=false) {
+  document.querySelectorAll('.hlp-prev').forEach(e=>e.remove());
+  const wrap=slideWrap(); if (!wrap) return;
+  if (permanent) {
+    wrap.querySelectorAll('.click-highlight').forEach(e=>e.remove());
+    getBoxes().forEach(b => {
+      const d=document.createElement('div');
+      d.className='click-highlight'; d.setAttribute('aria-hidden','true');
+      d.style.cssText='--box-x:'+b.x+'%; --box-y:'+b.y+'%; --box-w:'+b.w+'%; --box-h:'+b.h+'%;';
+      wrap.appendChild(d);
+    });
+    return;
+  }
+  if (!toolActive) return;
+  getBoxes().forEach((b,i) => {
+    const d=document.createElement('div');
+    d.className='hlp-prev';
+    Object.assign(d.style,{position:'absolute',left:b.x+'%',top:b.y+'%',width:b.w+'%',height:b.h+'%',
+      zIndex:'5',pointerEvents:'none',border:'2px solid #f59e0b',borderRadius:'4px',boxSizing:'border-box',
+      boxShadow:'0 0 0 1px rgba(0,0,0,.25), 0 0 10px rgba(245,158,11,.4)'});
+    const lbl=Object.assign(document.createElement('span'),{textContent:i+1});
+    Object.assign(lbl.style,{position:'absolute',top:'2px',left:'4px',background:'#f59e0b',
+      color:'#000',fontSize:'10px',fontWeight:'bold',padding:'0 3px',borderRadius:'2px'});
+    d.appendChild(lbl); wrap.appendChild(d);
+  });
+}
+
+// ── Toggle ────────────────────────────────────────────────────────────────────
+async function toggleTool() {
+  toolActive = !toolActive;
+  document.getElementById('hlp-btn').style.background = toolActive ? '#f59e0b' : '#1eae9d';
+  panelEl.style.display = toolActive ? 'block' : 'none';
+  if (!toolActive) {
+    drawMode=null; captureEl?.remove(); captureEl=null;
+    overlayEl.style.display='none';
+    document.querySelectorAll('.hlp-prev').forEach(e=>e.remove());
+  } else { await restoreHandles(); renderPanel(); syncOverlays(); }
+}
+
+// ── Draw mode (capture overlay avoids RevealJS event conflicts) ───────────────
+function activateDraw(id) {
+  captureEl?.remove(); captureEl=null;
+  drawMode = id;
+  const wrap = slideWrap();
+  if (wrap) {
+    captureEl = document.createElement('div');
+    captureEl.id='hlp-capture';
+    Object.assign(captureEl.style,{position:'absolute',inset:'0',zIndex:'20',cursor:'crosshair'});
+    captureEl.addEventListener('mousedown', onCaptureDown);
+    wrap.appendChild(captureEl);
+  }
+  renderPanel();
+}
+
+function onCaptureDown(e) {
+  e.preventDefault(); e.stopPropagation();
+  const wrap=captureEl.parentElement;
+  const r=wrap.getBoundingClientRect();
+  const sx=e.clientX-r.left, sy=e.clientY-r.top;
+  overlayEl.style.display='block';
+
+  function onMove(e) {
+    const cx=Math.max(0,Math.min(e.clientX-r.left,r.width));
+    const cy=Math.max(0,Math.min(e.clientY-r.top, r.height));
+    Object.assign(overlayEl.style,{
+      left:(r.left+Math.min(sx,cx))+'px', top:(r.top+Math.min(sy,cy))+'px',
+      width:Math.abs(cx-sx)+'px', height:Math.abs(cy-sy)+'px'});
+  }
+
+  function onUp(e) {
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    overlayEl.style.display='none';
+    captureEl?.remove(); captureEl=null;
+    const cx=Math.max(0,Math.min(e.clientX-r.left,r.width));
+    const cy=Math.max(0,Math.min(e.clientY-r.top, r.height));
+    const x=Math.min(sx,cx),y=Math.min(sy,cy),w=Math.abs(cx-sx),h=Math.abs(cy-sy);
+    if (w<8||h<8) { drawMode=null; renderPanel(); return; }
+    const bx=fmt((x/r.width)*100),by=fmt((y/r.height)*100),bw=fmt((w/r.width)*100),bh=fmt((h/r.height)*100);
+    const boxes=getBoxes();
+    if (drawMode==='new') boxes.push({id:nextId++,x:bx,y:by,w:bw,h:bh});
+    else { const b=boxes.find(b=>b.id===drawMode); if(b) Object.assign(b,{x:bx,y:by,w:bw,h:bh}); }
+    drawMode=null; syncOverlays(); renderPanel();
+  }
+
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+// ── File pickers ──────────────────────────────────────────────────────────────
+async function pickDeckFile() {
+  if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
+  try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
+}
+async function chooseImagesFolder() {
+  if (!('showDirectoryPicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
+  try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); await _db.save('images',imgFolderHandle); renderPanel(); } catch {}
+}
+
+// ── Callout: patch QMD and update live DOM ───────────────────────────────────
+function patchCallout(content, label, fname, idx) {
+  const n = numParts(label); if (!n) return null;
+  // Locate this slide by its unique main-shot src
+  const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
+  const mainPos = content.indexOf(mainSrc); if (mainPos===-1) return null;
+  // Find the callout-box that precedes the main image
+  const cbTag = '<div class="callout-box">';
+  const cbPos = content.lastIndexOf(cbTag, mainPos); if (cbPos===-1) return null;
+  const cbStart = cbPos + cbTag.length;
+  // Find closing </div> of callout-box (depth tracking)
+  let pos=cbStart, depth=0, cbEnd=-1;
+  while (pos < mainPos) {
+    const no=content.indexOf('<div',pos), nc=content.indexOf('</div>',pos);
+    if (nc===-1) break;
+    if (no!==-1 && no<nc) { depth++; pos=no+4; }
+    else { if(depth===0){cbEnd=nc;break;} depth--; pos=nc+6; }
+  }
+  if (cbEnd===-1) return null;
+  // Rebuild callout-box content: remove any existing callout <img>, prepend new one
+  let cbBody = content.slice(cbStart, cbEnd);
+  cbBody = cbBody.replace(/<img(?![\s\S]*?class="main-shot")[^>]*>\n?/g, '');
+  const imgTag = '\n    <img src="images/'+n.sec+'/'+fname+'" alt="Callout image for step '+n.sec+'.'+n.step+'">';
+  cbBody = imgTag + cbBody;
+  return content.slice(0, cbStart) + cbBody + content.slice(cbEnd);
+}
+
+function updateCalloutDOM(fname, idx) {
+  const slide = Reveal.getCurrentSlide(); if (!slide) return;
+  const label = slideLabel(), n = numParts(label);
+  const cb = slide.querySelector('.callout-box'); if (!cb) return;
+  // Add/replace callout img
+  let imgEl = cb.querySelector('img');
+  if (!imgEl) {
+    imgEl = document.createElement('img');
+    const lbl = cb.querySelector('.callout-label');
+    if (lbl) cb.insertBefore(imgEl, lbl); else cb.appendChild(imgEl);
+  }
+  if (n) imgEl.src = 'images/'+n.sec+'/'+fname;
+  imgEl.alt = label+' callout '+idx;
+  // Update callout-label prefix: N.M: → N.M.I:
+  const lblEl = cb.querySelector('.callout-label');
+  if (lblEl && n) {
+    const old = n.sec+'.'+n.step+':';
+    const fresh = n.sec+'.'+n.step+'.'+idx+':';
+    const t = lblEl.textContent;
+    if (t.includes(old) && !t.includes(fresh))
+      lblEl.textContent = t.replace(old, fresh);
+  }
+}
+
+// ── Callout save ──────────────────────────────────────────────────────────────
+async function saveCallout(box, idx) {
+  const img=slideWrap()?.querySelector('.main-shot'); if (!img) return;
+  const c=document.createElement('canvas'),ctx=c.getContext('2d');
+  const nw=img.naturalWidth,nh=img.naturalHeight;
+  const cx=Math.round((parseFloat(box.x)/100)*nw),cy=Math.round((parseFloat(box.y)/100)*nh);
+  const cw=Math.round((parseFloat(box.w)/100)*nw),ch=Math.round((parseFloat(box.h)/100)*nh);
+  c.width=cw; c.height=ch;
+  try { ctx.drawImage(img,cx,cy,cw,ch,0,0,cw,ch); }
+  catch { alert('CORS error — run quarto preview on localhost.'); return; }
+  const label=slideLabel(),fname=calloutName(label,idx),n=numParts(label);
+  c.toBlob(async blob => {
+    // Save directly to the selected folder (no subfolder created)
+    if (imgFolderHandle) {
+      try {
+        const fh=await imgFolderHandle.getFileHandle(fname,{create:true});
+        const wr=await fh.createWritable(); await wr.write(blob); await wr.close();
+        // One deck.qmd write: highlights + callout img tag together
+        if (deckFileHandle) {
+          const file=await deckFileHandle.getFile();
+          let content=await file.text();
+          const withHL=patchQmd(content, label, getBoxes());
+          if (withHL) content=withHL;
+          const withCL=patchCallout(content, label, fname, idx);
+          if (withCL) content=withCL;
+          const wr2=await deckFileHandle.createWritable();
+          await wr2.write(content); await wr2.close();
+        }
+        flashBtn('hlp-save-'+box.id,'✓ Saved & Applied'); return;
+      } catch(err) { console.warn('Save failed:',err); }
+    }
+    // Fallback: browser download
+    const url=URL.createObjectURL(blob);
+    const a=Object.assign(document.createElement('a'),{href:url,download:fname});
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(()=>URL.revokeObjectURL(url),1000);
+    updateCalloutDOM(fname, idx);
+    flashBtn('hlp-save-'+box.id,'✓ Downloaded');
+  },'image/webp', 0.92);
+}
+
+function flashBtn(id,msg) { const b=document.getElementById(id); if(!b) return; const o=b.textContent; b.textContent=msg; setTimeout(()=>b.textContent=o,2200); }
+function flashStatus(msg) { const el=document.getElementById('hlp-status'); if(!el) return; el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
+
+// ── Panel render ──────────────────────────────────────────────────────────────
+const bs=(bg,col,w='auto',p='3px 9px')=>'background:'+bg+';color:'+col+';border:1px solid '+col+'44;border-radius:4px;padding:'+p+';cursor:pointer;font-size:10px;font-family:ui-monospace,monospace;'+(w!=='auto'?'width:'+w+';':''  );
+
+function renderPanel() {
+  if (!panelEl||!toolActive) return;
+  const boxes=getBoxes(),label=slideLabel(),adding=drawMode==='new',hasDecks=!!deckFileHandle;
+  panelEl.innerHTML=
+    '<div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:2px;">📐 Highlight Picker</div>'+
+    '<div style="color:#555;font-size:10px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+label+'">'+( label||'—')+'</div>'+
+    '<div style="display:flex;gap:5px;margin-bottom:10px;">'+
+      '<button id="hlp-link-deck" style="'+bs('#1a1a1a',hasDecks?'#34d399':'#888','auto','4px 8px')+'">'+( hasDecks?'📄 '+deckFileHandle.name:'📄 Link deck.qmd')+'</button>'+
+      '<button id="hlp-link-imgs" style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+( imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
+    '</div>'+
+    (boxes.length ?
+      '<div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Highlights</div>'+
+      boxes.map((b,i)=>
+        '<div style="display:flex;align-items:center;gap:5px;background:'+(drawMode===b.id?'#2a2000':'#141414')+';border:1px solid '+(drawMode===b.id?'#f59e0b':'#2e2e2e')+';border-radius:5px;padding:5px 8px;margin-bottom:4px;">'+
+          '<span style="color:#f59e0b;font-size:10px;flex:1;">Box '+(i+1)+' &nbsp; x:'+b.x+'% y:'+b.y+'% w:'+b.w+'% h:'+b.h+'%</span>'+
+          '<button id="hlp-edit-'+b.id+'" style="'+bs('#2a2000','#f59e0b')+'">✏</button>'+
+          '<button id="hlp-del-'+b.id+'"  style="'+bs('#1a0000','#f87171')+'">✕</button>'+
+        '</div>'
+      ).join('')+''
+    : '<div style="color:#555;font-size:11px;line-height:1.6;background:#141414;border-radius:5px;padding:8px;margin-bottom:8px;">Click <strong style="color:#aaa;">+ Add highlight</strong> then drag on the image.</div>')+
+    '<button id="hlp-add" style="'+bs(adding?'#2a2000':'#1a1a1a',adding?'#f59e0b':'#888','100%','5px 8px')+'">'+( adding?'↖ Drag on image to draw…':'+ Add highlight')+'</button>'+
+    (boxes.length ?
+      '<hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">'+
+      '<button id="hlp-apply" style="'+bs(hasDecks?'#0a2a1a':'#1a1a1a',hasDecks?'#34d399':'#555','100%','6px 8px')+'">'+( hasDecks?'💾 Apply to deck.qmd':'💾 Apply (link deck.qmd first)')+'</button>'+
+      '<div id="hlp-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>'+
+      '<hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">'+
+      '<div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Callout images</div>'+
+      boxes.map((b,i)=>
+        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'+
+          '<span style="color:#555;font-size:10px;flex:1;font-family:monospace;">'+calloutPath(label,i+1)+'</span>'+
+          '<button id="hlp-save-'+b.id+'" data-boxid="'+b.id+'" data-idx="'+( i+1)+'" style="'+bs('#0d2620','#34d399')+'">⬇ Save &amp; Apply</button>'+
+        '</div>'
+      ).join('')
+    : '');
+
+  document.getElementById('hlp-link-deck').addEventListener('click',pickDeckFile);
+  document.getElementById('hlp-link-imgs').addEventListener('click',chooseImagesFolder);
+  document.getElementById('hlp-add').addEventListener('click',()=>activateDraw('new'));
+  document.getElementById('hlp-apply')?.addEventListener('click',applyToDeck);
+  boxes.forEach(b=>{
+    document.getElementById('hlp-edit-'+b.id)?.addEventListener('click',e=>{e.stopPropagation();activateDraw(b.id);});
+    document.getElementById('hlp-del-'+b.id)?.addEventListener('click',e=>{
+      e.stopPropagation();
+      const arr=getBoxes(); arr.splice(arr.findIndex(h=>h.id===b.id),1);
+      if(drawMode===b.id){captureEl?.remove();captureEl=null;drawMode=null;}
+      syncOverlays(); renderPanel();
+    });
+    const sb=document.getElementById('hlp-save-'+b.id);
+    sb?.addEventListener('click',()=>saveCallout(b,parseInt(sb.dataset.idx)));
+  });
+}
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+function build() {
+  const btn=document.createElement('button');
+  btn.id='hlp-btn'; btn.textContent='📐';
+  Object.assign(btn.style,{position:'fixed',bottom:'16px',right:'16px',zIndex:'10000',
+    width:'42px',height:'42px',borderRadius:'50%',border:'none',background:'#1eae9d',
+    fontSize:'18px',cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.4)',transition:'background .15s'});
+  btn.addEventListener('click',toggleTool);
+  document.body.appendChild(btn);
+
+  overlayEl=document.createElement('div');
+  Object.assign(overlayEl.style,{position:'fixed',zIndex:'9999',pointerEvents:'none',display:'none',
+    border:'2.5px solid #f59e0b',borderRadius:'5px',boxShadow:'0 0 0 2px rgba(0,0,0,.2), 0 0 16px rgba(245,158,11,.55)'});
+  document.body.appendChild(overlayEl);
+
+  panelEl=document.createElement('div');
+  Object.assign(panelEl.style,{position:'fixed',bottom:'68px',right:'16px',zIndex:'10000',
+    background:'#1a1a1a',color:'#f0f0f0',borderRadius:'10px',padding:'14px 16px',
+    fontFamily:'ui-monospace,monospace',width:'310px',display:'none',maxHeight:'82vh',overflowY:'auto',
+    boxShadow:'0 6px 28px rgba(0,0,0,.7)',border:'1px solid #2a2a2a'});
+  document.body.appendChild(panelEl);
+
+  Reveal.on('slidechanged',()=>{
+    drawMode=null; captureEl?.remove(); captureEl=null;
+    syncOverlays(); renderPanel();
+  });
+}
+
+whenReady(build);
+})();
+</script>

@@ -1,0 +1,361 @@
+---
+title: ""
+format:
+  revealjs:
+    title-slide: false
+    include-in-header:
+      - text: |
+          <style>
+          .pinball-divider-art {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background:
+              linear-gradient(142deg, transparent 48%, rgba(255, 255, 255, 0.18) 48.3%, transparent 49%),
+              linear-gradient(35deg, transparent 62%, rgba(255, 255, 255, 0.16) 62.3%, transparent 63%),
+              #123a47;
+          }
+
+          .pinball-divider-art::before,
+          .pinball-divider-art::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            border: 18px solid #f5c858;
+            box-shadow: inset 0 0 0 7px #e2553f, 0 0 0 8px rgba(255, 255, 255, 0.16);
+          }
+
+          .pinball-divider-art::before {
+            width: 108px;
+            height: 108px;
+            top: 21%;
+            left: 23%;
+          }
+
+          .pinball-divider-art::after {
+            width: 66px;
+            height: 66px;
+            right: 22%;
+            bottom: 23%;
+          }
+
+          .pinball-divider-led {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #7dd8c7;
+            box-shadow: 38px 28px 0 #ff8066, 76px 2px 0 #f5c858, 104px 42px 0 #7dd8c7;
+            top: 15%;
+            right: 22%;
+          }
+
+          .pinball-layout {
+            display: grid;
+            grid-template-columns: minmax(220px, 0.38fr) minmax(0, 1fr);
+            gap: 14px;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 100%;
+            height: 100%;
+          }
+
+          .pinball-notes,
+          .pinball-board,
+          .wokwi-shell {
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+            box-sizing: border-box;
+          }
+
+          .pinball-notes {
+            padding: 18px;
+          }
+
+          .pinball-notes h3,
+          .wokwi-caption h3 {
+            margin: 0 0 12px;
+            color: #123a47;
+            font-size: 20px;
+            line-height: 1.15;
+          }
+
+          .pinball-notes dl {
+            margin: 0;
+            display: grid;
+            gap: 12px;
+          }
+
+          .pinball-notes div {
+            padding-bottom: 10px;
+            border-bottom: 1px solid #dce8e4;
+          }
+
+          .pinball-notes dt {
+            color: #117168;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+          }
+
+          .pinball-notes dd {
+            margin: 4px 0 0;
+            color: #34444d;
+            font-size: 15px;
+            line-height: 1.35;
+          }
+
+          .pinball-board {
+            position: relative;
+            min-height: 0;
+            overflow: hidden;
+            background:
+              linear-gradient(145deg, rgba(18, 58, 71, 0.16) 1px, transparent 1px),
+              linear-gradient(35deg, rgba(18, 58, 71, 0.10) 1px, transparent 1px),
+              #e7f1ed;
+            background-size: 26px 26px, 26px 26px, auto;
+          }
+
+          .score-display {
+            position: absolute;
+            top: 24px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 10px 24px;
+            border: 5px solid #183640;
+            border-radius: 5px;
+            background: #07191e;
+            color: #f5c858;
+            font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+            font-size: 30px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            box-shadow: 0 5px 0 rgba(18, 58, 71, 0.20);
+          }
+
+          .target {
+            position: absolute;
+            width: 52px;
+            height: 52px;
+            border: 7px solid #e2553f;
+            border-radius: 50%;
+            background: #f5c858;
+            box-shadow: inset 0 0 0 7px #fff4ca, 0 4px 0 rgba(151, 49, 40, 0.20);
+          }
+
+          .target::after {
+            content: '+100';
+            position: absolute;
+            top: 61px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #a63d32;
+            font-size: 12px;
+            font-weight: 800;
+            white-space: nowrap;
+          }
+
+          .target.one { top: 36%; left: 26%; }
+          .target.two { top: 27%; left: 55%; }
+          .target.three { top: 51%; right: 22%; }
+
+          .flipper {
+            position: absolute;
+            bottom: 54px;
+            width: 130px;
+            height: 24px;
+            border: 0;
+            border-radius: 24px;
+            background: #e2553f;
+            box-shadow: 0 5px 0 #9f362c;
+          }
+
+          .flipper.left { left: 25%; transform: rotate(23deg); transform-origin: left center; }
+          .flipper.right { right: 25%; transform: rotate(-23deg); transform-origin: right center; }
+
+          .board-label {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: #123a47;
+            font-size: 13px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            white-space: nowrap;
+          }
+
+          .wokwi-grid {
+            display: grid;
+            grid-template-columns: minmax(225px, 0.34fr) minmax(0, 1fr);
+            gap: 14px;
+            flex: 1 1 auto;
+            min-width: 0;
+            width: 100%;
+            height: 100%;
+          }
+
+          .wokwi-caption {
+            padding: 18px;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            background: #ffffff;
+          }
+
+          .wokwi-caption p {
+            margin: 0 0 14px;
+            color: #34444d;
+            font-size: 15px;
+            line-height: 1.42;
+          }
+
+          .wokwi-caption code {
+            display: block;
+            margin: 8px 0;
+            padding: 7px 9px;
+            overflow-wrap: anywhere;
+            border-radius: 4px;
+            background: #edf5f1;
+            color: #123a47;
+            font-size: 12px;
+          }
+
+          .wokwi-link {
+            display: inline-block;
+            padding: 9px 12px;
+            border-radius: 5px;
+            background: #117168;
+            color: #ffffff !important;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+          }
+
+          .wokwi-shell {
+            min-height: 0;
+            overflow: hidden;
+            background: #123a47;
+          }
+
+          .wokwi-shell iframe {
+            display: block;
+            width: 100%;
+            height: 100%;
+            min-height: 370px;
+            border: 0;
+            background: #ffffff;
+          }
+
+          .pin-map {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 118px 20px 0;
+          }
+
+          .pin-map span {
+            padding: 10px;
+            border-left: 4px solid #f5c858;
+            background: #edf5f1;
+            color: #123a47;
+            font-size: 14px;
+            font-weight: 700;
+          }
+          </style>
+---
+
+# 0.0.0 Pinball Lab {.divider}
+
+```{=html}
+<div class="left-panel">
+  <div class="number">0</div>
+  <div class="label">MICROCONTROLLERS</div>
+</div>
+<div class="right-panel">
+  <div class="pinball-divider-art" aria-label="Stylized pinball board with targets and LEDs">
+    <div class="pinball-divider-led"></div>
+  </div>
+</div>
+```
+
+## 0.1 Inputs, Outputs, and Score {.content}
+
+```{=html}
+<div class="top-bar">0. PINBALL PROTOTYPE</div>
+<div class="screenshot-row">
+  <div class="pinball-layout">
+    <div class="pinball-notes">
+      <h3>Arduino Game Loop</h3>
+      <dl>
+        <div><dt>INPUTS</dt><dd>Two flipper buttons and three target switches use internal pull-up resistors.</dd></div>
+        <div><dt>OUTPUTS</dt><dd>Two servos move the flippers. Three LEDs flash when a target scores.</dd></div>
+        <div><dt>STATE</dt><dd>The score increases once per target hit and is reported in the serial monitor.</dd></div>
+      </dl>
+    </div>
+    <div class="pinball-board" aria-label="Basic pinball layout">
+      <div class="score-display">000000</div>
+      <div class="target one"></div>
+      <div class="target two"></div>
+      <div class="target three"></div>
+      <div class="flipper left"></div>
+      <div class="flipper right"></div>
+      <div class="board-label">FLIP • HIT • COUNT</div>
+    </div>
+  </div>
+</div>
+```
+
+## 0.2 Wokwi Arduino Simulation {.content}
+
+```{=html}
+<div class="top-bar">0. PINBALL PROTOTYPE</div>
+<div class="screenshot-row">
+  <div class="wokwi-grid">
+    <div class="wokwi-caption">
+      <h3>Live Simulator Embed</h3>
+      <p>The embedded Arduino workspace keeps the simulation in the lesson. The deck-local Wokwi files define the pinball circuit and sketch.</p>
+      <code>wokwi/sketch.ino</code>
+      <code>wokwi/diagram.json</code>
+      <p>Press either flipper switch to move a servo. Press a target switch to add 100 points and flash its LED.</p>
+      <a class="wokwi-link" href="https://wokwi.com/projects/new/arduino-uno" target="_blank" rel="noopener">Open in Wokwi</a>
+    </div>
+    <div class="wokwi-shell">
+      <iframe src="https://wokwi.com/projects/new/arduino-uno?embed=1" title="Embedded Wokwi Arduino Uno simulator" loading="lazy" allow="fullscreen"></iframe>
+    </div>
+  </div>
+</div>
+```
+
+## 0.3 Pin Map {.content}
+
+```{=html}
+<div class="top-bar">0. PINBALL PROTOTYPE</div>
+<div class="screenshot-row">
+  <div class="pinball-layout">
+    <div class="pinball-notes">
+      <h3>Build Order</h3>
+      <dl>
+        <div><dt>1. ACTUATE</dt><dd>Attach each servo and confirm its resting and raised angles.</dd></div>
+        <div><dt>2. DETECT</dt><dd>Wire target buttons to ground and read their transitions.</dd></div>
+        <div><dt>3. RESPOND</dt><dd>Light an LED and update score only when a new hit is detected.</dd></div>
+      </dl>
+    </div>
+    <div class="pinball-board">
+      <div class="score-display">D2 D4 D5</div>
+      <div class="pin-map">
+        <span>D8 · Left flipper button</span>
+        <span>D13 · Right flipper button</span>
+        <span>D9 · Left servo</span>
+        <span>D10 · Right servo</span>
+        <span>D2 / D4 / D5 · Targets</span>
+        <span>D3 / D11 / D12 · LEDs</span>
+      </div>
+      <div class="flipper left"></div>
+      <div class="flipper right"></div>
+      <div class="board-label">INPUTS ON THE LEFT · OUTPUTS ON THE RIGHT</div>
+    </div>
+  </div>
+</div>
+```
