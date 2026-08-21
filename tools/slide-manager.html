@@ -1,0 +1,460 @@
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAKER BOOTCAMP — SLIDE MANAGER v1
+   ───────────────────────────────────────────────────────────────────────────
+   Add to a module's _quarto.yml under format.revealjs:
+     include-after-body:
+       - ../../tools/slide-manager.html
+
+   Adds/deletes content and section slides, renumbering every later slide in
+   scope (and renaming their image files/folders to match) so deck.qmd and
+   images/ stay consistent with the N.M numbering convention.
+
+   Shares deck.qmd/images/ file handles with highlight-picker.html via the
+   same IndexedDB store — link either tool once, both pick it up. This is a
+   standalone script; nothing here is imported from the other tools.
+
+   Adding/deleting a whole SECTION renumbers every later section, every
+   slide inside them, and renames their entire images/N/ folders — the
+   biggest, riskiest operation this tool does. There's no undo. Commit your
+   deck to git before using it.
+
+   REQUIRES CHROME — open quarto preview localhost URL in Chrome for
+   File System Access API (file read/write) support.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+function whenReady(cb) {
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+  const t0 = Date.now();
+  const id = setInterval(() => {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+    else if (Date.now() - t0 > 8000) clearInterval(id);
+  }, 80);
+}
+
+// ── IndexedDB — same store/keys as highlight-picker.html, on purpose ─────────
+const _db = (() => {
+  let _c = null;
+  const open = () => _c ? Promise.resolve(_c) : new Promise((res,rej) => {
+    const r = indexedDB.open('hlp-db',1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore('h');
+    r.onsuccess = e => { _c=e.target.result; res(_c); };
+    r.onerror   = e => rej(e.target.error);
+  });
+  const tx = (rw,cb) => open().then(db => new Promise((res,rej) => {
+    const t=db.transaction('h',rw), s=t.objectStore('h'), q=cb(s);
+    t.oncomplete=()=>res(q?.result); t.onerror=rej;
+  }));
+  return {
+    save: (k,v) => tx('readwrite', s => s.put(v,k)),
+    load: (k)   => tx('readonly',  s => s.get(k)),
+  };
+})();
+
+let deckFileHandle = null, imgFolderHandle = null;
+
+async function restoreHandles() {
+  if (!deckFileHandle) {
+    const h = await _db.load('deck').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') deckFileHandle=h; }
+  }
+  if (!imgFolderHandle) {
+    const h = await _db.load('images').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') imgFolderHandle=h; }
+  }
+}
+async function pickDeckFile() {
+  if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
+  try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
+}
+async function chooseImagesFolder() {
+  if (!('showDirectoryPicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
+  try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); await _db.save('images',imgFolderHandle); renderPanel(); } catch {}
+}
+
+// ── Slide helpers ─────────────────────────────────────────────────────────────
+function numParts(label) { const m=(label||'').match(/^(\d+)\.(\d+)/); return m?{sec:m[1],step:m[2]}:null; }
+function slideKind() {
+  const s = Reveal.getCurrentSlide();
+  if (!s) return null;
+  if (s.querySelector('h2') && s.querySelector('.main-shot-wrap')) return 'content';
+  if (s.querySelector('.left-panel') && s.querySelector('.label')) return 'divider';
+  return null;
+}
+
+// ── Document-structure helpers (pure string ops, unit-tested in isolation) ──
+function listContentSteps(content, sec) {
+  const re = new RegExp('^## '+sec+'\\.(\\d+)\\s', 'gm');
+  const steps = []; let m;
+  while ((m = re.exec(content))) steps.push(parseInt(m[1],10));
+  return steps.sort((a,b)=>a-b);
+}
+function listSections(content) {
+  const re = /^# (\d+)\.0\.0\s/gm;
+  const secs = []; let m;
+  while ((m = re.exec(content))) secs.push(parseInt(m[1],10));
+  return secs.sort((a,b)=>a-b);
+}
+function findContentHeadingStart(content, sec, step) {
+  const pos = content.indexOf('images/'+sec+'/'+sec+'.'+step+'.0.');
+  if (pos===-1) return -1;
+  const nl = content.lastIndexOf('\n## ', pos);
+  return nl===-1 ? -1 : nl+1;
+}
+function findDividerHeadingStart(content, sec) {
+  const pos = content.indexOf('images/'+sec+'/'+sec+'.0.0.');
+  if (pos===-1) return -1;
+  const nl = content.lastIndexOf('\n# ', pos);
+  return nl===-1 ? -1 : nl+1;
+}
+function nextHeadingStart(content, fromPos) {
+  if (fromPos < 0) return content.length;
+  const re = /\n(#{1,2}) /g;
+  re.lastIndex = fromPos;
+  const m = re.exec(content);
+  return m ? m.index+1 : content.length;
+}
+function sliceSlideUnit(content, headingStart) {
+  const end = nextHeadingStart(content, headingStart);
+  return { text: content.slice(headingStart, end), end };
+}
+function getSectionLabel(content, sec) {
+  const dhs = findDividerHeadingStart(content, sec);
+  if (dhs===-1) return sec;
+  const { text } = sliceSlideUnit(content, dhs);
+  const m = text.match(/<div class="label">([\s\S]*?)<\/div>/);
+  return m ? m[1].trim() : sec;
+}
+
+// Renumbers every N.M reference inside one slide's already-sliced unit text:
+// heading, image src(s), "step N.M[.I]" alt text, and "N.M.I:" label
+// prefixes. oldStep/newStep null means this is a divider (section-only
+// change); otherwise sec may also change (whole-section renumbering) while
+// step stays the same. Matches are anchored to these specific surrounding
+// patterns rather than a blanket string replace, so an unrelated numeric
+// value (e.g. a highlight box's --box-x percentage) can never collide.
+function renumberUnit(unitText, oldSec, oldStep, newSec, newStep) {
+  let t = unitText;
+  if (oldStep == null) {
+    t = t.replace(new RegExp('^(# )'+oldSec+'(\\.0\\.0)'), '$1'+newSec+'$2');
+    t = t.replace(new RegExp('(<div class="number">)'+oldSec+'(</div>)'), '$1'+newSec+'$2');
+    t = t.replace(new RegExp('(images/)'+oldSec+'(/)'+oldSec+'(\\.0\\.0\\.)','g'), '$1'+newSec+'$2'+newSec+'$3');
+  } else {
+    t = t.replace(new RegExp('^(## )'+oldSec+'(\\.)'+oldStep+'(?=\\s)'), '$1'+newSec+'$2'+newStep);
+    t = t.replace(new RegExp('(images/)'+oldSec+'(/)'+oldSec+'(\\.)'+oldStep+'(\\.)','g'), '$1'+newSec+'$2'+newSec+'$3'+newStep+'$4');
+    t = t.replace(new RegExp('(step )'+oldSec+'(\\.)'+oldStep+'(\\.\\d+)?','g'), (w,p1,dot,suf)=>p1+newSec+dot+newStep+(suf||''));
+    t = t.replace(new RegExp('(^\\s*)'+oldSec+'(\\.)'+oldStep+'(\\.\\d+:)','gm'), '$1'+newSec+'$2'+newStep+'$3');
+  }
+  return t;
+}
+
+function buildContentSlideTemplate(sec, step, sectionLabel) {
+  return '\n## '+sec+'.'+step+' New Step {.content}\n\n'+
+    '```{=html}\n'+
+    '<div class="top-bar">'+sec+'. '+sectionLabel+'</div>\n'+
+    '<div class="screenshot-row">\n'+
+    '  <div class="callout-box">\n'+
+    '    <p class="concept-insight"><strong>*</strong> </p>\n'+
+    '  </div>\n'+
+    '  <div class="main-panel">\n'+
+    '    <div class="main-shot-wrap">\n'+
+    '      <img class="main-shot" src="images/'+sec+'/'+sec+'.'+step+'.0.webp" alt="Main screenshot for step '+sec+'.'+step+'">\n'+
+    '    </div>\n'+
+    '  </div>\n'+
+    '</div>\n'+
+    '```\n\n';
+}
+function buildDividerTemplate(sec) {
+  return '\n# '+sec+'.0.0 New Section {.divider}\n\n'+
+    '```{=html}\n'+
+    '<div class="left-panel">\n'+
+    '  <div class="number">'+sec+'</div>\n'+
+    '  <div class="label">NEW SECTION</div>\n'+
+    '</div>\n'+
+    '<div class="right-panel">\n'+
+    '  <img src="images/'+sec+'/'+sec+'.0.0.webp" alt="Section divider background for new section">\n'+
+    '</div>\n'+
+    '```\n\n';
+}
+
+// ── Image file/folder renaming (File System Access API) ─────────────────────
+async function listDirFileNames(dirHandle) {
+  const names = [];
+  for await (const [name, handle] of dirHandle.entries()) if (handle.kind==='file') names.push(name);
+  return names;
+}
+async function copyFile(srcDir, name, destDir, destName) {
+  const file = await (await srcDir.getFileHandle(name)).getFile();
+  const buf = await file.arrayBuffer();
+  const fh = await destDir.getFileHandle(destName, {create:true});
+  const w = await fh.createWritable(); await w.write(buf); await w.close();
+}
+// Renames every file whose name starts with "sec.oldStep." to "sec.newStep."
+// within one already-resolved section directory (main shot + however many
+// callout crops actually exist, discovered by listing rather than assumed).
+async function renameStepImages(sectionDir, sec, oldStep, newStep) {
+  const prefix = sec+'.'+oldStep+'.';
+  const names = (await listDirFileNames(sectionDir)).filter(n => n.startsWith(prefix));
+  for (const name of names) {
+    const newName = sec+'.'+newStep+'.'+name.slice(prefix.length);
+    await copyFile(sectionDir, name, sectionDir, newName);
+    await sectionDir.removeEntry(name);
+  }
+}
+// No native folder rename in the File System Access API: copy every file
+// into a newly-created oldSec+1 directory, then remove the old one.
+async function renameSectionFolder(imagesRoot, oldSec, newSec) {
+  const oldDir = await imagesRoot.getDirectoryHandle(oldSec);
+  const newDir = await imagesRoot.getDirectoryHandle(newSec, {create:true});
+  const names = await listDirFileNames(oldDir);
+  for (const name of names) {
+    const newName = name.replace(new RegExp('^'+oldSec+'\\.'), newSec+'.');
+    await copyFile(oldDir, name, newDir, newName);
+  }
+  await imagesRoot.removeEntry(oldSec, {recursive:true});
+}
+function resolveSectionDir(sec) {
+  return imgFolderHandle.name===sec ? Promise.resolve(imgFolderHandle) : imgFolderHandle.getDirectoryHandle(sec, {create:true});
+}
+
+// ── Add content slide ─────────────────────────────────────────────────────────
+async function addContentSlide() {
+  if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
+  const kind = slideKind();
+  if (!kind) { alert('This slide is neither a content slide nor a section slide.'); return; }
+  const slide = Reveal.getCurrentSlide();
+  let sec, afterStep;
+  if (kind === 'divider') { sec = slide.querySelector('.number').textContent.trim(); afterStep = 0; }
+  else { const n = numParts(slide.querySelector('h2').textContent.trim()); sec = n.sec; afterStep = parseInt(n.step,10); }
+  const newStep = afterStep + 1;
+
+  const file = await deckFileHandle.getFile();
+  let content = await file.text();
+  const shiftSteps = listContentSteps(content, sec).filter(s => s >= newStep).sort((a,b)=>b-a);
+
+  if (shiftSteps.length && !imgFolderHandle) { alert('Link images/ folder first (📁) to shift later slides\' image files.'); return; }
+  if (!confirm('Insert new content slide as '+sec+'.'+newStep+
+    (shiftSteps.length ? ', shifting '+shiftSteps.length+' later slide(s) in this section up by one.' : '.')+' Continue?')) return;
+
+  try {
+    for (const s of shiftSteps) {
+      const hs = findContentHeadingStart(content, sec, String(s));
+      if (hs===-1) continue;
+      const { text, end } = sliceSlideUnit(content, hs);
+      content = content.slice(0,hs) + renumberUnit(text, sec, String(s), sec, String(s+1)) + content.slice(end);
+    }
+    if (shiftSteps.length) {
+      const dir = await resolveSectionDir(sec);
+      for (const s of shiftSteps) await renameStepImages(dir, sec, String(s), String(s+1));
+    }
+    const sectionLabel = getSectionLabel(content, sec);
+    const insertAt = afterStep === 0
+      ? nextHeadingStart(content, findDividerHeadingStart(content, sec))
+      : nextHeadingStart(content, findContentHeadingStart(content, sec, String(afterStep)));
+    content = content.slice(0, insertAt) + buildContentSlideTemplate(sec, newStep, sectionLabel) + content.slice(insertAt);
+
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(content); await wr.close();
+    flashStatus('✓ Created '+sec+'.'+newStep+' — add images/'+sec+'/'+sec+'.'+newStep+'.0.webp before viewing it.');
+  } catch (err) { alert('Failed partway through: '+err.message+'. Check deck.qmd and images/ before continuing.'); }
+}
+
+// ── Add section slide ─────────────────────────────────────────────────────────
+async function addSectionSlide() {
+  if (!deckFileHandle || !imgFolderHandle) { alert('Link both deck.qmd (📄) and images/ (📁) first.'); return; }
+  const kind = slideKind();
+  if (!kind) { alert('This slide is neither a content slide nor a section slide.'); return; }
+  const slide = Reveal.getCurrentSlide();
+  const curSec = kind === 'divider' ? slide.querySelector('.number').textContent.trim() : numParts(slide.querySelector('h2').textContent.trim()).sec;
+  const newSec = String(parseInt(curSec,10)+1);
+
+  const file = await deckFileHandle.getFile();
+  let content = await file.text();
+  const shiftSecs = listSections(content).filter(s => s >= parseInt(newSec,10)).sort((a,b)=>b-a);
+
+  const warn = 'This creates a new section '+newSec+' after section '+curSec+'.'+
+    (shiftSecs.length ? ' Sections '+shiftSecs.slice().reverse().join(', ')+' will each shift up by one, and their image folders will be renamed.' : '')+
+    ' This cannot be undone by this tool — make sure your latest changes are committed to git first. Continue?';
+  if (!confirm(warn)) return;
+
+  try {
+    for (const s of shiftSecs) {
+      const oldSec = String(s), targetSec = String(s+1);
+      for (const step of listContentSteps(content, oldSec)) {
+        const hs = findContentHeadingStart(content, oldSec, String(step));
+        if (hs===-1) continue;
+        const { text, end } = sliceSlideUnit(content, hs);
+        content = content.slice(0,hs) + renumberUnit(text, oldSec, String(step), targetSec, String(step)) + content.slice(end);
+      }
+      const dhs = findDividerHeadingStart(content, oldSec);
+      if (dhs!==-1) {
+        const { text, end } = sliceSlideUnit(content, dhs);
+        content = content.slice(0,dhs) + renumberUnit(text, oldSec, null, targetSec, null) + content.slice(end);
+      }
+    }
+    for (const s of shiftSecs) await renameSectionFolder(imgFolderHandle, String(s), String(s+1));
+
+    const curSteps = listContentSteps(content, curSec);
+    const lastAnchorHs = curSteps.length
+      ? findContentHeadingStart(content, curSec, String(Math.max(...curSteps)))
+      : findDividerHeadingStart(content, curSec);
+    const insertAt = nextHeadingStart(content, lastAnchorHs);
+    content = content.slice(0, insertAt) + buildDividerTemplate(newSec) + content.slice(insertAt);
+    await imgFolderHandle.getDirectoryHandle(newSec, {create:true});
+
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(content); await wr.close();
+    flashStatus('✓ Created section '+newSec+' — add images/'+newSec+'/'+newSec+'.0.0.webp before viewing it.');
+  } catch (err) { alert('Failed partway through: '+err.message+'. Check deck.qmd and images/ carefully before continuing.'); }
+}
+
+// ── Delete slide ──────────────────────────────────────────────────────────────
+async function deleteContentSlide() {
+  const slide = Reveal.getCurrentSlide();
+  const n = numParts(slide.querySelector('h2').textContent.trim());
+  const sec = n.sec, step = parseInt(n.step,10);
+  if (!confirm('Delete slide '+sec+'.'+step+'? This cannot be undone.')) return;
+
+  try {
+    const file = await deckFileHandle.getFile();
+    let content = await file.text();
+    const hs = findContentHeadingStart(content, sec, String(step));
+    if (hs===-1) { alert('Slide not found in deck.qmd.'); return; }
+    content = content.slice(0,hs) + content.slice(sliceSlideUnit(content, hs).end);
+
+    const laterSteps = listContentSteps(content, sec).filter(s => s > step).sort((a,b)=>a-b);
+    if (laterSteps.length && !imgFolderHandle) { alert('Link images/ folder first (📁) to shift later slides\' image files, then retry.'); return; }
+    for (const s of laterSteps) {
+      const hs2 = findContentHeadingStart(content, sec, String(s));
+      if (hs2===-1) continue;
+      const { text, end } = sliceSlideUnit(content, hs2);
+      content = content.slice(0,hs2) + renumberUnit(text, sec, String(s), sec, String(s-1)) + content.slice(end);
+    }
+    if (laterSteps.length) {
+      const dir = await resolveSectionDir(sec);
+      for (const s of laterSteps) await renameStepImages(dir, sec, String(s), String(s-1));
+    }
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(content); await wr.close();
+    flashStatus('✓ Deleted '+sec+'.'+step+'.');
+  } catch (err) { alert('Failed partway through: '+err.message+'. Check deck.qmd and images/ before continuing.'); }
+}
+
+async function deleteSection() {
+  const slide = Reveal.getCurrentSlide();
+  const sec = slide.querySelector('.number').textContent.trim();
+  const typed = prompt('Type the section number "'+sec+'" to permanently delete section '+sec+' — every slide and image in it — and shift all later sections down by one:');
+  if (typed !== sec) { if (typed!==null) alert('Did not match — cancelled.'); return; }
+  if (!imgFolderHandle) { alert('Link images/ folder first (📁) — this section\'s images need to be removed too.'); return; }
+
+  try {
+    const file = await deckFileHandle.getFile();
+    let content = await file.text();
+    for (const step of listContentSteps(content, sec).sort((a,b)=>b-a)) {
+      const hs = findContentHeadingStart(content, sec, String(step));
+      if (hs===-1) continue;
+      content = content.slice(0,hs) + content.slice(sliceSlideUnit(content, hs).end);
+    }
+    const dhs = findDividerHeadingStart(content, sec);
+    if (dhs!==-1) content = content.slice(0,dhs) + content.slice(sliceSlideUnit(content, dhs).end);
+    await imgFolderHandle.removeEntry(sec, {recursive:true}).catch(()=>{});
+
+    const laterSecs = listSections(content).filter(s => s > parseInt(sec,10)).sort((a,b)=>a-b);
+    for (const s of laterSecs) {
+      const oldSec = String(s), targetSec = String(s-1);
+      for (const step of listContentSteps(content, oldSec)) {
+        const hs2 = findContentHeadingStart(content, oldSec, String(step));
+        if (hs2===-1) continue;
+        const { text, end } = sliceSlideUnit(content, hs2);
+        content = content.slice(0,hs2) + renumberUnit(text, oldSec, String(step), targetSec, String(step)) + content.slice(end);
+      }
+      const dhs2 = findDividerHeadingStart(content, oldSec);
+      if (dhs2!==-1) {
+        const { text, end } = sliceSlideUnit(content, dhs2);
+        content = content.slice(0,dhs2) + renumberUnit(text, oldSec, null, targetSec, null) + content.slice(end);
+      }
+    }
+    for (const s of laterSecs) await renameSectionFolder(imgFolderHandle, String(s), String(s-1));
+
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(content); await wr.close();
+    flashStatus('✓ Deleted section '+sec+'.');
+  } catch (err) { alert('Failed partway through: '+err.message+'. Check deck.qmd and images/ carefully before continuing.'); }
+}
+
+async function deleteCurrentSlide() {
+  if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
+  const kind = slideKind();
+  if (kind === 'content') return deleteContentSlide();
+  if (kind === 'divider') return deleteSection();
+  alert('This slide is neither a content slide nor a section slide.');
+}
+
+function flashStatus(msg) { const el=document.getElementById('sm-status'); if(!el) return; el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',6000); }
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+const bs=(bg,col,w='auto',p='3px 9px')=>'background:'+bg+';color:'+col+';border:1px solid '+col+'44;border-radius:4px;padding:'+p+';cursor:pointer;font-size:10px;font-family:ui-monospace,monospace;'+(w!=='auto'?'width:'+w+';':'');
+
+let addPanelEl, addOpen = false;
+
+function renderAddPanel() {
+  if (!addPanelEl) return;
+  addPanelEl.style.display = addOpen ? 'block' : 'none';
+  if (!addOpen) return;
+  const hasDeck = !!deckFileHandle;
+  addPanelEl.innerHTML =
+    '<div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:2px;">➕ New Slide</div>'+
+    '<div style="display:flex;gap:5px;margin-bottom:10px;">'+
+      '<button id="sm-link-deck" style="'+bs('#1a1a1a',hasDeck?'#34d399':'#888','auto','4px 8px')+'">'+(hasDeck?'📄 '+deckFileHandle.name:'📄 Link deck.qmd')+'</button>'+
+      '<button id="sm-link-imgs" style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+(imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
+    '</div>'+
+    '<button id="sm-add-content" style="'+bs('#0d2620','#34d399','100%','7px 8px')+'margin-bottom:6px;">+ Content Slide</button>'+
+    '<button id="sm-add-section" style="'+bs('#0d2620','#34d399','100%','7px 8px')+'">+ Section Slide</button>'+
+    '<div id="sm-status" style="color:#34d399;font-size:10px;margin-top:8px;display:none;"></div>';
+
+  document.getElementById('sm-link-deck').addEventListener('click', pickDeckFile);
+  document.getElementById('sm-link-imgs').addEventListener('click', chooseImagesFolder);
+  document.getElementById('sm-add-content').addEventListener('click', addContentSlide);
+  document.getElementById('sm-add-section').addEventListener('click', addSectionSlide);
+}
+
+async function toggleAddPanel() {
+  addOpen = !addOpen;
+  document.getElementById('sm-add-btn').style.background = addOpen ? '#f59e0b' : '#1eae9d';
+  if (addOpen) await restoreHandles();
+  renderAddPanel();
+}
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+function build() {
+  const addBtn = document.createElement('button');
+  addBtn.id='sm-add-btn'; addBtn.textContent='➕';
+  Object.assign(addBtn.style, {position:'fixed',bottom:'16px',right:'118px',zIndex:'10000',
+    width:'42px',height:'42px',borderRadius:'50%',border:'none',background:'#1eae9d',
+    fontSize:'18px',cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.4)',transition:'background .15s'});
+  addBtn.addEventListener('click', toggleAddPanel);
+  document.body.appendChild(addBtn);
+
+  addPanelEl = document.createElement('div');
+  Object.assign(addPanelEl.style, {position:'fixed',bottom:'68px',right:'118px',zIndex:'10000',
+    background:'#1a1a1a',color:'#f0f0f0',borderRadius:'10px',padding:'14px 16px',
+    fontFamily:'ui-monospace,monospace',width:'250px',display:'none',
+    boxShadow:'0 6px 28px rgba(0,0,0,.7)',border:'1px solid #2a2a2a'});
+  document.body.appendChild(addPanelEl);
+
+  const delBtn = document.createElement('button');
+  delBtn.id='sm-del-btn'; delBtn.textContent='🗑';
+  Object.assign(delBtn.style, {position:'fixed',bottom:'16px',right:'170px',zIndex:'10000',
+    width:'42px',height:'42px',borderRadius:'50%',border:'none',background:'#7a1f1f',
+    fontSize:'16px',cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.4)'});
+  delBtn.addEventListener('click', async () => { await restoreHandles(); deleteCurrentSlide(); });
+  document.body.appendChild(delBtn);
+
+  Reveal.on('slidechanged', () => { addOpen=false; document.getElementById('sm-add-btn').style.background='#1eae9d'; renderAddPanel(); });
+}
+
+whenReady(build);
+})();
+</script>

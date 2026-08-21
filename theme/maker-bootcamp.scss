@@ -216,6 +216,7 @@ body.reveal-viewport {
   .main-shot {
     width: 100%;
     max-width: none;
+    max-height: none;
     display: block;
     object-fit: cover;
     border: none;
@@ -293,15 +294,24 @@ body.reveal-viewport {
   }
 
   img {
-    width: 100%;
+    // Inset from the card walls — aligned with the label text's own
+    // horizontal padding (16px) so image and text edges line up.
+    width: calc(100% - 32px);
+    margin: 10px 16px 8px;
     flex: 0 0 auto;
     max-height: 40%;
     object-fit: cover;
-    border: none;
-    border-radius: 0;
+    border: 1.5px solid var(--color-card-border);
+    border-radius: var(--radius-md);
     box-shadow: none;
     display: block;
-    border-bottom: 1.5px solid var(--color-card-border);
+  }
+
+  // When a slide has more than one highlight, its callout box holds more
+  // than one image+label pair. Give each image a smaller fixed share so
+  // labels aren't squeezed to near-nothing as more callouts are added.
+  &:has(img ~ img) img {
+    max-height: 22%;
   }
 }
 
@@ -314,6 +324,12 @@ body.reveal-viewport {
   flex: 1;
 
   strong { color: var(--color-teal); }
+}
+
+.reveal .slides section.content .callout-box:has(img ~ img) .callout-label {
+  font-size: 12.5px;
+  line-height: 1.4;
+  padding: 8px 16px;
 }
 
 // ── Concept insight text ──────────────────────────────────────────────────────

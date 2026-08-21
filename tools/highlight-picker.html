@@ -1,6 +1,6 @@
 <script>
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — HIGHLIGHT PICKER v4
+   MAKER BOOTCAMP — HIGHLIGHT PICKER v13
    ───────────────────────────────────────────────────────────────────────────
    Add to a module's _quarto.yml under format.revealjs:
      include-after-body:
@@ -104,18 +104,122 @@ function patchQmd(content, label, boxes) {
   return null;
 }
 
-async function applyToDeck() {
+function cropRect(img, box) {
+  const nw=img.naturalWidth,nh=img.naturalHeight;
+  return {
+    cx:Math.round((parseFloat(box.x)/100)*nw), cy:Math.round((parseFloat(box.y)/100)*nh),
+    cw:Math.round((parseFloat(box.w)/100)*nw), ch:Math.round((parseFloat(box.h)/100)*nh),
+  };
+}
+
+function cropBoxToBlob(img, box) {
+  return new Promise(resolve => {
+    const {cx,cy,cw,ch}=cropRect(img,box);
+    const c=document.createElement('canvas'),ctx=c.getContext('2d');
+    c.width=cw; c.height=ch;
+    try { ctx.drawImage(img,cx,cy,cw,ch,0,0,cw,ch); }
+    catch { resolve(null); return; }
+    c.toBlob(blob=>resolve(blob),'image/webp',0.92);
+  });
+}
+
+// Synchronous small preview of the exact same crop cropBoxToBlob will save —
+// lets you sanity-check alignment against the drawn box before saving.
+function boxThumbDataURL(img, box, maxW=160) {
+  if (!img || !img.naturalWidth) return null;
+  const {cx,cy,cw,ch}=cropRect(img,box);
+  if (cw<=0||ch<=0) return null;
+  const scale=Math.min(1,maxW/cw);
+  const tw=Math.max(1,Math.round(cw*scale)), th=Math.max(1,Math.round(ch*scale));
+  const c=document.createElement('canvas'); c.width=tw; c.height=th;
+  try { c.getContext('2d').drawImage(img,cx,cy,cw,ch,0,0,tw,th); return c.toDataURL('image/webp',0.8); }
+  catch { return null; }
+}
+
+// Each successful save writes deck.qmd, which triggers Quarto's live-reload —
+// but that reload can land a moment late, after this page has already moved
+// on to another slide. If a *new* save starts before an *earlier* save's
+// reload actually fires, the reload tears down this page mid-save: whatever
+// already wrote (e.g. the image file) survives, but anything after it (e.g.
+// the deck.qmd write) never runs, with no error to show — the whole JS
+// context is just gone. reloadCooldown blocks starting a new save until a
+// prior one has had time to either reload the page (moot, state resets) or
+// prove no reload is coming.
+let reloadCooldown = false;
+const RELOAD_COOLDOWN_MS = 3000;
+
+// Single save action: always writes every highlight box, and additionally
+// crops + writes a callout image (and its <img> tag) for each box whose
+// "Save image" checkbox is checked.
+async function saveAll() {
+  if (reloadCooldown) { alert('Still waiting for Quarto to finish reloading from the last save — try again in a moment.'); return; }
   if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
-  const boxes=getBoxes(), label=slideLabel();
+  const boxes=getBoxes(); if (!boxes.length) return;
+  const label=slideLabel();
+  const toSave=boxes.filter(b=>b.saveImg);
+  if (toSave.length && !imgFolderHandle) { alert('Link images/ folder first (📁 button) to save checked images.'); return; }
+  const n = numParts(label);
+  if (toSave.length && !n) { alert('Slide title doesn\'t start with N.M — can\'t tell which images/ subfolder to use.'); return; }
+  // Guard against a stale linked handle from before per-deck linking existed
+  // (or a mis-click): if the linked folder's own name is a bare number, it's
+  // almost certainly a section subfolder itself, not the deck's images/ root.
+  if (toSave.length && /^\d+$/.test(imgFolderHandle.name) && imgFolderHandle.name!==n.sec) {
+    alert('Linked folder is "'+imgFolderHandle.name+'/" but this slide is section '+n.sec+' — click 📁 and link the deck\'s top-level images/ folder instead.');
+    return;
+  }
+
+  const btn=document.getElementById('hlp-save'), orig=btn?.textContent;
+  if (btn) btn.textContent='Saving…';
   try {
+    const img = toSave.length ? slideWrap()?.querySelector('.main-shot') : null;
+    if (toSave.length && !img) { alert('Main image not found.'); return; }
+
+    // Crop filenames are deterministic from label+idx, so the full deck.qmd
+    // content can be built before any bytes hit disk. Quarto's dev server
+    // watches referenced image assets too (confirmed: writing an image file
+    // alone triggers its reload, same as editing deck.qmd) — so image
+    // writes below carry the same page-teardown risk deck.qmd writes do.
+    // deck.qmd goes first because it holds the hardest-to-redo data (exact
+    // highlight position, any hand-typed label text); if a reload cuts the
+    // save short after this point, the worst case is a missing image that
+    // just needs re-checking and re-saving, not a lost highlight.
+    const crops=[];
+    for (const b of toSave) {
+      const idx=boxes.indexOf(b)+1;
+      const blob=await cropBoxToBlob(img,b);
+      if (!blob) { alert('CORS error — run quarto preview on localhost.'); return; }
+      crops.push({idx,fname:calloutName(label,idx),blob});
+    }
+
     const file=await deckFileHandle.getFile();
-    const updated=patchQmd(await file.text(), label, boxes);
-    if (!updated) { alert('Slide not found in deck.qmd — check image naming convention (N.M.0.png).'); return; }
-    const wr=await deckFileHandle.createWritable();
-    await wr.write(updated); await wr.close();
+    const withHL=patchQmd(await file.text(), label, boxes);
+    if (!withHL) { alert('Slide not found in deck.qmd — check image naming convention (N.M.0.webp).'); return; }
+    let content=withHL;
+    if (crops.length) {
+      const withCL=patchCallouts(content, label, crops);
+      if (withCL) content=withCL;
+    }
+    const wr2=await deckFileHandle.createWritable();
+    await wr2.write(content); await wr2.close();
+
+    for (const c of crops) {
+      // images/ is linked once per deck; each slide's crops land in the N
+      // subfolder matching its section number, created if missing — unless
+      // the linked folder already IS that section folder (name matches n.sec),
+      // in which case write directly into it instead of nesting N/N/.
+      const sectionDir = imgFolderHandle.name===n.sec
+        ? imgFolderHandle
+        : await imgFolderHandle.getDirectoryHandle(n.sec,{create:true});
+      const fh=await sectionDir.getFileHandle(c.fname,{create:true});
+      const wr=await fh.createWritable(); await wr.write(c.blob); await wr.close();
+    }
+
     syncOverlays(true);
-    flashStatus('✓ deck.qmd updated — Quarto is reloading…');
-  } catch(err) { alert('Write failed: '+err.message); }
+    flashStatus('✓ Saved — Quarto is reloading…');
+    reloadCooldown=true; renderPanel();
+    setTimeout(()=>{ reloadCooldown=false; renderPanel(); }, RELOAD_COOLDOWN_MS);
+  } catch(err) { alert('Save failed: '+err.message); }
+  finally { if (btn) btn.textContent=orig; }
 }
 
 // ── Overlays ──────────────────────────────────────────────────────────────────
@@ -176,7 +280,12 @@ function activateDraw(id) {
 function onCaptureDown(e) {
   e.preventDefault(); e.stopPropagation();
   const wrap=captureEl.parentElement;
-  const r=wrap.getBoundingClientRect();
+  // Anchor to the <img> itself, not the wrap — .main-shot-wrap is
+  // box-sizing:border-box with a 1px border, so its rect doesn't exactly
+  // match the image's rendered box. Percentages must be relative to the
+  // same box the crop math (naturalWidth/naturalHeight) assumes.
+  const imgEl=wrap.querySelector('.main-shot');
+  const r=(imgEl||wrap).getBoundingClientRect();
   const sx=e.clientX-r.left, sy=e.clientY-r.top;
   overlayEl.style.display='block';
 
@@ -199,7 +308,7 @@ function onCaptureDown(e) {
     if (w<8||h<8) { drawMode=null; renderPanel(); return; }
     const bx=fmt((x/r.width)*100),by=fmt((y/r.height)*100),bw=fmt((w/r.width)*100),bh=fmt((h/r.height)*100);
     const boxes=getBoxes();
-    if (drawMode==='new') boxes.push({id:nextId++,x:bx,y:by,w:bw,h:bh});
+    if (drawMode==='new') boxes.push({id:nextId++,x:bx,y:by,w:bw,h:bh,saveImg:true});
     else { const b=boxes.find(b=>b.id===drawMode); if(b) Object.assign(b,{x:bx,y:by,w:bw,h:bh}); }
     drawMode=null; syncOverlays(); renderPanel();
   }
@@ -213,13 +322,20 @@ async function pickDeckFile() {
   if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
   try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
 }
+// Pick the deck's top-level images/ folder once — saveAll() resolves the
+// N subfolder per slide from its section number, creating it if needed.
 async function chooseImagesFolder() {
   if (!('showDirectoryPicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
   try { imgFolderHandle=await window.showDirectoryPicker({mode:'readwrite'}); await _db.save('images',imgFolderHandle); renderPanel(); } catch {}
 }
 
-// ── Callout: patch QMD and update live DOM ───────────────────────────────────
-function patchCallout(content, label, fname, idx) {
+// ── Callout: patch QMD with the full set of checked callouts at once ─────────
+// Rebuilds every <img>+<div class="callout-label"> pair together (rather than
+// one at a time) so N checked boxes produce N callouts instead of each save
+// clobbering the previous one. Each label gets an auto-generated "N.M.I:"
+// prefix; any hand-written text typed after an existing label's prefix is
+// preserved by matching position across saves.
+function patchCallouts(content, label, crops) {
   const n = numParts(label); if (!n) return null;
   // Locate this slide by its unique main-shot src
   const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
@@ -237,80 +353,35 @@ function patchCallout(content, label, fname, idx) {
     else { if(depth===0){cbEnd=nc;break;} depth--; pos=nc+6; }
   }
   if (cbEnd===-1) return null;
-  // Rebuild callout-box content: remove any existing callout <img>, prepend new one
   let cbBody = content.slice(cbStart, cbEnd);
-  cbBody = cbBody.replace(/<img(?![\s\S]*?class="main-shot")[^>]*>\n?/g, '');
-  const imgTag = '\n    <img src="images/'+n.sec+'/'+fname+'" alt="Callout image for step '+n.sec+'.'+n.step+'">';
-  cbBody = imgTag + cbBody;
+
+  // Capture existing label bodies (prefix stripped) in document order, so
+  // re-saving preserves hand-written text at the same position.
+  const priorBodies = [];
+  const labelRe = /<div class="callout-label">([\s\S]*?)<\/div>/g;
+  let m;
+  while ((m = labelRe.exec(cbBody))) {
+    priorBodies.push(m[1].trim().replace(/^\d+\.\d+(?:\.\d+)?:\s*/, ''));
+  }
+
+  // Strip all existing callout <img> and callout-label blocks, including
+  // their leading whitespace, so re-saving doesn't accumulate indentation
+  // before whatever follows (e.g. <p class="concept-insight">).
+  cbBody = cbBody.replace(/\s*<img(?![\s\S]*?class="main-shot")[^>]*>/g, '');
+  cbBody = cbBody.replace(/\s*<div class="callout-label">[\s\S]*?<\/div>/g, '');
+
+  const blocks = crops.map((c,i) => {
+    const prefix = n.sec+'.'+n.step+'.'+c.idx+':';
+    const body = priorBodies[i] || '';
+    const text = body ? prefix+' '+body : prefix;
+    return '\n    <img src="images/'+n.sec+'/'+c.fname+'" alt="Callout image for step '+n.sec+'.'+n.step+'.'+c.idx+'">'+
+           '\n    <div class="callout-label">\n      '+text+'\n    </div>';
+  }).join('');
+
+  cbBody = blocks + cbBody;
   return content.slice(0, cbStart) + cbBody + content.slice(cbEnd);
 }
 
-function updateCalloutDOM(fname, idx) {
-  const slide = Reveal.getCurrentSlide(); if (!slide) return;
-  const label = slideLabel(), n = numParts(label);
-  const cb = slide.querySelector('.callout-box'); if (!cb) return;
-  // Add/replace callout img
-  let imgEl = cb.querySelector('img');
-  if (!imgEl) {
-    imgEl = document.createElement('img');
-    const lbl = cb.querySelector('.callout-label');
-    if (lbl) cb.insertBefore(imgEl, lbl); else cb.appendChild(imgEl);
-  }
-  if (n) imgEl.src = 'images/'+n.sec+'/'+fname;
-  imgEl.alt = label+' callout '+idx;
-  // Update callout-label prefix: N.M: → N.M.I:
-  const lblEl = cb.querySelector('.callout-label');
-  if (lblEl && n) {
-    const old = n.sec+'.'+n.step+':';
-    const fresh = n.sec+'.'+n.step+'.'+idx+':';
-    const t = lblEl.textContent;
-    if (t.includes(old) && !t.includes(fresh))
-      lblEl.textContent = t.replace(old, fresh);
-  }
-}
-
-// ── Callout save ──────────────────────────────────────────────────────────────
-async function saveCallout(box, idx) {
-  const img=slideWrap()?.querySelector('.main-shot'); if (!img) return;
-  const c=document.createElement('canvas'),ctx=c.getContext('2d');
-  const nw=img.naturalWidth,nh=img.naturalHeight;
-  const cx=Math.round((parseFloat(box.x)/100)*nw),cy=Math.round((parseFloat(box.y)/100)*nh);
-  const cw=Math.round((parseFloat(box.w)/100)*nw),ch=Math.round((parseFloat(box.h)/100)*nh);
-  c.width=cw; c.height=ch;
-  try { ctx.drawImage(img,cx,cy,cw,ch,0,0,cw,ch); }
-  catch { alert('CORS error — run quarto preview on localhost.'); return; }
-  const label=slideLabel(),fname=calloutName(label,idx),n=numParts(label);
-  c.toBlob(async blob => {
-    // Save directly to the selected folder (no subfolder created)
-    if (imgFolderHandle) {
-      try {
-        const fh=await imgFolderHandle.getFileHandle(fname,{create:true});
-        const wr=await fh.createWritable(); await wr.write(blob); await wr.close();
-        // One deck.qmd write: highlights + callout img tag together
-        if (deckFileHandle) {
-          const file=await deckFileHandle.getFile();
-          let content=await file.text();
-          const withHL=patchQmd(content, label, getBoxes());
-          if (withHL) content=withHL;
-          const withCL=patchCallout(content, label, fname, idx);
-          if (withCL) content=withCL;
-          const wr2=await deckFileHandle.createWritable();
-          await wr2.write(content); await wr2.close();
-        }
-        flashBtn('hlp-save-'+box.id,'✓ Saved & Applied'); return;
-      } catch(err) { console.warn('Save failed:',err); }
-    }
-    // Fallback: browser download
-    const url=URL.createObjectURL(blob);
-    const a=Object.assign(document.createElement('a'),{href:url,download:fname});
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    setTimeout(()=>URL.revokeObjectURL(url),1000);
-    updateCalloutDOM(fname, idx);
-    flashBtn('hlp-save-'+box.id,'✓ Downloaded');
-  },'image/webp', 0.92);
-}
-
-function flashBtn(id,msg) { const b=document.getElementById(id); if(!b) return; const o=b.textContent; b.textContent=msg; setTimeout(()=>b.textContent=o,2200); }
 function flashStatus(msg) { const el=document.getElementById('hlp-status'); if(!el) return; el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
 
 // ── Panel render ──────────────────────────────────────────────────────────────
@@ -319,42 +390,44 @@ const bs=(bg,col,w='auto',p='3px 9px')=>'background:'+bg+';color:'+col+';border:
 function renderPanel() {
   if (!panelEl||!toolActive) return;
   const boxes=getBoxes(),label=slideLabel(),adding=drawMode==='new',hasDecks=!!deckFileHandle;
+  const mainImg=slideWrap()?.querySelector('.main-shot');
   panelEl.innerHTML=
     '<div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:2px;">📐 Highlight Picker</div>'+
     '<div style="color:#555;font-size:10px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+label+'">'+( label||'—')+'</div>'+
     '<div style="display:flex;gap:5px;margin-bottom:10px;">'+
       '<button id="hlp-link-deck" style="'+bs('#1a1a1a',hasDecks?'#34d399':'#888','auto','4px 8px')+'">'+( hasDecks?'📄 '+deckFileHandle.name:'📄 Link deck.qmd')+'</button>'+
-      '<button id="hlp-link-imgs" style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+( imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
+      '<button id="hlp-link-imgs" title="Pick the deck\'s top-level images/ folder — section subfolders (0, 1, 2…) are resolved automatically." style="'+bs('#1a1a1a',imgFolderHandle?'#34d399':'#888','auto','4px 8px')+'">'+( imgFolderHandle?'📁 '+imgFolderHandle.name:'📁 Link images/')+'</button>'+
     '</div>'+
     (boxes.length ?
       '<div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Highlights</div>'+
       boxes.map((b,i)=>
-        '<div style="display:flex;align-items:center;gap:5px;background:'+(drawMode===b.id?'#2a2000':'#141414')+';border:1px solid '+(drawMode===b.id?'#f59e0b':'#2e2e2e')+';border-radius:5px;padding:5px 8px;margin-bottom:4px;">'+
-          '<span style="color:#f59e0b;font-size:10px;flex:1;">Box '+(i+1)+' &nbsp; x:'+b.x+'% y:'+b.y+'% w:'+b.w+'% h:'+b.h+'%</span>'+
-          '<button id="hlp-edit-'+b.id+'" style="'+bs('#2a2000','#f59e0b')+'">✏</button>'+
-          '<button id="hlp-del-'+b.id+'"  style="'+bs('#1a0000','#f87171')+'">✕</button>'+
+        '<div style="background:'+(drawMode===b.id?'#2a2000':'#141414')+';border:1px solid '+(drawMode===b.id?'#f59e0b':'#2e2e2e')+';border-radius:5px;padding:5px 8px;margin-bottom:4px;">'+
+          '<div style="display:flex;align-items:center;gap:5px;">'+
+            '<span style="color:#f59e0b;font-size:10px;flex:1;">Box '+(i+1)+' &nbsp; x:'+b.x+'% y:'+b.y+'% w:'+b.w+'% h:'+b.h+'%</span>'+
+            '<button id="hlp-edit-'+b.id+'" style="'+bs('#2a2000','#f59e0b')+'">✏</button>'+
+            '<button id="hlp-del-'+b.id+'"  style="'+bs('#1a0000','#f87171')+'">✕</button>'+
+          '</div>'+
+          '<label style="display:flex;align-items:center;gap:6px;margin-top:5px;font-size:10px;color:#888;cursor:pointer;">'+
+            '<input type="checkbox" id="hlp-img-'+b.id+'" '+(b.saveImg?'checked':'')+' style="cursor:pointer;">'+
+            '<span>Save image <span style="color:#444;font-family:monospace;">('+calloutPath(label,i+1)+')</span></span>'+
+          '</label>'+
+          (b.saveImg ? (()=>{ const t=boxThumbDataURL(mainImg,b); return t
+            ? '<img src="'+t+'" style="display:block;margin-top:6px;max-width:100%;border-radius:4px;border:1px solid #2e2e2e;">'
+            : '<div style="margin-top:6px;font-size:9px;color:#555;">preview unavailable</div>'; })() : '')+
         '</div>'
       ).join('')+''
     : '<div style="color:#555;font-size:11px;line-height:1.6;background:#141414;border-radius:5px;padding:8px;margin-bottom:8px;">Click <strong style="color:#aaa;">+ Add highlight</strong> then drag on the image.</div>')+
     '<button id="hlp-add" style="'+bs(adding?'#2a2000':'#1a1a1a',adding?'#f59e0b':'#888','100%','5px 8px')+'">'+( adding?'↖ Drag on image to draw…':'+ Add highlight')+'</button>'+
     (boxes.length ?
       '<hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">'+
-      '<button id="hlp-apply" style="'+bs(hasDecks?'#0a2a1a':'#1a1a1a',hasDecks?'#34d399':'#555','100%','6px 8px')+'">'+( hasDecks?'💾 Apply to deck.qmd':'💾 Apply (link deck.qmd first)')+'</button>'+
-      '<div id="hlp-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>'+
-      '<hr style="border:none;border-top:1px solid #242424;margin:10px 0 8px;">'+
-      '<div style="color:#555;font-size:10px;letter-spacing:1px;text-transform:uppercase;margin-bottom:5px;">Callout images</div>'+
-      boxes.map((b,i)=>
-        '<div style="display:flex;align-items:center;gap:6px;margin-bottom:5px;">'+
-          '<span style="color:#555;font-size:10px;flex:1;font-family:monospace;">'+calloutPath(label,i+1)+'</span>'+
-          '<button id="hlp-save-'+b.id+'" data-boxid="'+b.id+'" data-idx="'+( i+1)+'" style="'+bs('#0d2620','#34d399')+'">⬇ Save &amp; Apply</button>'+
-        '</div>'
-      ).join('')
+      '<button id="hlp-save" '+(reloadCooldown?'disabled':'')+' style="'+bs(reloadCooldown?'#1a1a1a':(hasDecks?'#0d2620':'#1a1a1a'),reloadCooldown?'#555':(hasDecks?'#34d399':'#555'),'100%','7px 8px')+(reloadCooldown?'cursor:not-allowed;':'')+'">'+( reloadCooldown?'⏳ Waiting for reload…':(hasDecks?'💾 Save changes':'💾 Save (link deck.qmd first)'))+'</button>'+
+      '<div id="hlp-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>'
     : '');
 
   document.getElementById('hlp-link-deck').addEventListener('click',pickDeckFile);
   document.getElementById('hlp-link-imgs').addEventListener('click',chooseImagesFolder);
   document.getElementById('hlp-add').addEventListener('click',()=>activateDraw('new'));
-  document.getElementById('hlp-apply')?.addEventListener('click',applyToDeck);
+  document.getElementById('hlp-save')?.addEventListener('click',saveAll);
   boxes.forEach(b=>{
     document.getElementById('hlp-edit-'+b.id)?.addEventListener('click',e=>{e.stopPropagation();activateDraw(b.id);});
     document.getElementById('hlp-del-'+b.id)?.addEventListener('click',e=>{
@@ -363,8 +436,7 @@ function renderPanel() {
       if(drawMode===b.id){captureEl?.remove();captureEl=null;drawMode=null;}
       syncOverlays(); renderPanel();
     });
-    const sb=document.getElementById('hlp-save-'+b.id);
-    sb?.addEventListener('click',()=>saveCallout(b,parseInt(sb.dataset.idx)));
+    document.getElementById('hlp-img-'+b.id)?.addEventListener('change',e=>{ b.saveImg=e.target.checked; renderPanel(); });
   });
 }
 

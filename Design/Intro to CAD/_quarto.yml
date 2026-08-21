@@ -19,6 +19,10 @@ project:
 
 format:
   revealjs:
+    include-after-body:
+        - ../../tools/highlight-picker.html
+        - ../../tools/text-editor.html
+        - ../../tools/slide-manager.html
     theme: [default, ../../theme/maker-bootcamp.scss, theme/overrides.scss]
     width: 1280
     height: 720
