@@ -11,3 +11,6 @@ README_files/
 **/deck.html
 **/deck_files/
 **/*.pdf
+
+/.quarto/
+**/*.quarto_ipynb

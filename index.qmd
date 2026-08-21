@@ -1,0 +1,193 @@
+---
+title: ""
+---
+
+```{=html}
+<style>
+  body { background: #1a1a1a; color: #fff; font-family: 'Segoe UI', Arial, sans-serif; }
+  .mb-hero {
+    text-align: center;
+    padding: 60px 20px 40px;
+  }
+  .mb-hero h1 {
+    font-size: 48px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0 0 8px;
+  }
+  .mb-hero p {
+    font-size: 18px;
+    color: #aaa;
+    margin: 0;
+  }
+  .mb-section {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+  }
+  .mb-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: #2b8a8a;
+    margin: 40px 0 16px;
+    border-bottom: 1px solid #333;
+    padding-bottom: 8px;
+  }
+  .mb-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 16px;
+  }
+  .mb-card {
+    background: #2a2a2a;
+    border: 1px solid #333;
+    border-radius: 8px;
+    overflow: hidden;
+    text-decoration: none;
+    color: #fff;
+    transition: border-color 0.2s, transform 0.15s;
+    display: flex;
+    flex-direction: column;
+  }
+  .mb-card:hover {
+    border-color: #2b8a8a;
+    transform: translateY(-2px);
+    text-decoration: none;
+    color: #fff;
+  }
+  .mb-card-header {
+    background: #2b8a8a;
+    padding: 10px 16px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+  .mb-card-body {
+    padding: 16px;
+    flex: 1;
+  }
+  .mb-card-num {
+    font-size: 28px;
+    font-weight: 900;
+    line-height: 1;
+    color: #2b8a8a;
+  }
+  .mb-card-title {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 6px 0 4px;
+    color: #fff;
+  }
+  .mb-card-desc {
+    font-size: 12px;
+    color: #888;
+    line-height: 1.4;
+  }
+  .mb-card-footer {
+    padding: 10px 16px;
+    font-size: 11px;
+    color: #555;
+    border-top: 1px solid #333;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .mb-card-footer::before {
+    content: "▶";
+    color: #2b8a8a;
+    font-size: 9px;
+  }
+  .mb-coming-soon {
+    opacity: 0.45;
+    pointer-events: none;
+    cursor: default;
+  }
+</style>
+
+<div class="mb-hero">
+  <h1>Maker Bootcamp</h1>
+  <p>Select a module below to open its deck</p>
+</div>
+
+<div class="mb-section">
+
+  <div class="mb-section-title">Design</div>
+  <div class="mb-cards">
+
+    <a class="mb-card" href="Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to CAD</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">01</div>
+        <div class="mb-card-title">CAD Level 2</div>
+        <div class="mb-card-desc">Parametric design in Autodesk Fusion — sketch, dimension, extrude, fit tolerances, and stud patterns.</div>
+      </div>
+      <div class="mb-card-footer">Open deck</div>
+    </a>
+
+    <a class="mb-card" href="Design/Intro to Vector Design/decks/01-intro/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to Vector Design</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">01</div>
+        <div class="mb-card-title">Intro</div>
+        <div class="mb-card-desc">Foundations of vector design tools and concepts.</div>
+      </div>
+      <div class="mb-card-footer">Open deck</div>
+    </a>
+
+    <a class="mb-card" href="Design/Intro to Python/decks/01-hello-python/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to Python</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">01</div>
+        <div class="mb-card-title">Hello Python</div>
+        <div class="mb-card-desc">Getting started with Python — variables, outputs, and first programs.</div>
+      </div>
+      <div class="mb-card-footer">Open deck</div>
+    </a>
+
+    <a class="mb-card" href="Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to DAW's</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">01</div>
+        <div class="mb-card-title">Pentatonic Keyboard</div>
+        <div class="mb-card-desc">Introduction to digital audio workstations using a pentatonic keyboard project.</div>
+      </div>
+      <div class="mb-card-footer">Open deck</div>
+    </a>
+
+  </div>
+
+  <div class="mb-section-title">Make</div>
+  <div class="mb-cards">
+
+    <a class="mb-card" href="Make/Intro to Sewing/decks/01-intro-to-sewing/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to Sewing</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">01</div>
+        <div class="mb-card-title">Intro to Sewing</div>
+        <div class="mb-card-desc">Thread a machine, prep fabric, sew a seam, and finish a drawstring bag from start to end.</div>
+      </div>
+      <div class="mb-card-footer">Open deck</div>
+    </a>
+
+  </div>
+
+  <div class="mb-section-title">Create</div>
+  <div class="mb-cards">
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Create</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">—</div>
+        <div class="mb-card-title">Coming Soon</div>
+        <div class="mb-card-desc">Decks for this section are in progress.</div>
+      </div>
+      <div class="mb-card-footer">Not yet available</div>
+    </div>
+  </div>
+
+</div>
+```

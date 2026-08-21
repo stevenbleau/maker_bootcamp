@@ -1,0 +1,18 @@
+project:
+  type: website
+  output-dir: _site
+  render:
+    - index.qmd
+    - Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2/deck.qmd
+    - "Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.qmd"
+    - "Design/Intro to Microcontrollers/decks/01-wokwi-pinball/deck.qmd"
+    - Design/Intro to Python/decks/01-hello-python/deck.qmd
+    - Design/Intro to Vector Design/decks/01-intro/deck.qmd
+    - Make/Intro to Sewing/decks/01-intro-to-sewing/deck.qmd
+
+execute:
+  freeze: auto
+
+website:
+  title: "Maker Bootcamp"
+  navbar: false
