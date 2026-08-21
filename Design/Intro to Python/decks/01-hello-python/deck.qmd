@@ -1,5 +1,5 @@
 ---
-jupyter: maker_bootcamp_venv
+jupyter: python3
 format:
   revealjs:
     include-in-header:
