@@ -3,16 +3,17 @@ project:
   output-dir: _site
   render:
     - index.qmd
-    - Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2/deck.qmd
-    - "Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.qmd"
-    - "Design/Intro to Microcontrollers/decks/01-wokwi-pinball/deck.qmd"
-    - Design/Intro to Python/decks/01-hello-python/deck.qmd
-    - Design/Intro to Vector Design/decks/01-intro/deck.qmd
-    - Make/Intro to Sewing/decks/01-intro-to-sewing/deck.qmd
-
-execute:
-  freeze: auto
 
 website:
   title: "Maker Bootcamp"
   navbar: false
+
+# Each module deck below is its OWN Quarto project (see its _quarto.yml:
+# format: revealjs, shared theme). Rendering a deck.qmd here in the root's
+# render list would silently drop that config and fall back to a plain
+# HTML/bootstrap document instead of the revealjs deck — Quarto does not
+# apply a nested directory's _quarto.yml to a file rendered as part of a
+# different (root) project. So this project only renders index.qmd; every
+# deck is rendered separately via its own project by build-site.sh, which
+# then assembles everything into _site/. Keep this comment and that list in
+# sync with build-site.sh's DECKS array.

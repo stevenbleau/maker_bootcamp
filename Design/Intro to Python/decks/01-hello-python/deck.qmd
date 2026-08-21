@@ -1,5 +1,4 @@
 ---
-jupyter: python3
 format:
   revealjs:
     include-in-header:
