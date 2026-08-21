@@ -2,9 +2,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — HIGHLIGHT PICKER v13
    ───────────────────────────────────────────────────────────────────────────
-   Add to a module's _quarto.yml under format.revealjs:
-     include-after-body:
-       - ../../tools/highlight-picker.html
+   Wire into a module via its _quarto-dev.yml (not _quarto.yml directly —
+   that would ship this tool in the published deck). See
+   Design/Intro to CAD/_quarto-dev.yml for the pattern. Then run:
+     QUARTO_PROFILE=dev quarto preview deck.qmd
 
    REQUIRES CHROME — open quarto preview localhost URL in Chrome for
    File System Access API (file read/write) support.

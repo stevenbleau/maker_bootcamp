@@ -15,14 +15,14 @@ project:
 #   1.0.0 = module 1, divider slide background
 #   1.1.0 = module 1, step 1, main screenshot
 #   1.1.1 = module 1, step 1, callout image
+#
+# DEV TOOLS (highlight picker, text editor, slide manager) are NOT included
+# by default — they must never appear in a published deck. To use them
+# locally: `QUARTO_PROFILE=dev quarto preview deck.qmd` (see _quarto-dev.yml).
 # ─────────────────────────────────────────────────────────────────────────────
 
 format:
   revealjs:
-    include-after-body:
-        - ../../tools/highlight-picker.html
-        - ../../tools/text-editor.html
-        - ../../tools/slide-manager.html
     theme: [default, ../../theme/maker-bootcamp.scss, theme/overrides.scss]
     width: 1280
     height: 720

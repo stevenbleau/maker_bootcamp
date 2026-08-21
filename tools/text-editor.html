@@ -2,9 +2,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — TEXT EDITOR v1
    ───────────────────────────────────────────────────────────────────────────
-   Add to a module's _quarto.yml under format.revealjs:
-     include-after-body:
-       - ../../tools/text-editor.html
+   Wire into a module via its _quarto-dev.yml (not _quarto.yml directly —
+   that would ship this tool in the published deck). See
+   Design/Intro to CAD/_quarto-dev.yml for the pattern. Then run:
+     QUARTO_PROFILE=dev quarto preview deck.qmd
 
    Edits a slide's visible text in place (title, callout labels, concept
    insight, or a section's badge label) and writes it back into deck.qmd.

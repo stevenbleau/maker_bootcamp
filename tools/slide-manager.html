@@ -2,9 +2,10 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — SLIDE MANAGER v1
    ───────────────────────────────────────────────────────────────────────────
-   Add to a module's _quarto.yml under format.revealjs:
-     include-after-body:
-       - ../../tools/slide-manager.html
+   Wire into a module via its _quarto-dev.yml (not _quarto.yml directly —
+   that would ship this tool in the published deck). See
+   Design/Intro to CAD/_quarto-dev.yml for the pattern. Then run:
+     QUARTO_PROFILE=dev quarto preview deck.qmd
 
    Adds/deletes content and section slides, renumbering every later slide in
    scope (and renaming their image files/folders to match) so deck.qmd and

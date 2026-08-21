@@ -1,0 +1,13 @@
+# Merged into _quarto.yml only when QUARTO_PROFILE=dev is set, e.g.:
+#   QUARTO_PROFILE=dev quarto preview deck.qmd
+# Wires in the dev tools (highlight picker, text editor, slide manager) for
+# local editing in Chrome. Never referenced by build-site.sh or CI, so a
+# published deck can never accidentally ship with these — no profile means
+# no dev tools, by construction, for this module and any future one that
+# copies this pattern.
+format:
+  revealjs:
+    include-after-body:
+      - ../../tools/highlight-picker.html
+      - ../../tools/text-editor.html
+      - ../../tools/slide-manager.html
