@@ -1,9 +1,13 @@
 .DS_Store
 .venv/
 
+# Planning files
+**/PLAN.md
+
 # Quarto / rendered output
 README.html
 README_files/
 **/.quarto/
 **/deck.html
 **/deck_files/
+**/*.pdf
