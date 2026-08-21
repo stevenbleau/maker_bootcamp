@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="../../../../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tabby.min.js"></script>
+<script src="../../../../site_libs/quarto-html/popper.min.js"></script>
+<script src="../../../../site_libs/quarto-html/tippy.umd.min.js"></script>
+<link href="../../../../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/light-border.css" rel="stylesheet">
+<link href="../../../../site_libs/quarto-html/quarto-syntax-highlighting-64a204ab8560d761af7679ceaba22944.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.10.18">
+
+  <title>Maker Bootcamp – deck</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="../../../../site_libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="../../../../site_libs/revealjs/dist/reveal.css">
+  <style>
+    /* Default styles provided by pandoc.
+    ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+    */
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: 1.5em;}
+    div.column{flex: auto;}
+    @media screen {
+    div.columns{gap: min(4vw, 1.5em);}
+    div.column{overflow-x: auto;}
+    }
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+      vertical-align: middle;
+    }
+  </style>
+  <link rel="stylesheet" href="../../../../site_libs/revealjs/dist/theme/quarto-2740581606dc327e82f18f789b69d8a0.css">
+  <link href="../../../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="../../../../site_libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="../../../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="../../../../site_libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  <style>
+  .keyboard-shell {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 18px;
+    box-sizing: border-box;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: linear-gradient(180deg, #f9fcff 0%, #eef4f8 100%);
+  }
+
+  .keyboard-note {
+    font-size: 15px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #5d6d7e;
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .piano {
+    position: relative;
+    flex: 1;
+    min-height: 360px;
+    user-select: none;
+  }
+
+  .white-keys {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 10px;
+  }
+
+  .piano-key {
+    appearance: none;
+    border: 0;
+    padding: 0;
+    font: inherit;
+    cursor: pointer;
+    outline: none;
+    transition: transform 120ms ease, box-shadow 120ms ease, filter 120ms ease;
+  }
+
+  .piano-key:focus-visible {
+    box-shadow: 0 0 0 4px rgba(43, 138, 138, 0.22);
+  }
+
+  .white-key {
+    position: relative;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f7fb 100%);
+    border: 1px solid #d7dee7;
+    border-radius: 0 0 12px 12px;
+    box-shadow: 0 6px 0 #c7d0da, 0 14px 24px rgba(15, 23, 42, 0.12);
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding-bottom: 16px;
+    color: #1f2937;
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+  }
+
+  .white-key.pentatonic {
+    background: linear-gradient(180deg, #e9fbf8 0%, #d8f4ee 100%);
+    border-color: #7bcdbf;
+    box-shadow: 0 6px 0 #55b9aa, 0 0 0 2px rgba(43, 138, 138, 0.12), 0 14px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .black-key {
+    position: absolute;
+    top: 0;
+    width: calc((100% - 60px) / 7 * 0.62);
+    height: 62%;
+    border-radius: 0 0 10px 10px;
+    background: linear-gradient(180deg, #3a4250 0%, #10151d 100%);
+    box-shadow: 0 6px 12px rgba(15, 23, 42, 0.35);
+    color: #f8fafc;
+    z-index: 2;
+    display: flex;
+    align-items: end;
+    justify-content: center;
+    padding-bottom: 14px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+  }
+
+  .black-key[data-slot="1"] { left: calc((100% - 60px) / 7 * 0.70); }
+  .black-key[data-slot="2"] { left: calc((100% - 60px) / 7 * 1.70); }
+  .black-key[data-slot="4"] { left: calc((100% - 60px) / 7 * 4.04); }
+  .black-key[data-slot="5"] { left: calc((100% - 60px) / 7 * 5.04); }
+  .black-key[data-slot="6"] { left: calc((100% - 60px) / 7 * 6.04); }
+
+  .piano-key.is-active {
+    transform: translateY(2px);
+    filter: brightness(1.08);
+  }
+
+  .piano-key.is-active.white-key {
+    box-shadow: 0 3px 0 #c7d0da, 0 0 0 2px rgba(43, 138, 138, 0.24), 0 14px 24px rgba(15, 23, 42, 0.12);
+  }
+
+  .piano-key.is-active.black-key {
+    box-shadow: 0 3px 10px rgba(15, 23, 42, 0.4), 0 0 0 2px rgba(255, 183, 3, 0.25);
+  }
+
+  .scale-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 8px;
+  }
+
+  .scale-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 42px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #f6f7f9;
+    border: 1px solid #d9dee5;
+    color: #4b5563;
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  .scale-chip.pentatonic {
+    background: linear-gradient(180deg, #e9fbf8 0%, #d8f4ee 100%);
+    border-color: #7bcdbf;
+    color: #12786d;
+  }
+
+  .backing-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 10px;
+  }
+
+  .backing-toggle {
+    appearance: none;
+    border: 0;
+    border-radius: 999px;
+    padding: 9px 16px;
+    background: var(--color-teal);
+    color: #ffffff;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .backing-toggle.is-playing {
+    background: #1d4f50;
+  }
+
+  .backing-status {
+    font-size: 15px;
+    color: #4b5563;
+    letter-spacing: 0.02em;
+  }
+
+  .backing-volume {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 6px;
+  }
+
+  .backing-volume-label {
+    font-size: 14px;
+    color: #4b5563;
+    white-space: nowrap;
+  }
+
+  .backing-volume-slider {
+    width: 120px;
+    accent-color: var(--color-teal);
+    cursor: pointer;
+  }
+  </style>
+  <script type="module">
+  let audioContext = null;
+  let backingIsPlaying = false;
+  let backingAudio = null;
+  const BACKING_TRACK_PATH = "deck_files/Groovy Neo Soul Backing Track in C Major I 85 BPM.mp3";
+
+  const noteFrequency = {
+    "C4": 261.63,
+    "C#4": 277.18,
+    "D4": 293.66,
+    "D#4": 311.13,
+    "E4": 329.63,
+    "F4": 349.23,
+    "F#4": 369.99,
+    "G4": 392.00,
+    "G#4": 415.30,
+    "A4": 440.00,
+    "A#4": 466.16,
+    "B4": 493.88,
+  };
+
+  function ensureAudioContext() {
+    if (!audioContext) {
+      audioContext = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (audioContext.state === "suspended") {
+      audioContext.resume();
+    }
+    return audioContext;
+  }
+
+  function pulseKey(key) {
+    key.classList.add("is-active");
+    window.setTimeout(() => key.classList.remove("is-active"), 180);
+  }
+
+  function playNote(note) {
+    const context = ensureAudioContext();
+    const frequency = noteFrequency[note];
+    if (!frequency) return;
+
+    const now = context.currentTime;
+    const gain = context.createGain();
+    const filter = context.createBiquadFilter();
+    const carrier = context.createOscillator();
+    const body = context.createOscillator();
+
+    filter.type = "lowpass";
+    filter.frequency.setValueAtTime(2400, now);
+
+    carrier.type = "triangle";
+    body.type = "sine";
+    carrier.frequency.setValueAtTime(frequency, now);
+    body.frequency.setValueAtTime(frequency / 2, now);
+
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(0.22, now + 0.03);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 1.1);
+
+    carrier.connect(filter);
+    body.connect(filter);
+    filter.connect(gain);
+    gain.connect(context.destination);
+
+    carrier.start(now);
+    body.start(now);
+    carrier.stop(now + 1.2);
+    body.stop(now + 1.2);
+  }
+
+  function updateBackingUi() {
+    const button = document.getElementById("backing-toggle");
+    const status = document.getElementById("backing-status");
+    if (!button || !status) return;
+
+    button.textContent = backingIsPlaying ? "Pause Backing Track" : "Play Backing Track";
+    button.classList.toggle("is-playing", backingIsPlaying);
+
+    if (!backingIsPlaying) {
+      status.textContent = "Stopped";
+    } else {
+      status.textContent = "Playing C major backing track";
+    }
+  }
+
+  function startBackingTrack() {
+    if (backingIsPlaying) return;
+    ensureAudioContext();
+    if (!backingAudio) return;
+    backingIsPlaying = true;
+    backingAudio.play().catch(() => {
+      backingIsPlaying = false;
+      updateBackingUi();
+    });
+    updateBackingUi();
+  }
+
+  function stopBackingTrack() {
+    backingIsPlaying = false;
+    if (backingAudio) {
+      backingAudio.pause();
+      backingAudio.currentTime = 0;
+    }
+    updateBackingUi();
+  }
+
+  function bindBackingTrack() {
+    const button = document.getElementById("backing-toggle");
+    if (!button) return;
+
+    backingAudio = new Audio(encodeURI(BACKING_TRACK_PATH));
+    backingAudio.loop = true;
+    backingAudio.preload = "auto";
+    backingAudio.volume = 0.65;
+
+    backingAudio.addEventListener("ended", () => {
+      backingIsPlaying = false;
+      updateBackingUi();
+    });
+
+    const volumeSlider = document.getElementById("backing-volume");
+    if (volumeSlider) {
+      volumeSlider.value = String(Math.round(backingAudio.volume * 100));
+      volumeSlider.addEventListener("input", () => {
+        const percent = Number(volumeSlider.value);
+        backingAudio.volume = Math.max(0, Math.min(1, percent / 100));
+      });
+    }
+
+    button.addEventListener("click", () => {
+      if (backingIsPlaying) {
+        stopBackingTrack();
+      } else {
+        startBackingTrack();
+      }
+    });
+
+    updateBackingUi();
+  }
+
+  function bindKeyboard() {
+    document.querySelectorAll(".piano-key").forEach((key) => {
+      key.addEventListener("pointerdown", (event) => {
+        event.preventDefault();
+        pulseKey(key);
+        playNote(key.dataset.note);
+      });
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    bindKeyboard();
+    bindBackingTrack();
+  });
+  </script>
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+
+<section id="pentatonic-in-c-major" class="slide level2 content">
+<h2>1.1 Pentatonic in C Major</h2>
+<div class="top-bar">1. MUSIC PRODUCTION</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <div class="callout-label">
+      <strong>C major pentatonic</strong> uses five notes: <strong>C, D, E, G, A</strong>.
+      It is a simple scale for riffs, melodies, and improvisation because every note fits cleanly over C major harmony.
+    </div>
+    <div class="scale-chips" aria-label="C major pentatonic notes">
+      <span class="scale-chip pentatonic">C</span>
+      <span class="scale-chip pentatonic">D</span>
+      <span class="scale-chip pentatonic">E</span>
+      <span class="scale-chip">F</span>
+      <span class="scale-chip pentatonic">G</span>
+      <span class="scale-chip pentatonic">A</span>
+      <span class="scale-chip">B</span>
+    </div>
+    <div class="backing-controls">
+      <button id="backing-toggle" class="backing-toggle" type="button" aria-label="Play or pause C major backing track">Play Backing Track</button>
+      <label class="backing-volume" for="backing-volume">
+        <span class="backing-volume-label">Volume</span>
+        <input id="backing-volume" class="backing-volume-slider" type="range" min="0" max="100" value="65" step="1" aria-label="Backing track volume">
+      </label>
+      <span id="backing-status" class="backing-status" aria-live="polite">Stopped</span>
+    </div>
+    <p class="concept-insight"><strong>*</strong> Click the highlighted keys to hear the scale. Try moving between notes in the order C, D, E, G, A.</p>
+  </div>
+  <div class="main-panel">
+    <div class="keyboard-shell">
+      <div class="keyboard-note">
+        <span>One octave keyboard</span>
+        <span>click a key to play the note</span>
+      </div>
+      <div class="piano" id="daw-keyboard" aria-label="One octave keyboard in C major">
+        <div class="white-keys">
+          <button class="piano-key white-key pentatonic" data-note="C4" aria-label="C4">C</button>
+          <button class="piano-key white-key pentatonic" data-note="D4" aria-label="D4">D</button>
+          <button class="piano-key white-key pentatonic" data-note="E4" aria-label="E4">E</button>
+          <button class="piano-key white-key" data-note="F4" aria-label="F4">F</button>
+          <button class="piano-key white-key pentatonic" data-note="G4" aria-label="G4">G</button>
+          <button class="piano-key white-key pentatonic" data-note="A4" aria-label="A4">A</button>
+          <button class="piano-key white-key" data-note="B4" aria-label="B4">B</button>
+        </div>
+        <button class="piano-key black-key" data-slot="1" data-note="C#4" aria-label="C sharp 4">C#</button>
+        <button class="piano-key black-key" data-slot="2" data-note="D#4" aria-label="D sharp 4">D#</button>
+        <button class="piano-key black-key" data-slot="4" data-note="F#4" aria-label="F sharp 4">F#</button>
+        <button class="piano-key black-key" data-slot="5" data-note="G#4" aria-label="G sharp 4">G#</button>
+        <button class="piano-key black-key" data-slot="6" data-note="A#4" aria-label="A sharp 4">A#</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+</section>
+    </div>
+  <div class="quarto-auto-generated-content" style="display: none;">
+<div class="footer footer-default">
+
+</div>
+</div></div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="../../../../site_libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="../../../../site_libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="../../../../site_libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/search/search.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="../../../../site_libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'jumpToSlide': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.togglePdfExport(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.toggleScrollView(event)\"><kbd>r</kbd> Scroll View Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"5\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: false,
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdn.jsdelivr.net/npm/mathjax@2.7.9/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    <script id="quarto-html-after-body" type="application/javascript">
+      window.document.addEventListener("DOMContentLoaded", function (event) {
+        const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+        tabsets.forEach(function(tabset) {
+          const tabby = new Tabby('#' + tabset.id);
+        });
+        const isCodeAnnotation = (el) => {
+          for (const clz of el.classList) {
+            if (clz.startsWith('code-annotation-')) {                     
+              return true;
+            }
+          }
+          return false;
+        }
+        const onCopySuccess = function(e) {
+          // button target
+          const button = e.trigger;
+          // don't keep focus
+          button.blur();
+          // flash "checked"
+          button.classList.add('code-copy-button-checked');
+          var currentTitle = button.getAttribute("title");
+          button.setAttribute("title", "Copied!");
+          let tooltip;
+          if (window.bootstrap) {
+            button.setAttribute("data-bs-toggle", "tooltip");
+            button.setAttribute("data-bs-placement", "left");
+            button.setAttribute("data-bs-title", "Copied!");
+            tooltip = new bootstrap.Tooltip(button, 
+              { trigger: "manual", 
+                customClass: "code-copy-button-tooltip",
+                offset: [0, -8]});
+            tooltip.show();    
+          }
+          setTimeout(function() {
+            if (tooltip) {
+              tooltip.hide();
+              button.removeAttribute("data-bs-title");
+              button.removeAttribute("data-bs-toggle");
+              button.removeAttribute("data-bs-placement");
+            }
+            button.setAttribute("title", currentTitle);
+            button.classList.remove('code-copy-button-checked');
+          }, 1000);
+          // clear code selection
+          e.clearSelection();
+        }
+        const getTextToCopy = function(trigger) {
+          const outerScaffold = trigger.parentElement.cloneNode(true);
+          const codeEl = outerScaffold.querySelector('code');
+          for (const childEl of codeEl.children) {
+            if (isCodeAnnotation(childEl)) {
+              childEl.remove();
+            }
+          }
+          return codeEl.innerText;
+        }
+        const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+          text: getTextToCopy
+        });
+        clipboard.on('success', onCopySuccess);
+        if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+          const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+            text: getTextToCopy,
+            container: window.document.getElementById('quarto-embedded-source-code-modal')
+          });
+          clipboardModal.on('success', onCopySuccess);
+        }
+          var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+          var mailtoRegex = new RegExp(/^mailto:/);
+            var filterRegex = new RegExp("https:\/\/stevenbleau\.github\.io\/maker_bootcamp\/");
+          var isInternal = (href) => {
+              return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+          }
+          // Inspect non-navigation links and adorn them if external
+         var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+          for (var i=0; i<links.length; i++) {
+            const link = links[i];
+            if (!isInternal(link.href)) {
+              // undo the damage that might have been done by quarto-nav.js in the case of
+              // links that we want to consider external
+              if (link.dataset.originalHref !== undefined) {
+                link.href = link.dataset.originalHref;
+              }
+            }
+          }
+        function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+          const config = {
+            allowHTML: true,
+            maxWidth: 500,
+            delay: 100,
+            arrow: false,
+            appendTo: function(el) {
+                return el.closest('section.slide') || el.parentElement;
+            },
+            interactive: true,
+            interactiveBorder: 10,
+            theme: 'light-border',
+            placement: 'bottom-start',
+          };
+          if (contentFn) {
+            config.content = contentFn;
+          }
+          if (onTriggerFn) {
+            config.onTrigger = onTriggerFn;
+          }
+          if (onUntriggerFn) {
+            config.onUntrigger = onUntriggerFn;
+          }
+            config['offset'] = [0,0];
+            config['maxWidth'] = 700;
+          window.tippy(el, config); 
+        }
+        const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+        for (var i=0; i<noterefs.length; i++) {
+          const ref = noterefs[i];
+          tippyHover(ref, function() {
+            // use id or data attribute instead here
+            let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+            try { href = new URL(href).hash; } catch {}
+            const id = href.replace(/^#\/?/, "");
+            const note = window.document.getElementById(id);
+            if (note) {
+              return note.innerHTML;
+            } else {
+              return "";
+            }
+          });
+        }
+        const findCites = (el) => {
+          const parentEl = el.parentElement;
+          if (parentEl) {
+            const cites = parentEl.dataset.cites;
+            if (cites) {
+              return {
+                el,
+                cites: cites.split(' ')
+              };
+            } else {
+              return findCites(el.parentElement)
+            }
+          } else {
+            return undefined;
+          }
+        };
+        var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+        for (var i=0; i<bibliorefs.length; i++) {
+          const ref = bibliorefs[i];
+          const citeInfo = findCites(ref);
+          if (citeInfo) {
+            tippyHover(citeInfo.el, function() {
+              var popup = window.document.createElement('div');
+              citeInfo.cites.forEach(function(cite) {
+                var citeDiv = window.document.createElement('div');
+                citeDiv.classList.add('hanging-indent');
+                citeDiv.classList.add('csl-entry');
+                var biblioDiv = window.document.getElementById('ref-' + cite);
+                if (biblioDiv) {
+                  citeDiv.innerHTML = biblioDiv.innerHTML;
+                }
+                popup.appendChild(citeDiv);
+              });
+              return popup.innerHTML;
+            });
+          }
+        }
+      });
+      </script>
+    
+
+</body></html>
