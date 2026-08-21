@@ -1,0 +1,359 @@
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAKER BOOTCAMP — TEXT EDITOR v1
+   ───────────────────────────────────────────────────────────────────────────
+   Add to a module's _quarto.yml under format.revealjs:
+     include-after-body:
+       - ../../tools/text-editor.html
+
+   Edits a slide's visible text in place (title, callout labels, concept
+   insight, or a section's badge label) and writes it back into deck.qmd.
+   Numbered/marked prefixes (N.M, N.M.I:, the "*" marker) stay locked so
+   editing here can't corrupt values highlight-picker.html and
+   slide-manager.html depend on.
+
+   Shares deck.qmd/images/ file handles with highlight-picker.html via the
+   same IndexedDB store — link either tool once, both pick it up. This is a
+   standalone script; nothing here is imported from the other tools.
+
+   REQUIRES CHROME — open quarto preview localhost URL in Chrome for
+   File System Access API (file read/write) support.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function () {
+'use strict';
+
+function whenReady(cb) {
+  if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }
+  const t0 = Date.now();
+  const id = setInterval(() => {
+    if (typeof Reveal !== 'undefined' && Reveal.isReady()) { clearInterval(id); cb(); }
+    else if (Date.now() - t0 > 8000) clearInterval(id);
+  }, 80);
+}
+
+// ── IndexedDB — same store/keys as highlight-picker.html, on purpose ─────────
+const _db = (() => {
+  let _c = null;
+  const open = () => _c ? Promise.resolve(_c) : new Promise((res,rej) => {
+    const r = indexedDB.open('hlp-db',1);
+    r.onupgradeneeded = e => e.target.result.createObjectStore('h');
+    r.onsuccess = e => { _c=e.target.result; res(_c); };
+    r.onerror   = e => rej(e.target.error);
+  });
+  const tx = (rw,cb) => open().then(db => new Promise((res,rej) => {
+    const t=db.transaction('h',rw), s=t.objectStore('h'), q=cb(s);
+    t.oncomplete=()=>res(q?.result); t.onerror=rej;
+  }));
+  return {
+    save: (k,v) => tx('readwrite', s => s.put(v,k)),
+    load: (k)   => tx('readonly',  s => s.get(k)),
+  };
+})();
+
+let deckFileHandle = null;
+
+async function restoreHandle() {
+  if (!deckFileHandle) {
+    const h = await _db.load('deck').catch(()=>null);
+    if (h) { const p=await h.requestPermission({mode:'readwrite'}).catch(()=>'denied'); if(p==='granted') deckFileHandle=h; }
+  }
+}
+async function pickDeckFile() {
+  if (!('showOpenFilePicker' in window)) { alert('Use Chrome — VS Code Simple Browser does not support File System Access API.'); return; }
+  try { [deckFileHandle]=await window.showOpenFilePicker({types:[{description:'Quarto Markdown',accept:{'text/plain':[".qmd"]}}]}); await _db.save('deck',deckFileHandle); renderPanel(); } catch {}
+}
+
+// ── Slide helpers ─────────────────────────────────────────────────────────────
+function numParts(label) {
+  const m = (label||'').match(/^(\d+)\.(\d+)/);
+  return m ? { sec:m[1], step:m[2] } : null;
+}
+function divParts(headingText) {
+  const m = (headingText||'').match(/^(\d+)\.0\.0/);
+  return m ? { sec:m[1] } : null;
+}
+function slideKind() {
+  const s = Reveal.getCurrentSlide();
+  if (!s) return null;
+  if (s.querySelector('h2') && s.querySelector('.main-shot-wrap')) return 'content';
+  if (s.querySelector('.left-panel') && s.querySelector('.label')) return 'divider';
+  return null;
+}
+
+// ── Editable-field wiring ─────────────────────────────────────────────────────
+// Splits an element's text at a locked "N.M " / "N.M.I:" style prefix and
+// makes only the remainder contenteditable, so the prefix can't be typed over.
+function wrapPrefixed(el, prefixRe) {
+  const text = el.textContent;
+  const m = text.match(prefixRe);
+  const prefix = m ? m[1] : '';
+  const body = m ? text.slice(prefix.length) : text;
+  el.innerHTML = '';
+  if (prefix) {
+    const locked = document.createElement('span');
+    locked.className = 'txted-locked';
+    locked.textContent = prefix;
+    el.appendChild(locked);
+  }
+  const field = document.createElement('span');
+  field.className = 'txted-field';
+  field.contentEditable = 'true';
+  field.textContent = body;
+  el.appendChild(field);
+  return field;
+}
+
+// concept-insight keeps its <strong>*</strong> marker element as-is; only the
+// text after it becomes editable.
+function wrapInsight(p) {
+  const strong = p.querySelector('strong');
+  let body = '';
+  for (let node = strong ? strong.nextSibling : p.firstChild; node; node = node.nextSibling) body += node.textContent;
+  p.innerHTML = '';
+  if (strong) p.appendChild(strong);
+  const field = document.createElement('span');
+  field.className = 'txted-field';
+  field.contentEditable = 'true';
+  field.textContent = body.replace(/^\s+/, ' ');
+  p.appendChild(field);
+  return field;
+}
+
+// No numeric prefix on a divider's label — the whole thing is editable.
+function wrapPlain(el) {
+  el.classList.add('txted-field');
+  el.contentEditable = 'true';
+  return el;
+}
+
+let editing = false;
+let fields = [];       // [{el, field, snapshotHTML}] for the current edit session
+let panelEl;
+
+function enterEdit() {
+  const kind = slideKind();
+  if (!kind) { alert('This slide is neither a content slide nor a section slide — nothing to edit.'); return; }
+  fields = [];
+  const slide = Reveal.getCurrentSlide();
+
+  if (kind === 'content') {
+    const h2 = slide.querySelector('h2');
+    fields.push({ el:h2, snapshotHTML:h2.innerHTML, field: wrapPrefixed(h2, /^(\d+\.\d+\s+)/) });
+    slide.querySelectorAll('.callout-label').forEach(lbl => {
+      fields.push({ el:lbl, snapshotHTML:lbl.innerHTML, field: wrapPrefixed(lbl, /^(\d+\.\d+\.\d+:\s*)/) });
+    });
+    const insight = slide.querySelector('.concept-insight');
+    if (insight) fields.push({ el:insight, snapshotHTML:insight.innerHTML, field: wrapInsight(insight) });
+  } else {
+    const label = slide.querySelector('.label');
+    fields.push({ el:label, snapshotHTML:label.innerHTML, field: wrapPlain(label) });
+  }
+
+  editing = true;
+  renderPanel();
+}
+
+function exitEdit(restore) {
+  fields.forEach(f => { if (restore) f.el.innerHTML = f.snapshotHTML; else plainify(f.el); });
+  fields = [];
+  editing = false;
+  renderPanel();
+}
+
+// After a save (or to normalize after a cancel-restore), collapse the
+// locked-prefix/editable-field spans back into plain text — textContent
+// reads the same either way, but this keeps the live DOM the shape other
+// tools/CSS expect rather than permanently leaving marker spans in place.
+function plainify(el) { el.textContent = el.textContent; }
+
+// ── QMD patchers ──────────────────────────────────────────────────────────────
+// Each locates its target the same way highlight-picker.html does: anchor on
+// this slide's unique main-shot / right-panel image src, then search from
+// there rather than trusting fixed offsets (which shift as earlier patches
+// in the same save change the string length).
+
+function patchTitle(content, n, newTitle) {
+  const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
+  const mainPos = content.indexOf(mainSrc);
+  if (mainPos === -1) return null;
+  const headStart = content.lastIndexOf('\n## ', mainPos);
+  if (headStart === -1) return null;
+  const headEnd = content.indexOf('\n', headStart+1);
+  const line = content.slice(headStart+1, headEnd);
+  const m = line.match(/^## (\d+\.\d+)\s+.*?(\s*\{\.content\})$/);
+  if (!m) return null;
+  const newLine = '## '+m[1]+' '+newTitle+m[2];
+  return content.slice(0, headStart+1) + newLine + content.slice(headEnd);
+}
+
+function patchDividerLabel(content, n, newLabel) {
+  const imgSrc = 'images/'+n.sec+'/'+n.sec+'.0.0.';
+  const imgPos = content.indexOf(imgSrc);
+  if (imgPos === -1) return null;
+  const tag = '<div class="label">';
+  const labelStart = content.lastIndexOf(tag, imgPos);
+  if (labelStart === -1) return null;
+  const bodyStart = labelStart + tag.length;
+  const bodyEnd = content.indexOf('</div>', bodyStart);
+  if (bodyEnd === -1) return null;
+  return content.slice(0, bodyStart) + newLabel + content.slice(bodyEnd);
+}
+
+// Replaces every callout-label body in this slide's callout-box, in
+// document order, preserving each one's own "N.M.I:" prefix.
+function patchCalloutLabels(content, n, newBodies) {
+  if (!newBodies.length) return content;
+  const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
+  const mainPos = content.indexOf(mainSrc);
+  if (mainPos === -1) return null;
+  const cbTag = '<div class="callout-box">';
+  const cbPos = content.lastIndexOf(cbTag, mainPos);
+  if (cbPos === -1) return null;
+  const cbStart = cbPos + cbTag.length;
+  let pos=cbStart, depth=0, cbEnd=-1;
+  while (pos < mainPos) {
+    const no=content.indexOf('<div',pos), nc=content.indexOf('</div>',pos);
+    if (nc===-1) break;
+    if (no!==-1 && no<nc) { depth++; pos=no+4; }
+    else { if(depth===0){cbEnd=nc;break;} depth--; pos=nc+6; }
+  }
+  if (cbEnd===-1) return null;
+  let cbBody = content.slice(cbStart, cbEnd);
+  let i = 0;
+  cbBody = cbBody.replace(/<div class="callout-label">([\s\S]*?)<\/div>/g, (whole, inner) => {
+    if (i >= newBodies.length) { i++; return whole; }
+    const prefixM = inner.match(/^\s*(\d+\.\d+\.\d+:)/);
+    const prefix = prefixM ? prefixM[1]+' ' : '';
+    const body = newBodies[i++];
+    return '<div class="callout-label">\n      '+prefix+body+'\n    </div>';
+  });
+  return content.slice(0, cbStart) + cbBody + content.slice(cbEnd);
+}
+
+function patchConceptInsight(content, n, newBody) {
+  const mainSrc = 'images/'+n.sec+'/'+n.sec+'.'+n.step+'.0.';
+  const mainPos = content.indexOf(mainSrc);
+  if (mainPos === -1) return null;
+  const cbTag = '<div class="callout-box">';
+  const cbPos = content.lastIndexOf(cbTag, mainPos);
+  if (cbPos === -1) return null;
+  const pTag = '<p class="concept-insight">';
+  const pPos = content.indexOf(pTag, cbPos);
+  if (pPos === -1 || pPos > mainPos) return content; // no insight paragraph on this slide
+  const strongEnd = content.indexOf('</strong>', pPos);
+  if (strongEnd === -1) return null;
+  const bodyStart = strongEnd + '</strong>'.length;
+  const bodyEnd = content.indexOf('</p>', bodyStart);
+  if (bodyEnd === -1) return null;
+  return content.slice(0, bodyStart) + ' ' + newBody + content.slice(bodyEnd);
+}
+
+async function saveEdits() {
+  if (!deckFileHandle) { alert('Link deck.qmd first (📄 button).'); return; }
+  const kind = slideKind();
+  if (!kind || !fields.length) return;
+  const headingText = kind === 'content'
+    ? Reveal.getCurrentSlide().querySelector('h2').textContent.trim()
+    : (() => { const s=Reveal.getCurrentSlide(); return s.querySelector('.number')?.textContent.trim()+'.0.0'; })();
+  const n = kind === 'content' ? numParts(headingText) : divParts(headingText);
+  if (!n) { alert('Could not determine this slide\'s section/step number.'); return; }
+
+  const btn = document.getElementById('txted-save'), orig = btn?.textContent;
+  if (btn) btn.textContent = 'Saving…';
+  try {
+    const file = await deckFileHandle.getFile();
+    let content = await file.text();
+
+    if (kind === 'content') {
+      const titleField = fields[0].field.textContent.trim();
+      const withTitle = patchTitle(content, n, titleField);
+      if (!withTitle) { alert('Slide not found in deck.qmd.'); return; }
+      content = withTitle;
+
+      const labelBodies = fields.filter(f => f.el.classList.contains('callout-label')).map(f => f.field.textContent.trim());
+      const withLabels = patchCalloutLabels(content, n, labelBodies);
+      if (withLabels) content = withLabels;
+
+      const insightField = fields.find(f => f.el.classList.contains('concept-insight'));
+      if (insightField) {
+        const withInsight = patchConceptInsight(content, n, insightField.field.textContent.trim());
+        if (withInsight) content = withInsight;
+      }
+    } else {
+      const withLabel = patchDividerLabel(content, n, fields[0].field.textContent.trim());
+      if (!withLabel) { alert('Slide not found in deck.qmd.'); return; }
+      content = withLabel;
+    }
+
+    const wr = await deckFileHandle.createWritable();
+    await wr.write(content); await wr.close();
+    exitEdit(false);
+    flashStatus('✓ Saved — Quarto is reloading…');
+  } catch (err) { alert('Save failed: '+err.message); }
+  finally { if (btn) btn.textContent = orig; }
+}
+
+function flashStatus(msg) { const el=document.getElementById('txted-status'); if(!el) return; el.textContent=msg; el.style.display='block'; setTimeout(()=>el.style.display='none',4000); }
+
+// ── Panel ─────────────────────────────────────────────────────────────────────
+const bs=(bg,col,w='auto',p='3px 9px')=>'background:'+bg+';color:'+col+';border:1px solid '+col+'44;border-radius:4px;padding:'+p+';cursor:pointer;font-size:10px;font-family:ui-monospace,monospace;'+(w!=='auto'?'width:'+w+';':'');
+
+function renderPanel() {
+  if (!panelEl) return;
+  const hasDeck = !!deckFileHandle;
+  const label = Reveal.getCurrentSlide()?.querySelector('h2')?.textContent?.trim()
+    || Reveal.getCurrentSlide()?.querySelector('.label')?.textContent?.trim() || '';
+  panelEl.style.display = editing ? 'block' : 'none';
+  if (!editing) return;
+  panelEl.innerHTML =
+    '<div style="font-weight:700;font-size:13px;color:#1eae9d;margin-bottom:2px;">✏ Text Editor</div>'+
+    '<div style="color:#555;font-size:10px;margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="'+label+'">'+(label||'—')+'</div>'+
+    '<button id="txted-link-deck" style="'+bs('#1a1a1a',hasDeck?'#34d399':'#888','100%','4px 8px')+'margin-bottom:8px;">'+(hasDeck?'📄 '+deckFileHandle.name:'📄 Link deck.qmd')+'</button>'+
+    '<div style="color:#888;font-size:11px;line-height:1.5;background:#141414;border-radius:5px;padding:8px;margin-bottom:8px;">Click the highlighted text on the slide to edit it. Numbered prefixes are locked.</div>'+
+    '<div style="display:flex;gap:6px;">'+
+      '<button id="txted-save" style="'+bs(hasDeck?'#0d2620':'#1a1a1a',hasDeck?'#34d399':'#555','auto','6px 8px')+'flex:1;">💾 Save text</button>'+
+      '<button id="txted-cancel" style="'+bs('#1a0000','#f87171','auto','6px 8px')+'flex:0 0 auto;">✕ Cancel</button>'+
+    '</div>'+
+    '<div id="txted-status" style="color:#34d399;font-size:10px;margin-top:5px;display:none;"></div>';
+
+  document.getElementById('txted-link-deck').addEventListener('click', pickDeckFile);
+  document.getElementById('txted-save').addEventListener('click', saveEdits);
+  document.getElementById('txted-cancel').addEventListener('click', () => exitEdit(true));
+}
+
+async function toggleEdit() {
+  if (editing) { exitEdit(true); return; }
+  await restoreHandle();
+  enterEdit();
+}
+
+// ── Build ─────────────────────────────────────────────────────────────────────
+function build() {
+  const style = document.createElement('style');
+  style.textContent =
+    '.txted-locked{opacity:.5;user-select:none;}'+
+    '.txted-field{outline:1px dashed #f59e0b;background:rgba(245,158,11,.08);border-radius:3px;padding:0 2px;cursor:text;}'+
+    '.txted-field:focus{outline:1px solid #f59e0b;background:rgba(245,158,11,.15);}';
+  document.head.appendChild(style);
+
+  const btn = document.createElement('button');
+  btn.id = 'txted-btn'; btn.textContent = '✏️';
+  Object.assign(btn.style, {position:'fixed',bottom:'16px',right:'66px',zIndex:'10000',
+    width:'42px',height:'42px',borderRadius:'50%',border:'none',background:'#1eae9d',
+    fontSize:'18px',cursor:'pointer',boxShadow:'0 2px 10px rgba(0,0,0,.4)',transition:'background .15s'});
+  btn.addEventListener('click', async () => { await toggleEdit(); btn.style.background = editing ? '#f59e0b' : '#1eae9d'; });
+  document.body.appendChild(btn);
+
+  panelEl = document.createElement('div');
+  Object.assign(panelEl.style, {position:'fixed',bottom:'68px',right:'66px',zIndex:'10000',
+    background:'#1a1a1a',color:'#f0f0f0',borderRadius:'10px',padding:'14px 16px',
+    fontFamily:'ui-monospace,monospace',width:'290px',display:'none',maxHeight:'82vh',overflowY:'auto',
+    boxShadow:'0 6px 28px rgba(0,0,0,.7)',border:'1px solid #2a2a2a'});
+  document.body.appendChild(panelEl);
+
+  Reveal.on('slidechanged', () => { if (editing) exitEdit(true); document.getElementById('txted-btn').style.background='#1eae9d'; });
+}
+
+whenReady(build);
+})();
+</script>

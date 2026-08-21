@@ -115,7 +115,24 @@ title: ""
 </div>
 ```
 
-## 0.5 STEPS {.content}
+
+## 0.5 New Step {.content}
+
+```{=html}
+<div class="top-bar">0. OVERVIEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <p class="concept-insight"><strong>*</strong> </p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/0/0.5.0.webp" alt="Main screenshot for step 0.5">
+    </div>
+  </div>
+</div>
+```
+
+## 0.6 STEPS {.content}
 
 ```{=html}
 <div class="top-bar">0. OVERVIEW</div>
@@ -125,22 +142,39 @@ title: ""
     --highlight-w:6.2%;
     --highlight-h:3.3%;">
   <div class="callout-box">
-    <img src="images/0/0.5.1.webp" alt="Callout image for step 0.5">
+    <img src="images/0/0.6.1.webp" alt="Callout image for step 0.6">
     <div class="callout-label">
-      0.5.1: 1. Setup 2. Enter Parameters 3. Make the Brick 4. Make the Top Stud 5. Make the Bottom Stud 6. Make the Stud Pattern
+      0.6.1: 1. Setup 2. Enter Parameters 3. Make the Brick 4. Make the Top Stud 5. Make the Bottom Stud 6. Make the Stud Pattern
     </div>
     <p class="concept-insight"><strong>*</strong> Keep dimensions parametric where possible.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/0/0.5.0.webp" alt="Main screenshot for step 0.5">
+      <img class="main-shot" src="images/0/0.6.0.webp" alt="Main screenshot for step 0.6">
       <div class="click-highlight" aria-hidden="true"></div>
     </div>
   </div>
 </div>
 ```
 
-## 0.6 TOOLS USED {.content}
+
+## 0.7 New Step {.content}
+
+```{=html}
+<div class="top-bar">0. OVERVIEW</div>
+<div class="screenshot-row">
+  <div class="callout-box">
+    <p class="concept-insight"><strong>*</strong> </p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/0/0.7.0.webp" alt="Main screenshot for step 0.7">
+    </div>
+  </div>
+</div>
+```
+
+## 0.8 TOOLS USED {.content}
 
 ```{=html}
 <div class="top-bar">0. OVERVIEW</div>
@@ -150,15 +184,15 @@ title: ""
     --highlight-w:10.2%;
     --highlight-h:8.7%;">
   <div class="callout-box">
-    <img src="images/0/0.6.1.webp" alt="Callout image for step 0.6">
+    <img src="images/0/0.8.1.webp" alt="Callout image for step 0.8">
     <div class="callout-label">
-      0.6.1: CHEATSHEET Create Sketch Extrude Offset Pattern Project Rectangle Circle Dimension
+      0.8.1: CHEATSHEET Create Sketch Extrude Offset Pattern Project Rectangle Circle Dimension
     </div>
     <p class="concept-insight"><strong>*</strong> Keep dimensions parametric where possible.</p>
   </div>
   <div class="main-panel">
     <div class="main-shot-wrap">
-      <img class="main-shot" src="images/0/0.6.0.webp" alt="Main screenshot for step 0.6">
+      <img class="main-shot" src="images/0/0.8.0.webp" alt="Main screenshot for step 0.8">
       <div class="click-highlight" aria-hidden="true"></div>
     </div>
   </div>
@@ -187,8 +221,8 @@ title: ""
   --highlight-w:12.0%;
   --highlight-h:6.0%;">
   <div class="callout-box">
-    <img src="images/1/1.1.1.webp" alt="Callout image for step 1.1">
-            <div class="callout-label">
+    <img src="images/1/1.1.1.webp" alt="Callout image for step 1.1.1">
+    <div class="callout-label">
       1.1.1: 1. SETUP
     </div>
     <p class="concept-insight"><strong>*</strong> Keep dimensions parametric where possible.</p>
@@ -196,7 +230,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/1/1.1.0.webp" alt="Main screenshot for step 1.1">
-      <div class="click-highlight" style="--box-x:1.7%; --box-y:20.6%; --box-w:12.3%; --box-h:2.8%;" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:1.7%; --box-y:4.8%; --box-w:12.0%; --box-h:3.6%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -212,8 +246,8 @@ title: ""
   --highlight-w:6.2%;
   --highlight-h:6.0%;">
   <div class="callout-box">
-    <img src="images/1/1.2.1.webp" alt="Callout image for step 1.2">
-                <div class="callout-label">
+    <img src="images/1/1.2.1.webp" alt="Callout image for step 1.2.1">
+    <div class="callout-label">
       1.2.1: 1. SETUP
     </div>
     <p class="concept-insight"><strong>*</strong> Keep dimensions parametric where possible.</p>
@@ -221,7 +255,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/1/1.2.0.webp" alt="Main screenshot for step 1.2">
-      <div class="click-highlight" style="--box-x:8.5%; --box-y:4.2%; --box-w:5.0%; --box-h:5.0%;" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:1.8%; --box-y:16.7%; --box-w:11.6%; --box-h:6.4%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -262,7 +296,7 @@ title: ""
   --highlight-w:4.8%;
   --highlight-h:6.5%;">
   <div class="callout-box">
-    <img src="images/1/1.4.1.webp" alt="Callout image for step 1.4">
+    <img src="images/1/1.4.1.webp" alt="Callout image for step 1.4.1">
     <div class="callout-label">
       1.4.1: 1. SETUP
     </div>
@@ -271,7 +305,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/1/1.4.0.webp" alt="Main screenshot for step 1.4">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:3.3%; --box-y:1.4%; --box-w:3.7%; --box-h:4.6%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -287,7 +321,7 @@ title: ""
   --highlight-w:84.0%;
   --highlight-h:10.5%;">
   <div class="callout-box">
-    <img src="images/1/1.5.1.webp" alt="Callout image for step 1.5">
+    <img src="images/1/1.5.1.webp" alt="Callout image for step 1.5.1">
     <div class="callout-label">
       1.5.1: 1. SETUP
     </div>
@@ -296,7 +330,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/1/1.5.0.webp" alt="Main screenshot for step 1.5">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:29.0%; --box-y:23.1%; --box-w:12.1%; --box-h:8.3%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -324,7 +358,7 @@ title: ""
     --highlight-w:11.5%;
     --highlight-h:7.0%;">
   <div class="callout-box">
-    <img src="images/2/2.1.1.webp" alt="Callout image for step 2.1">
+    <img src="images/2/2.1.1.webp" alt="Callout image for step 2.1.1">
     <div class="callout-label">
       2.1.1: 2. ENTER PARAMETERS
     </div>
@@ -333,7 +367,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.1.0.webp" alt="Main screenshot for step 2.1">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:27.7%; --box-y:55.2%; --box-w:11.5%; --box-h:3.9%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -349,7 +383,7 @@ title: ""
     --highlight-w:3.2%;
     --highlight-h:4.2%;">
   <div class="callout-box">
-    <img src="images/2/2.2.1.webp" alt="Callout image for step 2.2">
+    <img src="images/2/2.2.1.webp" alt="Callout image for step 2.2.1">
     <div class="callout-label">
       2.2.1: We will be adding a bunch of parameters next 2. ENTER PARAMETERS
     </div>
@@ -358,7 +392,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.2.0.webp" alt="Main screenshot for step 2.2">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:54.1%; --box-y:18.5%; --box-w:2.5%; --box-h:3.4%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -375,7 +409,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.3.1.webp" alt="Callout image for step 2.3">
+    <img src="images/2/2.3.1.webp" alt="Callout image for step 2.3.1">
     <div class="callout-label">
       2.3.1: 2. ENTER PARAMETERS
     </div>
@@ -384,7 +418,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.3.0.webp" alt="Main screenshot for step 2.3">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:40.5%; --box-y:38.1%; --box-w:15.9%; --box-h:23.5%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -400,7 +434,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.4.1.webp" alt="Callout image for step 2.4">
+    <img src="images/2/2.4.1.webp" alt="Callout image for step 2.4.1">
     <div class="callout-label">
       2.4.1: ”width” Parameter 2. ENTER PARAMETERS
     </div>
@@ -409,7 +443,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.4.0.webp" alt="Main screenshot for step 2.4">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:40.4%; --box-y:37.8%; --box-w:16.3%; --box-h:24.5%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -425,7 +459,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.5.1.webp" alt="Callout image for step 2.5">
+    <img src="images/2/2.5.1.webp" alt="Callout image for step 2.5.1">
     <div class="callout-label">
       2.5.1: “height” Parameter 2. ENTER PARAMETERS
     </div>
@@ -434,7 +468,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.5.0.webp" alt="Main screenshot for step 2.5">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:40.3%; --box-y:38.1%; --box-w:16.4%; --box-h:23.6%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -450,7 +484,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.6.1.webp" alt="Callout image for step 2.6">
+    <img src="images/2/2.6.1.webp" alt="Callout image for step 2.6.1">
     <div class="callout-label">
       2.6.1: “ fit_tolerance ” 2. ENTER PARAMETERS
     </div>
@@ -459,7 +493,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.6.0.webp" alt="Main screenshot for step 2.6">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:41.2%; --box-y:34.7%; --box-w:16.3%; --box-h:24.5%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -475,7 +509,7 @@ title: ""
     --highlight-w:52.0%;
     --highlight-h:16.5%;">
   <div class="callout-box">
-    <img src="images/2/2.7.1.webp" alt="Callout image for step 2.7">
+    <img src="images/2/2.7.1.webp" alt="Callout image for step 2.7.1">
     <div class="callout-label">
       2.7.1: These are the main parameters that we will use to create different LEGO-LIKE brick sizes Favorite them to keep them easily acessible 2. ENTER PARAMETERS
     </div>
@@ -484,7 +518,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.7.0.webp" alt="Main screenshot for step 2.7">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:21.6%; --box-y:20.4%; --box-w:28.3%; --box-h:12.9%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -500,7 +534,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.8.1.webp" alt="Callout image for step 2.8">
+    <img src="images/2/2.8.1.webp" alt="Callout image for step 2.8.1">
     <div class="callout-label">
       2.8.1: ” brick_length ” Here we can use expressions that reference other parameters like “length” (8mm between studs * amount of studs on brick length) – 0.2mm fit tolerance to allow bricks to fit side by side 2. ENTER PARAMETERS
     </div>
@@ -509,7 +543,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.8.0.webp" alt="Main screenshot for step 2.8">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:41.2%; --box-y:35.0%; --box-w:16.2%; --box-h:24.6%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -525,7 +559,7 @@ title: ""
     --highlight-w:23.5%;
     --highlight-h:30.0%;">
   <div class="callout-box">
-    <img src="images/2/2.9.1.webp" alt="Callout image for step 2.9">
+    <img src="images/2/2.9.1.webp" alt="Callout image for step 2.9.1">
     <div class="callout-label">
       2.9.1: Add “ brick_width ” 2. ENTER PARAMETERS
     </div>
@@ -534,7 +568,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.9.0.webp" alt="Main screenshot for step 2.9">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:41.4%; --box-y:35.3%; --box-w:15.9%; --box-h:23.8%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
@@ -550,7 +584,7 @@ title: ""
     --highlight-w:53.0%;
     --highlight-h:17.5%;">
   <div class="callout-box">
-    <img src="images/2/2.10.1.webp" alt="Callout image for step 2.10">
+    <img src="images/2/2.10.1.webp" alt="Callout image for step 2.10.1">
     <div class="callout-label">
       2.10.1: Add Stud Parameters 2. ENTER PARAMETERS
     </div>
@@ -559,7 +593,7 @@ title: ""
   <div class="main-panel">
     <div class="main-shot-wrap">
       <img class="main-shot" src="images/2/2.10.0.webp" alt="Main screenshot for step 2.10">
-      <div class="click-highlight" aria-hidden="true"></div>
+      <div class="click-highlight" style="--box-x:23.7%; --box-y:45.0%; --box-w:26.2%; --box-h:8.8%;" aria-hidden="true"></div>
     </div>
   </div>
 </div>
