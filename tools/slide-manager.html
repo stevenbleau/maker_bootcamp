@@ -2,10 +2,9 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — SLIDE MANAGER v1
    ───────────────────────────────────────────────────────────────────────────
-   Wire into a module via its _quarto-dev.yml (not _quarto.yml directly —
-   that would ship this tool in the published deck). See
-   Design/Intro to CAD/_quarto-dev.yml for the pattern. Then run:
-     QUARTO_PROFILE=dev quarto preview deck.qmd
+    Included unconditionally via the module's _quarto.yml (include-after-body)
+    and self-gates to local editing contexts (file://, localhost/127.0.0.1,
+    or ?dev=1), so it ships in the published deck but never activates there.
 
    Adds/deletes content and section slides, renumbering every later slide in
    scope (and renaming their image files/folders to match) so deck.qmd and
@@ -25,6 +24,14 @@
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
 'use strict';
+
+// ── Local-only gate ───────────────────────────────────────────────────────────
+// This tool ships in every deck but only activates in local editing contexts:
+// file:// (double-clicked deck.html), localhost/127.0.0.1 (quarto preview),
+// or an explicit ?dev=1. Any other host → silent no-op.
+if (!(location.protocol === 'file:'
+      || ['localhost', '127.0.0.1'].includes(location.hostname)
+      || new URLSearchParams(location.search).get('dev') === '1')) return;
 
 function whenReady(cb) {
   if (typeof Reveal !== 'undefined' && Reveal.isReady()) { cb(); return; }

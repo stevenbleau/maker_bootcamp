@@ -57,6 +57,14 @@ Render once:
 quarto render deck.qmd
 ```
 
+### Editing tools (local only)
+
+Every deck carries three built-in editing tools — 📐 highlight picker, ✏️ text
+editor, and slide manager (bottom-right buttons). They activate **only locally**:
+when you open `deck.html` directly (`file://`), use `quarto preview`
+(localhost), or append `?dev=1` to the URL. They never activate on the published
+site. Use Chrome for full functionality (file read/write support).
+
 ## Image Conventions
 
 For screenshot-heavy decks, images generally use:
