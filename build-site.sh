@@ -15,7 +15,7 @@ DECKS=(
   "Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2"
   "Design/Intro to DAW's/decks/01-pentatonic-keyboard"
   "Design/Intro to Microcontrollers/decks/01-wokwi-pinball"
-  "Design/Intro to Python/decks/01-hello-python"
+  "Design/Intro to Python/decks/01-intro-to-python"
   "Design/Intro to Vector Design/decks/01-intro"
   "Make/Intro to Sewing/decks/01-intro-to-sewing"
 )

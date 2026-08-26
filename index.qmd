@@ -141,12 +141,12 @@ title: ""
       <div class="mb-card-footer">Open deck</div>
     </a>
 
-    <a class="mb-card" href="Design/Intro to Python/decks/01-hello-python/deck.html" target="_blank">
+    <a class="mb-card" href="Design/Intro to Python/decks/01-intro-to-python/deck.html" target="_blank">
       <div class="mb-card-header">Intro to Python</div>
       <div class="mb-card-body">
         <div class="mb-card-num">01</div>
-        <div class="mb-card-title">Hello Python</div>
-        <div class="mb-card-desc">Getting started with Python — variables, outputs, and first programs.</div>
+        <div class="mb-card-title">Build a Tamagotchi</div>
+        <div class="mb-card-desc">Learn Python from scratch by raising your own virtual pet.</div>
       </div>
       <div class="mb-card-footer">Open deck</div>
     </a>

@@ -4,7 +4,7 @@ This module supports multiple decks.
 
 ## Structure
 
-- `decks/01-hello-python/` = starter Python teaching deck
+- `decks/01-intro-to-python/` = starter Python teaching deck (Tamagotchi course)
 - Add future decks as `decks/02-.../`, `decks/03-.../`, etc.
 
 Each deck folder should contain:
