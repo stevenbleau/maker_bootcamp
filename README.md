@@ -67,18 +67,30 @@ site. Use Chrome for full functionality (file read/write support).
 
 ## Creating a New Deck
 
-Scaffold a new deck — and its parent module when missing — with all boilerplate,
-registered for the site build and smoke-tested in one step:
+Scaffold a template deck right where you're standing — `cd` into the folder that
+should contain it, then:
+
+```bash
+make new-deck
+```
+
+This creates `NN-new-deck/` (next free number among the siblings) with the
+standard skeleton. Rename the folder to its real name whenever you like — the
+site build auto-discovers any `NN-*` folder containing a `deck.qmd`, so
+renaming never breaks anything.
+
+Explicit form (creates under `Design/` regardless of where you're standing, and
+creates the module if missing):
 
 ```bash
 make new-deck MODULE="Intro to Robotics" SLUG=01-first-bot TITLE="First Bot"
 ```
 
-- `MODULE` is created under `Design/` if it doesn't exist yet
-  (`TRACK=Make make new-deck ...` targets the Make track instead)
-- The script registers the deck in `build-site.sh` and prints a ready-to-paste
-  landing-page card for `index.qmd`
-- Bare `make` lists all targets; `make build` builds the full site into `_site/`
+(`TRACK=Make make new-deck ...` targets the Make track.)
+
+After creating a deck, add its landing-page card to `index.qmd` — the command
+prints a ready-to-paste snippet. Bare `make` lists all targets; `make build`
+builds the full site into `_site/`.
 
 ## Image Conventions
 

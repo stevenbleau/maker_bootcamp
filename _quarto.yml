@@ -15,5 +15,5 @@ website:
 # apply a nested directory's _quarto.yml to a file rendered as part of a
 # different (root) project. So this project only renders index.qmd; every
 # deck is rendered separately via its own project by build-site.sh, which
-# then assembles everything into _site/. Keep this comment and that list in
-# sync with build-site.sh's DECKS array.
+# auto-discovers every NN-named deck folder under Design/, Make/, and Create/
+# and assembles everything into _site/.
