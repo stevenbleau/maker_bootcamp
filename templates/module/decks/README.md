@@ -1,0 +1,27 @@
+# Deck Organization
+
+This module supports multiple decks (for different parts of the project).
+
+## Structure
+
+- `decks/01-.../` = first deck
+- Add future decks as `decks/02-.../`, `decks/03-.../`, etc.
+
+Each deck folder should contain:
+
+- `deck.qmd` (slides)
+- `PLAN.md` (deck-specific plan and notes — gitignored)
+- `images/` (deck-specific image assets)
+
+Shared module-level assets stay at module root:
+
+- `_quarto.yml`
+- `theme/`
+
+All image assets should live inside each deck's own `images/` folder.
+
+## Notes
+
+- No root-level deck or image content is maintained.
+- New work should be created under `decks/`.
+- New decks are created with `make new-deck` (see the repo README).

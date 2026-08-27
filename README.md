@@ -65,6 +65,21 @@ when you open `deck.html` directly (`file://`), use `quarto preview`
 (localhost), or append `?dev=1` to the URL. They never activate on the published
 site. Use Chrome for full functionality (file read/write support).
 
+## Creating a New Deck
+
+Scaffold a new deck — and its parent module when missing — with all boilerplate,
+registered for the site build and smoke-tested in one step:
+
+```bash
+make new-deck MODULE="Intro to Robotics" SLUG=01-first-bot TITLE="First Bot"
+```
+
+- `MODULE` is created under `Design/` if it doesn't exist yet
+  (`TRACK=Make make new-deck ...` targets the Make track instead)
+- The script registers the deck in `build-site.sh` and prints a ready-to-paste
+  landing-page card for `index.qmd`
+- Bare `make` lists all targets; `make build` builds the full site into `_site/`
+
 ## Image Conventions
 
 For screenshot-heavy decks, images generally use:

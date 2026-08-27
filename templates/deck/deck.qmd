@@ -1,0 +1,49 @@
+---
+title: "__TITLE__"
+---
+
+<!--
+  NEW DECK SKELETON
+  ─────────────────
+  • Drop screenshots into images/{section}/ using the N.M.I naming convention:
+      N.M.0 = main screenshot, N.M.1+ = callout images (webp preferred)
+  • Slide anatomy: .top-bar, .callout-box (left), .main-panel (right)
+  • Highlight boxes: draw them with the 📐 tool locally, or add
+    <div class="click-highlight" style="--box-x:..%; ..."> by hand
+  • Local editing tools (📐 ✏️ slide manager) activate automatically when
+    you open this deck from localhost or file:// — see the repo README
+-->
+
+# 0.0.0 Overview {.divider}
+
+```{=html}
+<div class="left-panel">
+  <div class="number">0</div>
+  <div class="label">OVERVIEW</div>
+</div>
+<div class="right-panel">
+  <img src="images/0/0.0.0.png" alt="Section divider background for overview">
+</div>
+```
+
+## 0.1 First Step {.content}
+
+```{=html}
+<div class="top-bar">0. OVERVIEW</div>
+
+<div class="screenshot-row">
+  <div class="callout-box">
+    <img src="images/0/0.1.1.png" alt="Callout image for step 0.1">
+    <div class="callout-label">
+      0.1.1: Replace this text with your step instruction.
+    </div>
+    <p class="concept-insight"><strong>*</strong> Add the reason behind this step.</p>
+  </div>
+  <div class="main-panel">
+    <div class="main-shot-wrap">
+      <img class="main-shot" src="images/0/0.1.0.png" alt="Main screenshot for step 0.1">
+      <div class="click-highlight" style="--box-x:10%; --box-y:10%; --box-w:20%; --box-h:12%;" aria-hidden="true"></div>
+    </div>
+  </div>
+</div>
+```
