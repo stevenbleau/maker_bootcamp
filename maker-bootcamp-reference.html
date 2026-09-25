@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Maker Bootcamp — Creation Hubs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&amp;family=Public+Sans:wght@400;500;600;700&amp;family=IBM+Plex+Mono:wght@500&amp;display=swap">
+<style>
+:root{
+  --gold:#F9B754;      /* Gold Spark — creative, playful: highlights */
+  --make:#D37323;      /* Electric Orange — energetic, friendly: Track 01 */
+  --design:#397F89;    /* Blue Book — ambitious, modern: Track 02 */
+  --create:#98012E;    /* Toaster Red — traditional, academic: Track 03 */
+  --on-make:#1B1B1B;   /* white on #D37323 is only ~3.4:1 — use ink */
+  --on-design:#FFFFFF;
+  --on-create:#FFFFFF;
+  --ink:#1B1B1B; --paper:#FFF7EA; --card:#FFFFFF; --tint:#F3EEE4;
+  --text-2:#3D3A35; --text-3:#55524C; --dash:#8A8478;
+}
+body{margin:0;background:#FFF7EA;font-family:"Public Sans",system-ui,-apple-system,"Segoe UI",sans-serif;color:#1B1B1B;-webkit-font-smoothing:antialiased}
+a{color:#1B1B1B}a:hover{color:#000000}
+</style>
+</head>
+<body>
+<div style="width: 1440px; height: 2640px; box-sizing: border-box; background: #FFF7EA; display: flex; flex-direction: column">
+
+<header style="height: 88px; box-sizing: border-box; padding: 0 80px; display: flex; align-items: center; justify-content: space-between">
+<div style="display: flex; align-items: center; gap: 12px">
+<svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="10" fill="#1B1B1B"></rect><circle cx="13" cy="20" r="4" style="fill: var(--make)"></circle><circle cx="20" cy="20" r="4" style="fill: var(--design)"></circle><circle cx="27" cy="20" r="4" style="fill: var(--create)"></circle></svg>
+<div style="display: flex; flex-direction: column; gap: 1px">
+<span style="font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-size: 20px; font-weight: 800; letter-spacing: -0.01em">Maker Bootcamp</span>
+<span style="font-size: 12px; color: #55524C">Creation Hubs · UMN Libraries</span>
+</div>
+</div>
+<nav aria-label="Tracks" style="display: flex; align-items: center; gap: 10px">
+<a href="#make" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--make)"></span>Make</a>
+<a href="#design" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--design)"></span>Design</a>
+<a href="#create" style="display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 16px; border-radius: 999px; text-decoration: none; font-size: 15px; font-weight: 600"><span style="width: 10px; height: 10px; border-radius: 50%; background: var(--create)"></span>Create</a>
+</nav>
+</header>
+
+<section style="padding: 64px 80px 72px; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 48px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 28px">
+<span style="align-self: flex-start; display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 2px solid #1B1B1B; border-radius: 999px; background: var(--gold); font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500">Free &amp; open course · Digital fabrication</span>
+<h1 style="margin: 0; font-family: 'Bricolage Grotesque', system-ui, sans-serif; font-weight: 800; font-size: 104px; line-height: 0.92; letter-spacing: -0.035em">Pick a track.<br><span style="box-shadow: inset 0 -0.28em 0 var(--gold)">Make a thing.</span></h1>
+<p style="margin: 0; max-width: 520px; font-size: 20px; line-height: 1.55; color: #3D3A35">Each track is a line of hands-on stops. Hop on anywhere, open a module's deck, and leave with something you made.</p>
+<div style="display: flex; gap: 14px">
+<a href="#make" style="display: flex; align-items: center; gap: 10px; height: 56px; padding: 0 26px; border-radius: 999px; background: #1B1B1B; color: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 700">Start the Make track<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+<a href="#design" style="display: flex; align-items: center; height: 56px; padding: 0 26px; border-radius: 999px; border: 2px solid #1B1B1B; background: #FFFFFF; text-decoration: none; font-size: 17px; font-weight: 700">See all tracks</a>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 24px; box-shadow: 8px 8px 0 #1B1B1B; padding: 28px 28px 20px">
+<svg width="100%" viewBox="0 0 560 400" role="img" aria-label="Route map: the Make, Design and Create tracks converge on your project">
+<text x="36" y="58" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#1B1B1B">MAKE · 1 STOP</text>
+<path d="M40 86 H160" fill="none" style="stroke: var(--make)" stroke-width="14" stroke-linecap="round"></path>
+<path d="M188 86 H370 Q430 86 450 150 L462 190" fill="none" style="stroke: var(--make)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 26"></path>
+<circle cx="110" cy="86" r="12" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="4"></circle>
+<text x="36" y="178" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#1B1B1B">DESIGN · 4 STOPS</text>
+<path d="M40 206 H440" fill="none" style="stroke: var(--design)" stroke-width="14" stroke-linecap="round"></path>
+<circle cx="90" cy="206" r="12" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="4"></circle>
+<circle cx="170" cy="206" r="12" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="4"></circle>
+<circle cx="250" cy="206" r="12" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="4"></circle>
+<circle cx="330" cy="206" r="12" fill="#FFFFFF" stroke="#1B1B1B" stroke-width="4"></circle>
+<text x="36" y="298" font-family="IBM Plex Mono, monospace" font-size="13" font-weight="500" fill="#1B1B1B">CREATE · UNDER CONSTRUCTION</text>
+<path d="M40 326 H370 Q430 326 450 262 L462 222" fill="none" style="stroke: var(--create)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 26"></path>
+<circle cx="488" cy="206" r="30" style="fill: var(--gold)" stroke="#1B1B1B" stroke-width="4"></circle>
+<path d="M476 206 l8 8 l16 -16" fill="none" stroke="#1B1B1B" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></path>
+<text x="488" y="266" text-anchor="middle" font-family="Bricolage Grotesque, sans-serif" font-size="17" font-weight="800" fill="#1B1B1B">Your project</text>
+</svg>
+</div>
+</section>
+
+<section aria-label="How it works" style="margin: 0 80px; padding: 28px 36px; border: 2px solid #1B1B1B; border-radius: 20px; background: #FFFFFF; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px">
+<div style="display: flex; align-items: center; gap: 16px">
+<span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--make); color: var(--on-make); display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px">1</span>
+<span style="font-size: 17px; font-weight: 600">Choose a track</span>
+</div>
+<div style="display: flex; align-items: center; gap: 16px">
+<span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--design); color: var(--on-design); display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px">2</span>
+<span style="font-size: 17px; font-weight: 600">Open a module deck</span>
+</div>
+<div style="display: flex; align-items: center; gap: 16px">
+<span style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 50%; background: var(--create); color: var(--on-create); display: flex; align-items: center; justify-content: center; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 20px">3</span>
+<span style="font-size: 17px; font-weight: 600">Make the thing, then take the next stop</span>
+</div>
+</section>
+
+<section id="make" style="padding: 96px 80px 0; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; padding: 36px 40px; border-radius: 24px; background: var(--make); color: var(--on-make)">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500">Track 01</span>
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; letter-spacing: -0.03em">Make</h2>
+</div>
+<p style="margin: 0; max-width: 380px; font-size: 18px; line-height: 1.5; text-align: right">Get your hands on the machines and turn materials into objects.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 4px solid #1B1B1B; background: #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500">1</span><span style="flex-grow: 1; height: 10px; margin-right: -24px; background: var(--make)"></span></div>
+<article style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 18px; box-shadow: 5px 5px 0 #1B1B1B">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #F3EEE4; color: var(--make); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="6" cy="6" r="3"></circle><circle cx="6" cy="18" r="3"></circle><path d="M20 4L8.1 15.9"></path><path d="M14.5 14.5L20 20"></path><path d="M8.1 8.1L12 12"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #55524C">Intro to Sewing</span>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1">Drawstring Bag</h3>
+</div>
+<p style="margin: 0; flex-grow: 1; font-size: 15px; line-height: 1.55; color: #3D3A35">Thread a machine, prep fabric, sew a seam, and finish a drawstring bag from start to end.</p>
+<a href="#" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--make); color: var(--on-make); text-decoration: none; font-size: 15px; font-weight: 700">Open deck<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+
+<div style="grid-column: span 3; display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; height: 40px"><span style="flex-grow: 1; height: 0; border-top: 10px dotted var(--make)"></span></div>
+<div style="flex-grow: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; border: 2px dashed #8A8478; border-radius: 18px; text-align: center; padding: 32px">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 28px">More stops being built</span>
+<span style="font-size: 16px; color: #55524C">New Make modules will land on this line.</span>
+</div>
+</div>
+
+</div>
+</section>
+
+<section id="design" style="padding: 96px 80px 0; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; padding: 36px 40px; border-radius: 24px; background: var(--design); color: var(--on-design)">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500">Track 02</span>
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; letter-spacing: -0.03em">Design</h2>
+</div>
+<p style="margin: 0; max-width: 380px; font-size: 18px; line-height: 1.5; text-align: right">Model it, draw it, code it, hear it. The digital side of making.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px">
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 4px solid #1B1B1B; background: #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500">1</span><span style="flex-grow: 1; height: 10px; margin-right: -24px; background: var(--design)"></span></div>
+<article style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 18px; box-shadow: 5px 5px 0 #1B1B1B">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #F3EEE4; color: var(--design); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z"></path><path d="M12 12l8-4.5"></path><path d="M12 12v9"></path><path d="M12 12L4 7.5"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #55524C">Intro to CAD</span>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1">CAD Level 2</h3>
+</div>
+<p style="margin: 0; flex-grow: 1; font-size: 15px; line-height: 1.55; color: #3D3A35">Parametric design in Autodesk Fusion — sketch, dimension, extrude, fit tolerances, and stud patterns.</p>
+<a href="#" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--design); color: var(--on-design); text-decoration: none; font-size: 15px; font-weight: 700">Open deck<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 4px solid #1B1B1B; background: #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500">2</span><span style="flex-grow: 1; height: 10px; margin-right: -24px; background: var(--design)"></span></div>
+<article style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 18px; box-shadow: 5px 5px 0 #1B1B1B">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #F3EEE4; color: var(--design); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 19l7-7 3 3-7 7-3-3z"></path><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path><path d="M2 2l7.6 7.6"></path><circle cx="11" cy="11" r="2"></circle></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #55524C">Intro to Vector Design</span>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1">Intro</h3>
+</div>
+<p style="margin: 0; flex-grow: 1; font-size: 15px; line-height: 1.55; color: #3D3A35">Foundations of vector design tools and concepts.</p>
+<a href="#" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--design); color: var(--on-design); text-decoration: none; font-size: 15px; font-weight: 700">Open deck<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 4px solid #1B1B1B; background: #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500">3</span><span style="flex-grow: 1; height: 10px; margin-right: -24px; background: var(--design)"></span></div>
+<article style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 18px; box-shadow: 5px 5px 0 #1B1B1B">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #F3EEE4; color: var(--design); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 6l-6 6 6 6"></path><path d="M16 6l6 6-6 6"></path><path d="M14 4l-4 16"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #55524C">Intro to Python</span>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1">Hello Python</h3>
+</div>
+<p style="margin: 0; flex-grow: 1; font-size: 15px; line-height: 1.55; color: #3D3A35">Getting started with Python — variables, outputs, and first programs.</p>
+<a href="#" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--design); color: var(--on-design); text-decoration: none; font-size: 15px; font-weight: 700">Open deck<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center"><span style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 50%; border: 4px solid #1B1B1B; background: #FFFFFF; box-sizing: border-box; display: flex; align-items: center; justify-content: center; font-family: 'IBM Plex Mono', monospace; font-size: 13px; font-weight: 500">4</span><span style="flex-grow: 1; height: 10px; background: var(--design); border-radius: 0 999px 999px 0"></span></div>
+<article style="flex-grow: 1; display: flex; flex-direction: column; gap: 16px; padding: 24px; background: #FFFFFF; border: 2px solid #1B1B1B; border-radius: 18px; box-shadow: 5px 5px 0 #1B1B1B">
+<div style="width: 48px; height: 48px; border-radius: 12px; background: #F3EEE4; color: var(--design); display: flex; align-items: center; justify-content: center"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12h2"></path><path d="M7 8v8"></path><path d="M11 4v16"></path><path d="M15 7v10"></path><path d="M19 10v4"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'IBM Plex Mono', monospace; font-size: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.04em; color: #55524C">Intro to DAWs</span>
+<h3 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 26px; line-height: 1.1">Pentatonic Keyboard</h3>
+</div>
+<p style="margin: 0; flex-grow: 1; font-size: 15px; line-height: 1.55; color: #3D3A35">Introduction to digital audio workstations using a pentatonic keyboard project.</p>
+<a href="#" style="align-self: flex-start; display: flex; align-items: center; gap: 8px; height: 44px; padding: 0 18px; border-radius: 999px; background: var(--design); color: var(--on-design); text-decoration: none; font-size: 15px; font-weight: 700">Open deck<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg></a>
+</article>
+</div>
+
+</div>
+</section>
+
+<section id="create" style="padding: 96px 80px 0; display: flex; flex-direction: column; gap: 40px">
+<div style="display: flex; align-items: flex-end; justify-content: space-between; padding: 36px 40px; border-radius: 24px; background: var(--create); color: var(--on-create)">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace; font-size: 14px; font-weight: 500">Track 03</span>
+<h2 style="margin: 0; font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 72px; line-height: 1; letter-spacing: -0.03em">Create</h2>
+</div>
+<p style="margin: 0; max-width: 380px; font-size: 18px; line-height: 1.5; text-align: right">Where design and making meet in your own original project.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 20px">
+<div style="display: flex; align-items: center; height: 40px"><span style="flex-grow: 1; height: 0; border-top: 10px dotted var(--create)"></span></div>
+<div style="display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 32px 36px; border: 2px dashed #8A8478; border-radius: 18px">
+<div style="display: flex; align-items: center; gap: 20px">
+<span style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 14px; background: var(--gold); border: 2px solid #1B1B1B; display: flex; align-items: center; justify-content: center"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#1B1B1B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 20h20"></path><path d="M5 20l3-12h8l3 12"></path><path d="M9.5 12h5"></path><path d="M8.5 16h7"></path></svg></span>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 28px">Track under construction</span>
+<span style="font-size: 16px; color: #55524C">Decks for this track are in progress. Finish Make and Design to be ready when it opens.</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<footer style="margin: auto 80px 0; padding: 40px 0 48px; border-top: 2px solid #1B1B1B; display: flex; justify-content: space-between; align-items: center; font-size: 14px; color: #3D3A35">
+<span>University of Minnesota Libraries · Engagement, Outreach &amp; Community Partnerships</span>
+<span style="font-family: 'IBM Plex Mono', ui-monospace, monospace">Creation Hubs / Maker Bootcamp</span>
+</footer>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,459 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   MAKER BOOTCAMP — LANDING PAGE STYLESHEET (redesign)
+   ─────────────────────────────────────────────────────────────────────────────
+   Visual source of truth: maker-bootcamp-reference.html (approved design).
+   Structure/rules per maker-bootcamp-dev-handoff.md.
+
+   EDIT GUIDE:
+     • Track/brand colors          → :root brand tokens (see contrast rule)
+     • Fonts                       → :root font tokens (swap in one place)
+     • Spacing/radii/shadows       → :root shape tokens
+     • Responsive breakpoints      → @media blocks at the bottom
+   CONTRAST RULE: text sitting on a track color must hit ≥4.5:1. If a track
+   color changes, re-check it and flip its --on-* token between --ink and
+   #FFFFFF. (White on Electric Orange #D37323 is only ~3.4:1 — that is why
+   --on-make is ink.)
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+:root {
+  /* Brand */
+  --gold: #F9B754;      /* Gold Spark — highlights, not a track color */
+  --make: #D37323;      /* Electric Orange — Track 01 Make */
+  --design: #397F89;    /* Blue Book — Track 02 Design */
+  --create: #98012E;    /* Toaster Red — Track 03 Create */
+
+  /* Text on track colors (WCAG AA — see contrast rule above) */
+  --on-make: #1B1B1B;
+  --on-design: #FFFFFF;
+  --on-create: #FFFFFF;
+
+  /* Neutrals */
+  --ink: #1B1B1B;
+  --paper: #FFF7EA;
+  --card: #FFFFFF;
+  --tint: #F3EEE4;
+  --text-2: #3D3A35;
+  --text-3: #55524C;
+  --dash: #8A8478;
+
+  /* Fonts */
+  --font-display: 'Bricolage Grotesque', system-ui, sans-serif;
+  --font-body: 'Public Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', monospace;
+
+  /* Shape */
+  --pad: clamp(20px, 5vw, 80px);
+  /* Content track: fills the window exactly like the 1440px design comp
+     (1280 content + 80px padding) and keeps adapting up to 1600px content
+     on wide/full-screen windows, then holds centered. */
+  --content-w: 1600px;
+  --radius-card: 18px;
+  --radius-banner: 24px;
+  --shadow-card: 5px 5px 0 var(--ink);
+  --shadow-card-hover: 3px 3px 0 var(--ink);
+  --border-w: 2px;
+}
+
+/* ── Break out of Quarto's article-width page grid ────────────────────────── */
+html, body { background: var(--paper); }
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+#quarto-content { display: block; }
+#quarto-document-content {
+  max-width: var(--content-w);
+  margin: 0 auto;
+  padding: 0 var(--pad);
+  box-sizing: border-box;
+}
+#title-block-header { display: none; }
+
+a { color: var(--ink); }
+a:hover { color: #000; }
+
+/* ── Header ────────────────────────────────────────────────────────────────── */
+.mb-header {
+  min-height: 88px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  padding: 16px 0;
+}
+.mb-logo { display: flex; align-items: center; gap: 12px; }
+.mb-logo-name {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+.mb-logo-sub { font-size: 12px; color: var(--text-3); }
+.mb-nav { display: flex; align-items: center; gap: 10px; }
+.mb-nav a {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 16px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 600;
+}
+.mb-nav .mb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+/* ── Hero ──────────────────────────────────────────────────────────────────── */
+.mb-hero {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 48px;
+  padding: 64px 0 72px;
+}
+.mb-hero-copy { display: flex; flex-direction: column; gap: 28px; }
+.mb-badge {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 999px;
+  background: var(--gold);
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+.mb-hero h1 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(56px, 9vw, 104px);
+  line-height: 0.92;
+  letter-spacing: -0.035em;
+}
+.mb-hero h1 .mb-highlight { box-shadow: inset 0 -0.28em 0 var(--gold); }
+.mb-hero p {
+  margin: 0;
+  max-width: 520px;
+  font-size: 20px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.mb-hero-actions { display: flex; gap: 14px; flex-wrap: wrap; }
+.mb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 26px;
+  border-radius: 999px;
+  text-decoration: none;
+  font-size: 17px;
+  font-weight: 700;
+  box-sizing: border-box;
+}
+.mb-btn-primary { background: var(--ink); color: #FFFFFF; }
+.mb-btn-secondary { border: var(--border-w) solid var(--ink); background: var(--card); }
+
+/* ── How it works ──────────────────────────────────────────────────────────── */
+.mb-steps {
+  padding: 28px 36px;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 20px;
+  background: var(--card);
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 32px;
+}
+.mb-step { display: flex; align-items: center; gap: 16px; }
+.mb-step-num {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 20px;
+}
+.mb-step span:last-child { font-size: 17px; font-weight: 600; }
+
+/* ── Track sections ────────────────────────────────────────────────────────── */
+.mb-track { padding: 96px 0 0; scroll-margin-top: 24px; }
+.mb-banner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 36px 40px;
+  border-radius: var(--radius-banner);
+  background: var(--track);
+  color: var(--on-track);
+}
+.mb-banner-kicker {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.mb-banner h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: clamp(44px, 6vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+.mb-banner .mb-banner-blurb {
+  margin: 0;
+  max-width: 380px;
+  font-size: 18px;
+  line-height: 1.5;
+  text-align: right;
+}
+
+/* Route grid: stop markers joined by a thick line, cards below */
+.mb-stops {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 24px;
+  margin-top: 40px;
+}
+.mb-stop-col { display: flex; flex-direction: column; gap: 20px; }
+.mb-stop-row { display: flex; align-items: center; }
+.mb-stop-marker {
+  width: 40px;
+  height: 40px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  border: 4px solid var(--ink);
+  background: var(--card);
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+}
+.mb-stop-line { flex-grow: 1; height: 10px; margin-right: -24px; background: var(--track); }
+.mb-stop-col.is-final .mb-stop-line { margin-right: 0; border-radius: 0 999px 999px 0; }
+
+/* Module card */
+.mb-card {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 24px;
+  background: var(--card);
+  border: var(--border-w) solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.mb-card-img, .mb-card-ph {
+  width: calc(100% + 48px);
+  margin: -24px -24px 0;
+  aspect-ratio: 1 / 1;
+  display: block;
+  border-bottom: var(--border-w) solid var(--ink);
+  box-sizing: border-box;
+}
+.mb-card-img {
+  object-fit: cover;
+  object-position: center;
+}
+.mb-card-ph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--tint);
+}
+.mb-card-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: var(--tint);
+  color: var(--track);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb-card-icon--ph {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--card);
+  color: var(--track);
+}
+.mb-card-icon--ph svg { width: 36px; height: 36px; }
+.mb-card-eyebrow {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-3);
+  margin-bottom: 4px;
+}
+.mb-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 26px;
+  line-height: 1.1;
+}
+.mb-card p {
+  margin: 0;
+  flex-grow: 1;
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--text-2);
+}
+.mb-deck-btn {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  background: var(--track);
+  color: var(--on-track);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+/* Placeholders / construction */
+.mb-dotted {
+  height: 0;
+  border-top: 10px dotted var(--track);
+  margin-top: 20px;
+}
+.mb-dash-box {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: var(--border-w) dashed var(--dash);
+  border-radius: var(--radius-card);
+  text-align: center;
+  padding: 32px;
+}
+.mb-dash-title {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+}
+.mb-dash-note { font-size: 16px; color: var(--text-3); }
+.mb-stop-col--placeholder { grid-column: 2 / -1; }
+.mb-construction {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.mb-construction .mb-dash-box {
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 20px;
+  text-align: left;
+  padding: 32px 36px;
+}
+.mb-construction-icon {
+  width: 56px;
+  height: 56px;
+  flex-shrink: 0;
+  border-radius: 14px;
+  background: var(--gold);
+  border: var(--border-w) solid var(--ink);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Footer ────────────────────────────────────────────────────────────────── */
+.mb-footer {
+  margin-top: 96px;
+  padding: 40px 0 48px;
+  border-top: var(--border-w) solid var(--ink);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 14px;
+  color: var(--text-2);
+}
+.mb-footer-mono { font-family: var(--font-mono); }
+
+/* ── Focus & motion ────────────────────────────────────────────────────────── */
+:where(a, button):focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html { scroll-behavior: smooth; }
+  .mb-card, .mb-btn, .mb-deck-btn { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .mb-card:hover, .mb-card:focus-within { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
+  .mb-btn:hover, .mb-deck-btn:hover { transform: translate(2px, 2px); }
+  .mb-btn:active, .mb-deck-btn:active, .mb-card:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
+}
+
+/* ── Responsive ────────────────────────────────────────────────────────────── */
+
+/* 2 cards per row */
+@media (max-width: 1100px) {
+  .mb-stops { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .mb-stop-col--placeholder { grid-column: 2 / -1; }
+}
+
+/* Hero stacks above→below 900px */
+@media (max-width: 900px) {
+  .mb-hero { padding: 40px 0 48px; gap: 40px; }
+  .mb-banner { flex-direction: column; align-items: flex-start; }
+  .mb-banner .mb-banner-blurb { text-align: left; }
+}
+
+/* 1 card per row + vertical route below 700px */
+@media (max-width: 700px) {
+  .mb-steps { grid-template-columns: 1fr; }
+  .mb-stops { grid-template-columns: minmax(0, 1fr); }
+  .mb-stop-col, .mb-stop-col--placeholder {
+    position: relative;
+    padding-left: 56px;
+  }
+  .mb-stop-col::before {
+    content: "";
+    position: absolute;
+    left: 15px;
+    top: 0;
+    bottom: 0;
+    width: 10px;
+    background: var(--track);
+  }
+  .mb-stop-col:last-child::before { bottom: auto; height: 25px; }
+  .mb-stop-row { position: absolute; left: 0; top: 0; }
+  .mb-stop-line { display: none; }
+  .mb-stop-col--placeholder .mb-dotted { display: none; }
+  .mb-construction .mb-dash-box { flex-direction: column; align-items: center; text-align: center; }
+  .mb-nav a { padding: 0 14px; }
+  .mb-nav a .mb-nav-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+}

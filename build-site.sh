@@ -11,6 +11,13 @@ cd "$(dirname "$0")"
 rm -rf _site
 quarto render
 
+# Landing page resources. Quarto normally copies referenced assets
+# automatically; copy explicitly so the landing page never depends on
+# Quarto's resource detection.
+mkdir -p _site/assets
+cp -R assets/. _site/assets/
+cp modules.js _site/
+
 DECKS=(
   "Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2"
   "Design/Intro to DAW's/decks/01-pentatonic-keyboard"
