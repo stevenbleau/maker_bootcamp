@@ -49,7 +49,7 @@ window.MB_DATA = {
       modules: [
         {
           course: "Intro to CAD",
-          title: "CAD Level 2",
+          title: "Toy Brick Character",
           icon: "cube",
           image: "assets/card-images/intro-to-cad.jpg",
           description: "Parametric design in Autodesk Fusion — sketch, dimension, extrude, fit tolerances, and stud patterns.",
@@ -57,7 +57,7 @@ window.MB_DATA = {
         },
         {
           course: "Intro to Vector Design",
-          title: "Intro to Vector Design",
+          title: "Marble Maze",
           icon: "pen",
           image: "assets/card-images/intro-to-vector-design.jpg",
           description: "Foundations of vector design tools and concepts.",
