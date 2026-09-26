@@ -20,6 +20,7 @@ title: ""
     <a href="#make"><span class="mb-dot" style="background: var(--make)"></span><span class="mb-nav-label">Make</span></a>
     <a href="#design"><span class="mb-dot" style="background: var(--design)"></span><span class="mb-nav-label">Design</span></a>
     <a href="#create"><span class="mb-dot" style="background: var(--create)"></span><span class="mb-nav-label">Create</span></a>
+    <a href="about.html"><span class="mb-dot" style="background: var(--gold)"></span><span class="mb-nav-label">About</span></a>
   </nav>
 </header>
 
