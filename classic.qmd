@@ -128,10 +128,10 @@ title: ""
   }
 </style>
 
-<a class="mb-classic-link" href="index.html">Try the new layout →</a>
+<a class="mb-classic-link" href="home.html">Try the new layout →</a>
 
 <div class="mb-hero">
-  <h1>Maker Bootcamp</h1>
+  <h1>Creation Studios</h1>
   <p>Select a module below to open its deck</p>
 </div>
 

@@ -9,25 +9,20 @@ title: ""
 <link rel="stylesheet" href="assets/site.css">
 
 <header class="mb-header">
-  <div class="mb-logo">
+  <a class="mb-logo" href="home.html" aria-label="Creation Studios home" style="text-decoration:none;color:inherit">
     <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="10" fill="#1B1B1B"></rect><circle cx="13" cy="20" r="4" style="fill: var(--make)"></circle><circle cx="20" cy="20" r="4" style="fill: var(--design)"></circle><circle cx="27" cy="20" r="4" style="fill: var(--create)"></circle></svg>
     <div>
-      <div class="mb-logo-name">Maker Bootcamp</div>
-      <div class="mb-logo-sub">Creation Hubs · UMN Libraries</div>
+      <div class="mb-logo-name">Creation Studios</div>
+      <div class="mb-logo-sub">UMN Libraries · Creation Hubs</div>
     </div>
-  </div>
-  <nav class="mb-nav" aria-label="Tracks">
-    <a href="#make"><span class="mb-dot" style="background: var(--make)"></span><span class="mb-nav-label">Make</span></a>
-    <a href="#design"><span class="mb-dot" style="background: var(--design)"></span><span class="mb-nav-label">Design</span></a>
-    <a href="#create"><span class="mb-dot" style="background: var(--create)"></span><span class="mb-nav-label">Create</span></a>
-    <a href="about.html"><span class="mb-dot" style="background: var(--gold)"></span><span class="mb-nav-label">About</span></a>
-  </nav>
+  </a>
+  <nav class="mb-nav" aria-label="Studios"></nav>
 </header>
 
-<main>
+<main data-mb-site="maker">
   <section class="mb-hero" aria-label="Introduction">
     <div class="mb-hero-copy">
-      <span class="mb-badge">Free &amp; open course · Digital fabrication</span>
+      <span class="mb-badge">Maker Studio · Digital fabrication</span>
       <h1>Pick a track.<br><span class="mb-highlight">Make a thing.</span></h1>
       <p>Each track is a line of hands-on stops. Hop on anywhere, open a module's deck, and leave with something you made.</p>
       <div class="mb-hero-actions">
@@ -48,7 +43,7 @@ title: ""
 
 <footer class="mb-footer">
   <span>University of Minnesota Libraries · Engagement, Outreach &amp; Community Partnerships</span>
-  <span class="mb-footer-mono">Creation Hubs / Maker Bootcamp · <a href="classic.html">classic layout</a></span>
+  <span class="mb-footer-mono">creationstudios.org · <a href="home.html">home</a> · <a href="classic.html">classic layout</a></span>
 </footer>
 
 <script src="modules.js"></script>

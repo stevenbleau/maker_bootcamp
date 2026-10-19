@@ -1,10 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — LANDING PAGE RENDERER
    ─────────────────────────────────────────────────────────────────────────────
-   Renders everything data-driven from window.MB_DATA (modules.js):
-     • the "How it works" step colors (track order)
-     • each track banner, route row, module card, and placeholder
-   No framework, no fetch — works on GitHub Pages and from file://.
+    Renders everything data-driven from window.MB_DATA (modules.js):
+      • the studio nav (home / maker / media / dev), active via [data-mb-site]
+      • the "How it works" step colors (track order)
+      • each track banner, route row, module card, and placeholder,
+        filtered to the current page's site (track.site === data-mb-site)
+    No framework, no fetch — works on GitHub Pages and from file://.
    Edit content in modules.js; edit styling in assets/site.css.
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -29,13 +31,41 @@
   const arrow = (s) => '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>';
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  // ── How it works — number circles cycle the track colors ──────────────────
+  // ── Current page ───────────────────────────────────────────────────────────
+  // Each page's <main> (or header) carries data-mb-site: home | maker | media |
+  // dev. The nav highlights it and renderTracks() shows only that site's tracks.
+  const PAGES = [
+    { id: 'home', label: 'Home', href: 'home.html' },
+    { id: 'maker', label: 'Maker', href: 'index.html' },
+    { id: 'media', label: 'Media', href: 'media.html' },
+    { id: 'dev', label: 'Dev', href: 'dev.html' }
+  ];
+  const siteEl = document.querySelector('[data-mb-site]');
+  const SITE = siteEl ? siteEl.getAttribute('data-mb-site') : '';
+  const siteTracks = (id) => DATA.tracks.filter((t) => t.site === (id || SITE));
+
+  // ── Nav: home / maker / media / dev ────────────────────────────────────────
+  function renderNav() {
+    const el = document.querySelector('.mb-nav');
+    if (!el) return;
+    el.setAttribute('aria-label', 'Studios');
+    el.innerHTML = PAGES.map((p) => {
+      const active = p.id === SITE;
+      return '<a href="' + esc(p.href) + '"' +
+        (active ? ' class="is-active" aria-current="page"' : '') + '>' +
+        esc(p.label) + '</a>';
+    }).join('');
+  }
+
+  // ── How it works — number circles cycle the current site's track colors ───
   function renderSteps() {
     const el = document.getElementById('mb-steps');
     if (!el) return;
+    const tracks = siteTracks(SITE);
+    if (!tracks.length) { el.innerHTML = ''; return; }
     const steps = ['Choose a track', 'Open a module deck', 'Make the thing, then take the next stop'];
     el.innerHTML = steps.map((label, i) => {
-      const t = DATA.tracks[i % DATA.tracks.length];
+      const t = tracks[i % tracks.length];
       return '<div class="mb-step">' +
         '<span class="mb-step-num" style="background: var(--' + esc(t.id) + '); color: var(--on-' + esc(t.id) + ')">' + (i + 1) + '</span>' +
         '<span>' + esc(label) + '</span></div>';
@@ -84,7 +114,7 @@
   function renderTracks() {
     const el = document.getElementById('mb-tracks');
     if (!el) return;
-    el.innerHTML = DATA.tracks.map((t) => {
+    el.innerHTML = siteTracks(SITE).map((t) => {
       const n = t.modules.length;
       let route;
       if (t.status !== 'construction' && n > 0) {
@@ -109,7 +139,7 @@
             '<span class="mb-construction-icon">' + icon('construction', 26) + '</span>' +
             '<span style="display:flex;flex-direction:column;gap:4px">' +
               '<span class="mb-dash-title">Track under construction</span>' +
-              '<span class="mb-dash-note">Decks for this track are in progress. Finish Make and Design to be ready when it opens.</span>' +
+              '<span class="mb-dash-note">' + esc(t.constructionNote || 'Decks for this track are in progress.') + '</span>' +
             '</span></div></div>';
       }
       return '<section id="' + esc(t.id) + '" class="mb-track" aria-labelledby="' + esc(t.id) + '-title" ' +
@@ -122,6 +152,7 @@
     }).join('');
   }
 
+  renderNav();
   renderSteps();
   renderTracks();
 })();

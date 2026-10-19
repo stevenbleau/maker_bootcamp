@@ -1,0 +1,46 @@
+---
+title: ""
+---
+
+```{=html}
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="assets/site.css">
+
+<header class="mb-header">
+  <a class="mb-logo" href="home.html" aria-label="Creation Studios home" style="text-decoration:none;color:inherit">
+    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="10" fill="#1B1B1B"></rect><circle cx="13" cy="20" r="4" style="fill: var(--make)"></circle><circle cx="20" cy="20" r="4" style="fill: var(--design)"></circle><circle cx="27" cy="20" r="4" style="fill: var(--create)"></circle></svg>
+    <div>
+      <div class="mb-logo-name">Creation Studios</div>
+      <div class="mb-logo-sub">UMN Libraries · Creation Hubs</div>
+    </div>
+  </a>
+  <nav class="mb-nav" aria-label="Studios"></nav>
+</header>
+
+<main data-mb-site="media">
+  <section class="mb-hero" aria-label="Media studio introduction">
+    <div class="mb-hero-copy">
+      <span class="mb-badge">Media Studio</span>
+      <h1>Capture.<br>Produce.<br><span class="mb-highlight">Create.</span></h1>
+      <p>The media studio takes footage and sound from empty room to finished piece. Tracks are on the line — decks land as they're built.</p>
+      <div class="mb-hero-actions">
+        <a class="mb-btn mb-btn-secondary" href="home.html">Back to home</a>
+      </div>
+    </div>
+  </section>
+
+  <div id="mb-tracks">
+    <noscript><p style="padding:40px 0;font-size:18px">This page lists tracks and modules with a small script. The <a href="classic.html">classic layout</a> works without JavaScript.</p></noscript>
+  </div>
+</main>
+
+<footer class="mb-footer">
+  <span>University of Minnesota Libraries · Engagement, Outreach &amp; Community Partnerships</span>
+  <span class="mb-footer-mono">creationstudios.org · <a href="home.html">home</a> · <a href="classic.html">classic layout</a></span>
+</footer>
+
+<script src="modules.js"></script>
+<script src="assets/site.js"></script>
+```

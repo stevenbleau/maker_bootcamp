@@ -21,6 +21,11 @@
 //   rendered but its copy stays on file.
 //   To add a track:  append an object to `tracks` AND add the matching
 //     color tokens to assets/site.css :root — see the contrast rule there.
+//   Each track has a `site` ("maker" | "media" | "dev") that decides which
+//     studio page renders it (assets/site.js filters on it). Pages carry
+//     data-mb-site and the header's nav (home / maker / media / dev) is
+//     rendered by assets/site.js — keep page hrefs in sync with the
+//     render list in _quarto.yml.
 //
 //   Track order here is the taught order: Make → Design → Create.
 // ═══════════════════════════════════════════════════════════════════════════
@@ -28,6 +33,7 @@ window.MB_DATA = {
   tracks: [
     {
       id: "make",
+      site: "maker",
       number: "01",
       name: "Make",
       status: "active",
@@ -81,6 +87,7 @@ window.MB_DATA = {
     },
     {
       id: "design",
+      site: "maker",
       number: "02",
       name: "Design",
       status: "active",
@@ -126,10 +133,72 @@ window.MB_DATA = {
     },
     {
       id: "create",
+      site: "maker",
       number: "03",
       name: "Create",
       status: "construction",
       blurb: "Where design and making meet in your own original project.",
+      constructionNote: "Decks for this track are in progress. Finish Make and Design to be ready when it opens.",
+      modules: []
+    },
+    {
+      id: "capture",
+      site: "media",
+      number: "01",
+      name: "Capture",
+      status: "construction",
+      blurb: "Cameras, mics, and light — get the footage and sound.",
+      constructionNote: "Decks for this track are in progress.",
+      modules: []
+    },
+    {
+      id: "produce",
+      site: "media",
+      number: "02",
+      name: "Produce",
+      status: "construction",
+      blurb: "Edit, mix, and shape what you captured into a finished piece.",
+      constructionNote: "Decks for this track are in progress.",
+      modules: []
+    },
+    {
+      id: "create-media",
+      site: "media",
+      number: "03",
+      name: "Create",
+      status: "construction",
+      blurb: "Where capture and production meet in your own original project.",
+      constructionNote: "Decks for this track are in progress.",
+      modules: []
+    },
+    {
+      id: "launch",
+      site: "dev",
+      number: "01",
+      name: "Launch",
+      status: "construction",
+      blurb: "Tools and publishing — get a project live.",
+      constructionNote: "Decks for this track are in progress.",
+      modules: []
+    },
+    {
+      id: "develop",
+      site: "dev",
+      number: "02",
+      name: "Develop",
+      status: "construction",
+      blurb: "Code, iterate, and build software projects that work.",
+      constructionNote: "Decks for this track are in progress.",
+      modules: []
+    },
+    {
+      id: "create-dev",
+      site: "dev",
+      number: "03",
+      name: "Create",
+      status: "construction",
+      blurb: "Where launch and development meet in your own original project.",
+      constructionNote: "Decks for this track are in progress.",
       modules: []
     }
   ],

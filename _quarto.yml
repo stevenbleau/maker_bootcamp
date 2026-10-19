@@ -2,12 +2,15 @@ project:
   type: website
   output-dir: _site
   render:
+    - home.qmd
     - index.qmd
+    - media.qmd
+    - dev.qmd
     - classic.qmd
     - about.qmd
 
 website:
-  title: "Maker Bootcamp"
+  title: "Creation Studios"
   navbar: false
 
 # Each module deck below is its OWN Quarto project (see its _quarto.yml:
@@ -15,7 +18,8 @@ website:
 # render list would silently drop that config and fall back to a plain
 # HTML/bootstrap document instead of the revealjs deck — Quarto does not
 # apply a nested directory's _quarto.yml to a file rendered as part of a
-# different (root) project. So this project only renders index.qmd; every
-# deck is rendered separately via its own project by build-site.sh, which
-# then assembles everything into _site/. Keep this comment and that list in
-# sync with build-site.sh's DECKS array.
+# different (root) project. So this project only renders the landing pages
+# (home / maker / media / dev / classic / about); every deck is rendered
+# separately via its own project by build-site.sh, which then assembles
+# everything into _site/. Keep this comment and that list in sync with
+# build-site.sh's DECKS array.
