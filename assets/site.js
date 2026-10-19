@@ -102,7 +102,7 @@
     const footer = soon
       ? '<span class="mb-deck-btn mb-deck-btn--soon">Coming soon</span>'
       : '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
-          'aria-label="Open deck: ' + esc(m.title) + ' (opens in a new tab)">Open deck ' + arrow() + '</a>';
+          'aria-label="Open module: ' + esc(m.title) + ' (opens in a new tab)">Open module ' + arrow() + '</a>';
     return '<div class="mb-stop-col' + (soon ? ' is-soon' : '') + '">' +
       '<div class="mb-stop-row"><span class="mb-stop-marker">' + num + '</span><span class="mb-stop-line"></span></div>' +
       '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '">' : '">') +

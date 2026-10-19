@@ -147,7 +147,7 @@ title: ""
         <div class="mb-card-title">Toy Brick Character</div>
         <div class="mb-card-desc">Parametric design in Autodesk Fusion — sketch, dimension, extrude, fit tolerances, and stud patterns.</div>
       </div>
-      <div class="mb-card-footer">Open deck</div>
+      <div class="mb-card-footer">Open module</div>
     </a>
 
     <a class="mb-card" href="Design/Intro to Vector Design/decks/01-intro/deck.html" target="_blank">
@@ -157,7 +157,7 @@ title: ""
         <div class="mb-card-title">Marble Maze</div>
         <div class="mb-card-desc">Foundations of vector design tools and concepts.</div>
       </div>
-      <div class="mb-card-footer">Open deck</div>
+      <div class="mb-card-footer">Open module</div>
     </a>
 
     <div class="mb-card mb-coming-soon">
@@ -187,7 +187,7 @@ title: ""
         <div class="mb-card-title">Pinball Machine</div>
         <div class="mb-card-desc">Embedded programming fundamentals — sensors, loops, and game logic in a pinball machine project.</div>
       </div>
-      <div class="mb-card-footer">Open deck</div>
+      <div class="mb-card-footer">Open module</div>
     </a>
 
   </div>
@@ -202,7 +202,7 @@ title: ""
         <div class="mb-card-title">Drawstring Bag</div>
         <div class="mb-card-desc">Thread a machine, prep fabric, sew a seam, and finish a drawstring bag from start to end.</div>
       </div>
-      <div class="mb-card-footer">Open deck</div>
+      <div class="mb-card-footer">Open module</div>
     </a>
 
     <div class="mb-card mb-coming-soon">
