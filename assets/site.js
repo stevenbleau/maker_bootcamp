@@ -1,10 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════════════
    MAKER BOOTCAMP — LANDING PAGE RENDERER
    ─────────────────────────────────────────────────────────────────────────────
-   Renders everything data-driven from window.MB_DATA (modules.js):
-     • the "How it works" step colors (track order)
-     • each track banner, route row, module card, and placeholder
-   No framework, no fetch — works on GitHub Pages and from file://.
+    Renders everything data-driven from window.MB_DATA (modules.js):
+      • the studio nav (home / maker / media / dev), active via [data-mb-site]
+      • the "How it works" step colors (track order)
+      • each track banner, route row, module card, and placeholder,
+        filtered to the current page's site (track.site === data-mb-site)
+    No framework, no fetch — works on GitHub Pages and from file://.
    Edit content in modules.js; edit styling in assets/site.css.
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -19,7 +21,10 @@
     pen: '<path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.6 7.6"/><circle cx="11" cy="11" r="2"/>',
     code: '<path d="M8 6l-6 6 6 6"/><path d="M16 6l6 6-6 6"/><path d="M14 4l-4 16"/>',
     waveform: '<path d="M3 12h2"/><path d="M7 8v8"/><path d="M11 4v16"/><path d="M15 7v10"/><path d="M19 10v4"/>',
-    construction: '<path d="M2 20h20"/><path d="M5 20l3-12h8l3 12"/><path d="M9.5 12h5"/><path d="M8.5 16h7"/>'
+    construction: '<path d="M2 20h20"/><path d="M5 20l3-12h8l3 12"/><path d="M9.5 12h5"/><path d="M8.5 16h7"/>',
+    camera: '<rect x="3" y="7" width="18" height="13" rx="2"/><path d="M8 7l1.5-2.5h5L16 7"/><circle cx="12" cy="13.5" r="3.5"/>',
+    monitor: '<rect x="2" y="4" width="20" height="14" rx="2"/><path d="M12 18v3"/><path d="M8 21h8"/>',
+    image: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/>'
   };
   const icon = (name, size) => {
     const s = size || 24;
@@ -29,13 +34,41 @@
   const arrow = (s) => '<svg width="' + (s || 16) + '" height="' + (s || 16) + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14"></path><path d="M13 6l6 6-6 6"></path></svg>';
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  // ── How it works — number circles cycle the track colors ──────────────────
+  // ── Current page ───────────────────────────────────────────────────────────
+  // Each page's <main> (or header) carries data-mb-site: home | maker | media |
+  // dev. The nav highlights it and renderTracks() shows only that site's tracks.
+  const PAGES = [
+    { id: 'home', label: 'Home', href: 'home.html' },
+    { id: 'maker', label: 'Maker', href: 'index.html' },
+    { id: 'media', label: 'Media', href: 'media.html' },
+    { id: 'dev', label: 'Dev', href: 'dev.html' }
+  ];
+  const siteEl = document.querySelector('[data-mb-site]');
+  const SITE = siteEl ? siteEl.getAttribute('data-mb-site') : '';
+  const siteTracks = (id) => DATA.tracks.filter((t) => t.site === (id || SITE));
+
+  // ── Nav: home / maker / media / dev ────────────────────────────────────────
+  function renderNav() {
+    const el = document.querySelector('.mb-nav');
+    if (!el) return;
+    el.setAttribute('aria-label', 'Studios');
+    el.innerHTML = PAGES.map((p) => {
+      const active = p.id === SITE;
+      return '<a href="' + esc(p.href) + '"' +
+        (active ? ' class="is-active" aria-current="page"' : '') + '>' +
+        esc(p.label) + '</a>';
+    }).join('');
+  }
+
+  // ── How it works — number circles cycle the current site's track colors ───
   function renderSteps() {
     const el = document.getElementById('mb-steps');
     if (!el) return;
+    const tracks = siteTracks(SITE);
+    if (!tracks.length) { el.innerHTML = ''; return; }
     const steps = ['Choose a track', 'Open a module deck', 'Make the thing, then take the next stop'];
     el.innerHTML = steps.map((label, i) => {
-      const t = DATA.tracks[i % DATA.tracks.length];
+      const t = tracks[i % tracks.length];
       return '<div class="mb-step">' +
         '<span class="mb-step-num" style="background: var(--' + esc(t.id) + '); color: var(--on-' + esc(t.id) + ')">' + (i + 1) + '</span>' +
         '<span>' + esc(label) + '</span></div>';
@@ -60,30 +93,38 @@
     img.outerHTML = placeholderSlot(img.dataset.icon);
   };
 
+  // Placeholder modules (no deckUrl) render as a muted "Coming soon" card:
+  // same card shell, but the media slot stays a placeholder and the deck
+  // button becomes a non-interactive dashed chip.
   function cardHTML(m, t, num) {
-    return '<div class="mb-stop-col">' +
+    const soon = !m.deckUrl;
+    const media = soon ? placeholderSlot(m.icon) : mediaSlot(m);
+    const footer = soon
+      ? '<span class="mb-deck-btn mb-deck-btn--soon">Coming soon</span>'
+      : '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
+          'aria-label="Open module: ' + esc(m.title) + ' (opens in a new tab)">Open module ' + arrow() + '</a>';
+    return '<div class="mb-stop-col' + (soon ? ' is-soon' : '') + '">' +
       '<div class="mb-stop-row"><span class="mb-stop-marker">' + num + '</span><span class="mb-stop-line"></span></div>' +
-      '<article class="mb-card">' +
-        mediaSlot(m) +
+      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '">' : '">') +
+        media +
         '<div><span class="mb-card-eyebrow">' + esc(m.course) + '</span>' +
         '<h3>' + esc(m.title) + '</h3></div>' +
         '<p>' + esc(m.description) + '</p>' +
-        '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
-          'aria-label="Open deck: ' + esc(m.title) + ' (opens in a new tab)">Open deck ' + arrow() + '</a>' +
+        footer +
       '</article></div>';
   }
 
   function renderTracks() {
     const el = document.getElementById('mb-tracks');
     if (!el) return;
-    el.innerHTML = DATA.tracks.map((t) => {
+    el.innerHTML = siteTracks(SITE).map((t) => {
       const n = t.modules.length;
       let route;
       if (t.status !== 'construction' && n > 0) {
         const cols = t.modules.map((m, i) => {
           const html = cardHTML(m, t, i + 1);
           const isFinalRowEnd = n >= 4 && i === n - 1;
-          return html.replace('class="mb-stop-col"', 'class="mb-stop-col' + (isFinalRowEnd ? ' is-final' : '') + '"');
+          return html.replace('class="mb-stop-col', 'class="mb-stop-col' + (isFinalRowEnd ? ' is-final' : ''));
         }).join('');
         const placeholder = n < 4
           ? '<div class="mb-stop-col mb-stop-col--placeholder">' +
@@ -101,7 +142,7 @@
             '<span class="mb-construction-icon">' + icon('construction', 26) + '</span>' +
             '<span style="display:flex;flex-direction:column;gap:4px">' +
               '<span class="mb-dash-title">Track under construction</span>' +
-              '<span class="mb-dash-note">Decks for this track are in progress. Finish Make and Design to be ready when it opens.</span>' +
+              '<span class="mb-dash-note">' + esc(t.constructionNote || 'Decks for this track are in progress.') + '</span>' +
             '</span></div></div>';
       }
       return '<section id="' + esc(t.id) + '" class="mb-track" aria-labelledby="' + esc(t.id) + '-title" ' +
@@ -114,6 +155,7 @@
     }).join('');
   }
 
+  renderNav();
   renderSteps();
   renderTracks();
 })();

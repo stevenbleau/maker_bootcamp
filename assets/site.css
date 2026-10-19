@@ -18,14 +18,26 @@
 :root {
   /* Brand */
   --gold: #F9B754;      /* Gold Spark — highlights, not a track color */
-  --make: #D37323;      /* Electric Orange — Track 01 Make */
-  --design: #397F89;    /* Blue Book — Track 02 Design */
-  --create: #98012E;    /* Toaster Red — Track 03 Create */
+  --make: #D37323;      /* Electric Orange — Maker: Make */
+  --design: #397F89;    /* Blue Book — Maker: Design */
+  --create: #98012E;    /* Toaster Red — Maker: Create */
+  --capture: #2A6F97;   /* Harbor Blue — Media: Capture */
+  --produce: #B08908;   /* Mustard Gold — Media: Produce */
+  --create-media: #5B3A8E; /* Plum — Media: Create (unique id: --create) */
+  --launch: #4A4E8C;    /* Slate Indigo — Dev: Launch */
+  --develop: #3E5641;   /* Forest Pine — Dev: Develop */
+  --create-dev: #8C2F39; /* Brick — Dev: Create (unique id: --create) */
 
   /* Text on track colors (WCAG AA — see contrast rule above) */
   --on-make: #1B1B1B;
   --on-design: #FFFFFF;
   --on-create: #FFFFFF;
+  --on-capture: #FFFFFF;
+  --on-produce: #1B1B1B;
+  --on-create-media: #FFFFFF;
+  --on-launch: #FFFFFF;
+  --on-develop: #FFFFFF;
+  --on-create-dev: #FFFFFF;
 
   /* Neutrals */
   --ink: #1B1B1B;
@@ -107,6 +119,58 @@ a:hover { color: #000; }
   font-weight: 600;
 }
 .mb-nav .mb-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.mb-nav a.is-active { background: var(--ink); color: #FFFFFF; }
+
+/* ── Studio cards (home page) ──────────────────────────────────────────────── */
+.mb-home-grid { display: grid; gap: 28px; padding-top: 24px; }
+.mb-studio-card {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
+  padding: 32px 36px;
+  background: var(--card);
+  border: var(--border-w) solid var(--ink);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  text-decoration: none;
+  color: var(--ink);
+}
+.mb-studio-card .mb-studio-icon {
+  width: 72px;
+  height: 72px;
+  border-radius: 18px;
+  background: var(--tint);
+  color: var(--studio, var(--ink));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.mb-studio-card .mb-studio-icon svg { width: 34px; height: 34px; }
+.mb-studio-card h2 {
+  margin: 0 0 8px;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 28px;
+  line-height: 1.1;
+}
+.mb-studio-card p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--text-2); }
+.mb-studio-tracks { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+.mb-studio-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 14px;
+  border: var(--border-w) solid var(--ink);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  background: var(--tint);
+}
+.mb-studio-pill .mb-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+@media (max-width: 700px) {
+  .mb-studio-card { grid-template-columns: minmax(0, 1fr); padding: 24px; }
+}
 
 /* ── Hero ──────────────────────────────────────────────────────────────────── */
 .mb-hero {
@@ -336,6 +400,14 @@ a:hover { color: #000; }
   font-size: 15px;
   font-weight: 700;
 }
+/* Placeholder ("coming soon") card: muted shell, dashed non-interactive chip */
+.mb-card--soon { box-shadow: none; opacity: 0.75; }
+.mb-deck-btn--soon {
+  border: 2px dashed var(--dash);
+  background: transparent;
+  color: var(--text-3);
+  font-weight: 600;
+}
 
 /* Placeholders / construction */
 .mb-dotted {
@@ -411,10 +483,11 @@ a:hover { color: #000; }
 
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
-  .mb-card, .mb-btn, .mb-deck-btn { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-  .mb-card:hover, .mb-card:focus-within { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
-  .mb-btn:hover, .mb-deck-btn:hover { transform: translate(2px, 2px); }
-  .mb-btn:active, .mb-deck-btn:active, .mb-card:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
+  .mb-card, .mb-btn, .mb-deck-btn, .mb-studio-card { transition: transform 0.15s ease, box-shadow 0.15s ease; }
+  .mb-studio-card:hover { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
+  .mb-card:not(.mb-card--soon):hover, .mb-card:not(.mb-card--soon):focus-within { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
+  .mb-btn:hover, .mb-deck-btn:not(.mb-deck-btn--soon):hover { transform: translate(2px, 2px); }
+  .mb-btn:active, .mb-deck-btn:not(.mb-deck-btn--soon):active, .mb-card:not(.mb-card--soon):active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */
