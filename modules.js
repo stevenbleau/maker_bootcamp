@@ -215,6 +215,12 @@ window.MB_DATA = {
           title: "Digital Illustration",
           icon: "pen",
           description: "From sketch to finished artwork — brushes, layers, and digital painting."
+        },
+        {
+          course: "Intro to 3D Rendering",
+          title: "Ispy Page",
+          icon: "cube",
+          description: "Model, light, and render a 3D scene — from first blockout to a finished rendered page."
         }
       ]
     },
