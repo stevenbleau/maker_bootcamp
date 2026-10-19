@@ -8,8 +8,8 @@
 //   To add a module:  append an object to the track's `modules` array.
 //     • course    → mono eyebrow text (the module/course name)
 //     • title     → card headline (the deck's project name)
-//     • icon      → one of: scissors | cube | pen | code | waveform
-//                   (icon paths live in assets/site.js ICONS)
+//     • icon      → one of: scissors | cube | pen | code | waveform |
+//                   camera | monitor | image (icon paths in assets/site.js ICONS)
 //     • image     → OPTIONAL card illustration, relative to the site root
 //                   (put files in assets/card-images/; omit the field to
 //                   render the card without a picture)
@@ -146,20 +146,77 @@ window.MB_DATA = {
       site: "media",
       number: "01",
       name: "Capture",
-      status: "construction",
+      status: "active",
       blurb: "Cameras, mics, and light — get the footage and sound.",
-      constructionNote: "Decks for this track are in progress.",
-      modules: []
+      placeholderNote: "New Capture modules will land on this line.",
+      modules: [
+        {
+          course: "Intro to MIDI Controllers",
+          title: "MIDI Controller",
+          icon: "waveform",
+          description: "Wire, power, and program a hands-on MIDI controller for live performance."
+        },
+        {
+          course: "Intro to Audio Interfaces",
+          title: "Audio Interface",
+          icon: "waveform",
+          description: "Connect, configure, and record clean audio through a studio interface."
+        },
+        {
+          course: "Intro to Drawing Tablets",
+          title: "Drawing Tablet",
+          icon: "pen",
+          description: "Pen tablet fundamentals — pressure, shortcuts, and sketching to final art."
+        },
+        {
+          course: "Intro to Photography",
+          title: "Camera Photography",
+          icon: "camera",
+          description: "Composition, exposure, and workflow — shooting stills on an interchangeable-lens camera."
+        },
+        {
+          course: "Intro to Videography",
+          title: "Camera Videography",
+          icon: "camera",
+          description: "Handheld camera, framing, and motion — capturing clean video."
+        }
+      ]
     },
     {
       id: "produce",
       site: "media",
       number: "02",
       name: "Produce",
-      status: "construction",
+      status: "active",
       blurb: "Edit, mix, and shape what you captured into a finished piece.",
-      constructionNote: "Decks for this track are in progress.",
-      modules: []
+      placeholderNote: "New Produce modules will land on this line.",
+      modules: [
+        {
+          course: "Intro to DAWs",
+          title: "Pentatonic Keyboard",
+          icon: "waveform",
+          description: "Introduction to digital audio workstations using a pentatonic keyboard project.",
+          deckUrl: "Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.html"
+        },
+        {
+          course: "Intro to Non-Linear Editors",
+          title: "Non-Linear Editor",
+          icon: "monitor",
+          description: "Cut, assemble, and finish video in a non-linear editing system."
+        },
+        {
+          course: "Intro to Photo Editors",
+          title: "Photo Editor",
+          icon: "image",
+          description: "Retouch, grade, and composite photos in the editor of your choice."
+        },
+        {
+          course: "Intro to Digital Illustration",
+          title: "Digital Illustration",
+          icon: "pen",
+          description: "From sketch to finished artwork — brushes, layers, and digital painting."
+        }
+      ]
     },
     {
       id: "create-media",
@@ -203,6 +260,7 @@ window.MB_DATA = {
     }
   ],
   // Retired modules — kept for reference, not rendered by the landing page.
+  // (Intro to DAWs left this list: it's live again under Media → Produce.)
   archived: [
     {
       course: "Intro to Python",
@@ -210,13 +268,6 @@ window.MB_DATA = {
       icon: "code",
       description: "Getting started with Python — variables, outputs, and first programs.",
       deckUrl: "Design/Intro to Python/decks/01-hello-python/deck.html"
-    },
-    {
-      course: "Intro to DAWs",
-      title: "Pentatonic Keyboard",
-      icon: "waveform",
-      description: "Introduction to digital audio workstations using a pentatonic keyboard project.",
-      deckUrl: "Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.html"
     }
   ]
 };
