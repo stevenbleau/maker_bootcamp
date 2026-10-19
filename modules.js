@@ -17,8 +17,9 @@
 //                   (must match an entry in build-site.sh's DECKS array).
 //                   OMIT this field for a placeholder card — the renderer
 //                   shows a muted "Coming soon" card with no link instead.
-//   To retire a module:  move it to the `archived` array below so it is not
-//   rendered but its copy stays on file.
+//   To retire a module:  remove it from a track's `modules` array (or move it
+//   to an `archived: []` top-level array so its copy stays on file — the
+//   renderer ignores anything outside `tracks`).
 //   To add a track:  append an object to `tracks` AND add the matching
 //     color tokens to assets/site.css :root — see the contrast rule there.
 //   Each track has a `site` ("maker" | "media" | "dev") that decides which
@@ -239,20 +240,71 @@ window.MB_DATA = {
       site: "dev",
       number: "01",
       name: "Launch",
-      status: "construction",
+      status: "active",
       blurb: "Tools and publishing — get a project live.",
-      constructionNote: "Decks for this track are in progress.",
-      modules: []
+      placeholderNote: "New Launch modules will land on this line.",
+      modules: [
+        {
+          course: "Intro to Version Control",
+          title: "Version Control",
+          icon: "code",
+          description: "Track changes and collaborate — commits, branches, and merges."
+        },
+        {
+          course: "Intro to the Command Line",
+          title: "Command Line Interface",
+          icon: "monitor",
+          description: "Navigate, build, and script from a terminal — the interface under every tool."
+        },
+        {
+          course: "Intro to Python",
+          title: "Hello Python",
+          icon: "code",
+          description: "Getting started with Python — variables, outputs, and first programs.",
+          deckUrl: "Design/Intro to Python/decks/01-hello-python/deck.html"
+        },
+        {
+          course: "Intro to Agentic Coding",
+          title: "Agentic Coding",
+          icon: "code",
+          description: "Direct coding agents to write, test, and review software alongside you."
+        }
+      ]
     },
     {
       id: "develop",
       site: "dev",
       number: "02",
       name: "Develop",
-      status: "construction",
+      status: "active",
       blurb: "Code, iterate, and build software projects that work.",
-      constructionNote: "Decks for this track are in progress.",
-      modules: []
+      placeholderNote: "New Develop modules will land on this line.",
+      modules: [
+        {
+          course: "Intro to Game Development",
+          title: "Game Development",
+          icon: "cube",
+          description: "Build a playable game — loop, input, collision, and a finished build."
+        },
+        {
+          course: "Intro to Web Development",
+          title: "Web Development",
+          icon: "monitor",
+          description: "From HTML to a deployed site — structure, style, and behavior in the browser."
+        },
+        {
+          course: "Intro to App Development",
+          title: "App Development",
+          icon: "code",
+          description: "Design, build, and package a native app from first screen to store-ready."
+        },
+        {
+          course: "Intro to XR Development",
+          title: "XR Development",
+          icon: "cube",
+          description: "Design and build for extended reality — VR, AR, and spatial interfaces."
+        }
+      ]
     },
     {
       id: "create-dev",
@@ -263,17 +315,6 @@ window.MB_DATA = {
       blurb: "Where launch and development meet in your own original project.",
       constructionNote: "Decks for this track are in progress.",
       modules: []
-    }
-  ],
-  // Retired modules — kept for reference, not rendered by the landing page.
-  // (Intro to DAWs left this list: it's live again under Media → Produce.)
-  archived: [
-    {
-      course: "Intro to Python",
-      title: "Hello Python",
-      icon: "code",
-      description: "Getting started with Python — variables, outputs, and first programs.",
-      deckUrl: "Design/Intro to Python/decks/01-hello-python/deck.html"
     }
   ]
 };
