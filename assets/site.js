@@ -72,7 +72,7 @@
           'aria-label="Open deck: ' + esc(m.title) + ' (opens in a new tab)">Open deck ' + arrow() + '</a>';
     return '<div class="mb-stop-col' + (soon ? ' is-soon' : '') + '">' +
       '<div class="mb-stop-row"><span class="mb-stop-marker">' + num + '</span><span class="mb-stop-line"></span></div>' +
-      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '"' : '">') +
+      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '">' : '">') +
         media +
         '<div><span class="mb-card-eyebrow">' + esc(m.course) + '</span>' +
         '<h3>' + esc(m.title) + '</h3></div>' +
@@ -91,7 +91,7 @@
         const cols = t.modules.map((m, i) => {
           const html = cardHTML(m, t, i + 1);
           const isFinalRowEnd = n >= 4 && i === n - 1;
-          return html.replace('class="mb-stop-col"', 'class="mb-stop-col' + (isFinalRowEnd ? ' is-final' : '') + '"');
+          return html.replace('class="mb-stop-col', 'class="mb-stop-col' + (isFinalRowEnd ? ' is-final' : ''));
         }).join('');
         const placeholder = n < 4
           ? '<div class="mb-stop-col mb-stop-col--placeholder">' +
