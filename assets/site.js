@@ -60,16 +60,24 @@
     img.outerHTML = placeholderSlot(img.dataset.icon);
   };
 
+  // Placeholder modules (no deckUrl) render as a muted "Coming soon" card:
+  // same card shell, but the media slot stays a placeholder and the deck
+  // button becomes a non-interactive dashed chip.
   function cardHTML(m, t, num) {
-    return '<div class="mb-stop-col">' +
+    const soon = !m.deckUrl;
+    const media = soon ? placeholderSlot(m.icon) : mediaSlot(m);
+    const footer = soon
+      ? '<span class="mb-deck-btn mb-deck-btn--soon">Coming soon</span>'
+      : '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
+          'aria-label="Open deck: ' + esc(m.title) + ' (opens in a new tab)">Open deck ' + arrow() + '</a>';
+    return '<div class="mb-stop-col' + (soon ? ' is-soon' : '') + '">' +
       '<div class="mb-stop-row"><span class="mb-stop-marker">' + num + '</span><span class="mb-stop-line"></span></div>' +
-      '<article class="mb-card">' +
-        mediaSlot(m) +
+      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '"' : '">') +
+        media +
         '<div><span class="mb-card-eyebrow">' + esc(m.course) + '</span>' +
         '<h3>' + esc(m.title) + '</h3></div>' +
         '<p>' + esc(m.description) + '</p>' +
-        '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
-          'aria-label="Open deck: ' + esc(m.title) + ' (opens in a new tab)">Open deck ' + arrow() + '</a>' +
+        footer +
       '</article></div>';
   }
 

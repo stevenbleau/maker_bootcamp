@@ -336,6 +336,14 @@ a:hover { color: #000; }
   font-size: 15px;
   font-weight: 700;
 }
+/* Placeholder ("coming soon") card: muted shell, dashed non-interactive chip */
+.mb-card--soon { box-shadow: none; opacity: 0.75; }
+.mb-deck-btn--soon {
+  border: 2px dashed var(--dash);
+  background: transparent;
+  color: var(--text-3);
+  font-weight: 600;
+}
 
 /* Placeholders / construction */
 .mb-dotted {
@@ -412,9 +420,9 @@ a:hover { color: #000; }
 @media (prefers-reduced-motion: no-preference) {
   html { scroll-behavior: smooth; }
   .mb-card, .mb-btn, .mb-deck-btn { transition: transform 0.15s ease, box-shadow 0.15s ease; }
-  .mb-card:hover, .mb-card:focus-within { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
-  .mb-btn:hover, .mb-deck-btn:hover { transform: translate(2px, 2px); }
-  .mb-btn:active, .mb-deck-btn:active, .mb-card:active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
+  .mb-card:not(.mb-card--soon):hover, .mb-card:not(.mb-card--soon):focus-within { transform: translate(2px, 2px); box-shadow: var(--shadow-card-hover); }
+  .mb-btn:hover, .mb-deck-btn:not(.mb-deck-btn--soon):hover { transform: translate(2px, 2px); }
+  .mb-btn:active, .mb-deck-btn:not(.mb-deck-btn--soon):active, .mb-card:not(.mb-card--soon):active { transform: translate(5px, 5px); box-shadow: 0 0 0 var(--ink); }
 }
 
 /* ── Responsive ────────────────────────────────────────────────────────────── */

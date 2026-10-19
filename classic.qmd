@@ -144,7 +144,7 @@ title: ""
       <div class="mb-card-header">Intro to CAD</div>
       <div class="mb-card-body">
         <div class="mb-card-num">01</div>
-        <div class="mb-card-title">CAD Level 2</div>
+        <div class="mb-card-title">Toy Brick Character</div>
         <div class="mb-card-desc">Parametric design in Autodesk Fusion — sketch, dimension, extrude, fit tolerances, and stud patterns.</div>
       </div>
       <div class="mb-card-footer">Open deck</div>
@@ -153,29 +153,39 @@ title: ""
     <a class="mb-card" href="Design/Intro to Vector Design/decks/01-intro/deck.html" target="_blank">
       <div class="mb-card-header">Intro to Vector Design</div>
       <div class="mb-card-body">
-        <div class="mb-card-num">01</div>
-        <div class="mb-card-title">Intro</div>
+        <div class="mb-card-num">02</div>
+        <div class="mb-card-title">Marble Maze</div>
         <div class="mb-card-desc">Foundations of vector design tools and concepts.</div>
       </div>
       <div class="mb-card-footer">Open deck</div>
     </a>
 
-    <a class="mb-card" href="Design/Intro to Python/decks/01-hello-python/deck.html" target="_blank">
-      <div class="mb-card-header">Intro to Python</div>
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to Digital Pattern Making</div>
       <div class="mb-card-body">
-        <div class="mb-card-num">01</div>
-        <div class="mb-card-title">Hello Python</div>
-        <div class="mb-card-desc">Getting started with Python — variables, outputs, and first programs.</div>
+        <div class="mb-card-num">03</div>
+        <div class="mb-card-title">Pajama Pants</div>
+        <div class="mb-card-desc">Draft and refine digital sewing patterns — from measurements to a sewable pajama pant block.</div>
       </div>
-      <div class="mb-card-footer">Open deck</div>
-    </a>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
 
-    <a class="mb-card" href="Design/Intro to DAW's/decks/01-pentatonic-keyboard/deck.html" target="_blank">
-      <div class="mb-card-header">Intro to DAW's</div>
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to ECAD</div>
       <div class="mb-card-body">
-        <div class="mb-card-num">01</div>
-        <div class="mb-card-title">Pentatonic Keyboard</div>
-        <div class="mb-card-desc">Introduction to digital audio workstations using a pentatonic keyboard project.</div>
+        <div class="mb-card-num">04</div>
+        <div class="mb-card-title">Synthesizer</div>
+        <div class="mb-card-desc">Principles of electronic circuit design — layout, simulation, and a buildable pocket synthesizer.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <a class="mb-card" href="Design/Intro to Microcontrollers/decks/01-wokwi-pinball/deck.html" target="_blank">
+      <div class="mb-card-header">Intro to Microcontrollers</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">05</div>
+        <div class="mb-card-title">Pinball Machine</div>
+        <div class="mb-card-desc">Embedded programming fundamentals — sensors, loops, and game logic in a pinball machine project.</div>
       </div>
       <div class="mb-card-footer">Open deck</div>
     </a>
@@ -189,11 +199,71 @@ title: ""
       <div class="mb-card-header">Intro to Sewing</div>
       <div class="mb-card-body">
         <div class="mb-card-num">01</div>
-        <div class="mb-card-title">Intro to Sewing</div>
+        <div class="mb-card-title">Drawstring Bag</div>
         <div class="mb-card-desc">Thread a machine, prep fabric, sew a seam, and finish a drawstring bag from start to end.</div>
       </div>
       <div class="mb-card-footer">Open deck</div>
     </a>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to 3D Printing</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">02</div>
+        <div class="mb-card-title">Benchy</div>
+        <div class="mb-card-desc">FDM 3D printing from model to finished print — slicer settings, supports, and a full benchy run.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to Machine Embroidery</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">03</div>
+        <div class="mb-card-title">Embroidered Patch</div>
+        <div class="mb-card-desc">Machine embroidery fundamentals — digitizing, stabilizing, and finishing a felt patch.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to Vacuum Forming</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">04</div>
+        <div class="mb-card-title">Chocolate Bar Mold</div>
+        <div class="mb-card-desc">Shape thermoplastics with heat and vacuum — design and form a chocolate bar mold.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to CNC Milling</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">05</div>
+        <div class="mb-card-title">PCB</div>
+        <div class="mb-card-desc">Subtractive manufacturing on the CNC mill — fixtures, tool paths, and a finished circuit board.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to Laser Cutting</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">06</div>
+        <div class="mb-card-title">Keychain</div>
+        <div class="mb-card-desc">Vector cutting and scoring on the laser — material prep, settings, and a polished keychain.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
+
+    <div class="mb-card mb-coming-soon">
+      <div class="mb-card-header">Intro to Vinyl Cutting</div>
+      <div class="mb-card-body">
+        <div class="mb-card-num">07</div>
+        <div class="mb-card-title">Sticker</div>
+        <div class="mb-card-desc">Weed and transfer cut vinyl — from digital artwork to a finished sticker.</div>
+      </div>
+      <div class="mb-card-footer">Coming soon</div>
+    </div>
 
   </div>
 
