@@ -24,6 +24,70 @@ project:
 format:
   revealjs:
     theme: [default, ../../theme/maker-bootcamp.scss, theme/overrides.scss]
+    # Brand fonts + slide enhancement (Step pill, gold title highlight).
+    # The enhancement degrades gracefully if the script is absent.
+    header-includes:
+      - |
+          <link rel="preconnect" href="https://fonts.googleapis.com">
+          <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Public+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500&display=swap">
+          <script>
+          (function () {
+            function sentenceCase(s) {
+              if (!s) return s;
+              return s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+            }
+            function enhance() {
+              document.querySelectorAll('.reveal .slides section.content').forEach(function (sec) {
+                var h2 = sec.querySelector(':scope > h2');
+                var topbar = sec.querySelector(':scope > .top-bar');
+                var card = sec.querySelector(':scope .callout-box');
+                if (!h2) return;
+                var text = h2.textContent.trim();
+                var m = text.match(/^(\d+(?:\.\d+)*)\s+(.*)$/);
+                if (!m) return;
+                var num = m[1];                  // step number, e.g. "6.3"
+                var title = m[2];                // step name, e.g. "Select the Bottom Stud"
+                var sectionNum = num.split('.')[0]; // section number, e.g. "6"
+
+                // Section name from the top-bar (e.g. "6. MAKE THE STUD PATTERN"
+                // -> "Make the stud pattern").
+                var sectionName = '';
+                if (topbar) {
+                  var tb = topbar.textContent.trim();
+                  var tbm = tb.match(/^\d+\.\s*(.*)$/);
+                  sectionName = sentenceCase(tbm ? tbm[1] : tb);
+                }
+
+                // MAIN TITLE (h2) = the SECTION: "Section 6" pill + section name.
+                h2.innerHTML = '<span class="step-pill">Section ' + sectionNum + '</span><span class="slide-title">' + sectionName + '</span>';
+
+                // SIDEBAR CARD = the STEP: track header with step number + step title.
+                if (card) {
+                  var header = document.createElement('div');
+                  header.className = 'card-header';
+                  header.innerHTML =
+                    '<div class="card-header__left">' +
+                      '<div class="card-header__module">' + sentenceCase(title) + '</div>' +
+                    '</div>' +
+                    '<div class="card-header__num">' + num + '</div>';
+                  card.insertBefore(header, card.firstChild);
+                }
+
+                // The section label moved to the main title; clear it from the
+                // top-right (the logo ::after stays).
+                if (topbar) {
+                  topbar.textContent = '';
+                }
+              });
+            }
+            if (document.readyState === 'loading') {
+              document.addEventListener('DOMContentLoaded', enhance);
+            } else {
+              enhance();
+            }
+          })();
+          </script>
     width: 1280
     height: 720
     slide-number: false

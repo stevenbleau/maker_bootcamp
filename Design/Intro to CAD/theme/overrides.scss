@@ -1,4 +1,9 @@
 /*-- scss:rules --*/
 // ── Module-specific theme overrides ──────────────────────────────────────────
-// Add only module-specific colour, spacing, or layout changes here.
-// Leave empty to inherit everything from the shared theme unchanged.
+// Intro to CAD sits on the Design track (Blue Book, #397F89). Set the module
+// track colour here so the divider, "Next step" button, and accent text use it.
+// Leave the rest to the shared theme (theme/maker-bootcamp.scss).
+.reveal .slides section {
+  --track: #397F89;
+  --on-track: #FFFFFF;
+}
