@@ -76,7 +76,7 @@ title: ""
 
 <header class="mb-header">
   <a class="mb-logo" href="home.html" aria-label="Creation Studios home" style="text-decoration:none;color:inherit">
-    <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true"><rect x="2" y="2" width="36" height="36" rx="10" fill="#1B1B1B"></rect><circle cx="13" cy="20" r="4" style="fill: var(--make)"></circle><circle cx="20" cy="20" r="4" style="fill: var(--design)"></circle><circle cx="27" cy="20" r="4" style="fill: var(--create)"></circle></svg>
+    <svg width="40" height="40" viewBox="0 0 216 216" aria-hidden="true"><circle cx="107.5" cy="78.82" r="56.66" fill="#e8893a"/><circle cx="76.03" cy="137.58" r="56.66" fill="#3e98a4"/><circle cx="138.98" cy="137.58" r="56.66" fill="#c2234f"/><path d="M51.37,86.56c4.28,31,32.87,52.66,63.87,48.39,5.87-.81,11.57-2.53,16.91-5.11-4.28-31-32.87-52.66-63.87-48.39-5.87.81-11.57,2.53-16.91,5.11Z" fill="#eecfb9"/><path d="M82.85,129.84c28.18,13.62,62.06,1.81,75.67-26.37,2.58-5.33,4.3-11.04,5.11-16.91-28.18-13.62-62.06-1.81-75.67,26.37-2.58,5.33-4.3,11.04-5.11,16.91Z" fill="#f99977"/><path d="M107.5,184.69c26.02-17.39,33.02-52.57,15.63-78.59-4.13-6.19-9.45-11.5-15.63-15.63-26.02,17.39-33.02,52.57-15.63,78.59,4.13,6.19,9.45,11.5,15.63,15.63Z" fill="#d1a6c0"/><path d="M132.16,129.84c-15.57,7.53-33.73,7.53-49.3,0,2.21-16.04,11.19-30.37,24.65-39.37,13.47,9,22.44,23.33,24.65,39.37Z" fill="#fbd6ce"/></svg>
     <div>
       <div class="mb-logo-name">Creation Studios</div>
       <div class="mb-logo-sub">UMN Libraries · Creation Hubs</div>
