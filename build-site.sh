@@ -17,6 +17,7 @@ quarto render
 mkdir -p _site/assets
 cp -R assets/. _site/assets/
 cp modules.js _site/
+cp CNAME _site/
 
 DECKS=(
   "Design/Intro to CAD/decks/autodesk-fusion/01-cad-level-2"
