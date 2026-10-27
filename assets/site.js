@@ -1,12 +1,12 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — LANDING PAGE RENDERER
+   MAKER BOOTCAMP, LANDING PAGE RENDERER
    ─────────────────────────────────────────────────────────────────────────────
     Renders everything data-driven from window.MB_DATA (modules.js):
       • the studio nav (home / maker / media / dev), active via [data-mb-site]
       • the "How it works" step colors (track order)
       • each track banner, route row, module card, and placeholder,
         filtered to the current page's site (track.site === data-mb-site)
-    No framework, no fetch — works on GitHub Pages and from file://.
+    No framework, no fetch, works on GitHub Pages and from file://.
    Edit content in modules.js; edit styling in assets/site.css.
    ═══════════════════════════════════════════════════════════════════════════ */
 (function () {
@@ -60,7 +60,7 @@
     }).join('');
   }
 
-  // ── How it works — number circles cycle the current site's track colors ───
+  // ── How it works, number circles cycle the current site's track colors ───
   function renderSteps() {
     const el = document.getElementById('mb-steps');
     if (!el) return;
@@ -94,18 +94,18 @@
   };
 
   // Placeholder modules (no deckUrl) render as a muted "Coming soon" card:
-  // same card shell, but the media slot stays a placeholder and the deck
-  // button becomes a non-interactive dashed chip.
+  // same card shell, and the deck button becomes a non-interactive dashed chip.
+  // The media slot still shows the card image if one is set, otherwise a placeholder.
   function cardHTML(m, t, num) {
     const soon = !m.deckUrl;
-    const media = soon ? placeholderSlot(m.icon) : mediaSlot(m);
+    const media = m.image ? mediaSlot(m) : placeholderSlot(m.icon);
     const footer = soon
       ? '<span class="mb-deck-btn mb-deck-btn--soon">Coming soon</span>'
       : '<a class="mb-deck-btn" href="' + esc(m.deckUrl) + '" target="_blank" rel="noopener" ' +
           'aria-label="Open module: ' + esc(m.title) + ' (opens in a new tab)">Open module ' + arrow() + '</a>';
     return '<div class="mb-stop-col' + (soon ? ' is-soon' : '') + '">' +
       '<div class="mb-stop-row"><span class="mb-stop-marker">' + num + '</span><span class="mb-stop-line"></span></div>' +
-      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ' — ' + esc(m.title) + '">' : '">') +
+      '<article class="mb-card' + (soon ? ' mb-card--soon" aria-label="Coming soon: ' + esc(m.course) + ', ' + esc(m.title) + '">' : '">') +
         media +
         '<div><span class="mb-card-eyebrow">' + esc(m.course) + '</span>' +
         '<h3>' + esc(m.title) + '</h3></div>' +
