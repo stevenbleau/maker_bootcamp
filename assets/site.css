@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════════════════════
-   MAKER BOOTCAMP — LANDING PAGE STYLESHEET (redesign)
+   MAKER BOOTCAMP, LANDING PAGE STYLESHEET (redesign)
    ─────────────────────────────────────────────────────────────────────────────
    Visual source of truth: maker-bootcamp-reference.html (approved design).
    Structure/rules per maker-bootcamp-dev-handoff.md.
@@ -11,24 +11,24 @@
      • Responsive breakpoints      → @media blocks at the bottom
    CONTRAST RULE: text sitting on a track color must hit ≥4.5:1. If a track
    color changes, re-check it and flip its --on-* token between --ink and
-   #FFFFFF. (White on Electric Orange #D37323 is only ~3.4:1 — that is why
+   #FFFFFF. (White on Electric Orange #D37323 is only ~3.4:1, that is why
    --on-make is ink.)
    ═══════════════════════════════════════════════════════════════════════════ */
 
 :root {
   /* Brand */
-  --gold: #F9B754;      /* Gold Spark — highlights, not a track color */
-  --make: #D37323;      /* Electric Orange — Maker: Make */
-  --design: #397F89;    /* Blue Book — Maker: Design */
-  --create: #98012E;    /* Toaster Red — Maker: Create */
-  --capture: #2A6F97;   /* Harbor Blue — Media: Capture */
-  --produce: #B08908;   /* Mustard Gold — Media: Produce */
-  --create-media: #5B3A8E; /* Plum — Media: Create (unique id: --create) */
-  --launch: #4A4E8C;    /* Slate Indigo — Dev: Launch */
-  --develop: #3E5641;   /* Forest Pine — Dev: Develop */
-  --create-dev: #8C2F39; /* Brick — Dev: Create (unique id: --create) */
+  --gold: #F9B754;      /* Gold Spark, highlights, not a track color */
+  --make: #D37323;      /* Electric Orange, Maker: Make */
+  --design: #397F89;    /* Blue Book, Maker: Design */
+  --create: #98012E;    /* Toaster Red, Maker: Create */
+  --capture: #2A6F97;   /* Harbor Blue, Media: Capture */
+  --produce: #B08908;   /* Mustard Gold, Media: Produce */
+  --create-media: #5B3A8E; /* Plum, Media: Create (unique id: --create) */
+  --launch: #4A4E8C;    /* Slate Indigo, Dev: Launch */
+  --develop: #3E5641;   /* Forest Pine, Dev: Develop */
+  --create-dev: #8C2F39; /* Brick, Dev: Create (unique id: --create) */
 
-  /* Text on track colors (WCAG AA — see contrast rule above) */
+  /* Text on track colors (WCAG AA, see contrast rule above) */
   --on-make: #1B1B1B;
   --on-design: #FFFFFF;
   --on-create: #FFFFFF;
